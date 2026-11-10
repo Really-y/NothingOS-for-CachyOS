@@ -54,10 +54,11 @@ Card {
             anchors.bottomMargin: secs.visible ? Math.round(10 * root.u) : 0
             width: parent.width
 
+            // Digits sit on the bottom padding, left-aligned with the date.
             DotTime {
                 id: wt
-                anchors.centerIn: parent
-                anchors.verticalCenterOffset: Math.round(4 * root.u)
+                anchors.left: parent.left
+                anchors.bottom: parent.bottom
                 hours: root.use24h ? String(root.h24).padStart(2, "0") : String(root.h12)
                 minutes: root.mm
                 colonColor: Theme.red
@@ -101,10 +102,11 @@ Card {
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
             stacked: true
+            gapRows: 1
             hours: String(root.use24h ? root.h24 : root.h12).padStart(2, "0")
             minutes: root.mm
             // 11 columns wide, 16 rows tall; leave room for the date column
-            size: Math.min(sq.height * 10 / (15 + dotRatio), (sq.width - dateCol.width - 8 * root.u) * 10 / (10 + dotRatio))
+            size: Math.min(sq.height * 10 / (14 + dotRatio), (sq.width - dateCol.width - 8 * root.u) * 10 / (10 + dotRatio))
             width: implicitWidth; height: implicitHeight
         }
 

@@ -20,7 +20,7 @@ Rectangle {
         // compact representation on a 36px black panel
         Rectangle {
             width: 360; height: 36; color: "#000000"
-            DotTime { anchors.centerIn: parent; hours: "21"; minutes: "47"; size: 30; dotRatio: 0.8; width: implicitWidth; height: implicitHeight }
+            Text { anchors.centerIn: parent; text: "21:47"; color: Theme.fg; font.family: Theme.mono; font.bold: true; font.pixelSize: 15; font.letterSpacing: 0.5 }
         }
     }
     Clock.DotCalendar { x: 408; y: 24; width: 360; height: 320; today: mock }

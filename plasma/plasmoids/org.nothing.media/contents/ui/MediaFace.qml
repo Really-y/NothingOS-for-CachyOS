@@ -2,10 +2,11 @@ import QtQuick
 import "nothing"
 
 // Nothing now-playing card. Pure view: feed it track data, listen to the signals.
-//  square: full-bleed halftone art, status top-left, title/artist lower-left,
-//          small white play/pause bottom-right
+//  square: posterised halftone dot portrait inside the content box, white
+//          play/pause top-right, status + title + artist in the bottom band
 //  wide:   desaturated art (concentric radius), status, marquee title/artist,
-//          bare prev/next glyphs around a white play circle
+//          dot prev/next glyphs around a white play circle
+//  idle:   vinyl pictogram + "IDLE" in dots
 Card {
     id: root
     property bool hasMedia: false
@@ -39,21 +40,22 @@ Card {
         Label {
             size: Math.max(10, Math.round(10 * root.u))
             color: root.playing ? Theme.red : Theme.fg2
-            text: !root.hasMedia ? "No media" : root.playing ? "Now playing" : "Paused"
+            text: root.playing ? "Now playing" : "Paused"
         }
     }
 
+    // White circle, black dot glyph.
     component PlayButton: Pressable {
         property int diameter: 44
         width: diameter; height: diameter
         enabled: root.canPlayPause
         onClicked: root.playPause()
         Rectangle { anchors.fill: parent; radius: width / 2; color: Theme.fg }
-        Icon {
+        FlatGlyph {
             anchors.centerIn: parent
-            name: root.playing ? "pause" : "play_arrow"
-            size: Math.round(parent.diameter * 0.55)
-            fill: 1
+            anchors.horizontalCenterOffset: root.playing ? 0 : Math.round(parent.diameter * 0.03)
+            width: Math.round(parent.diameter * 0.4); height: width
+            glyph: root.playing ? "pause" : "play"
             color: Theme.bg
         }
     }
@@ -63,82 +65,94 @@ Card {
         property bool can: true
         width: Math.round(36 * root.u); height: width
         enabled: can
-        Icon {
+        FlatGlyph {
             anchors.centerIn: parent
-            name: parent.glyph
-            size: Math.round(22 * root.u)
-            fill: 1
+            width: Math.round(20 * root.u); height: width
+            glyph: parent.glyph
             color: !parent.can ? Theme.fg3 : parent.containsMouse ? Theme.fg : Theme.fg2
         }
     }
 
     // ══ Square ═══════════════════════════════════════════════════════════════
     Item {
+        id: sq
         visible: !root.wide
         anchors.fill: parent
+        anchors.margins: root.padding
 
-        ArtCanvas {
-            anchors.fill: parent
+        // Contained dot-portrait tile above the text band.
+        Rectangle {
             visible: root.hasArt
+            anchors.fill: portrait
+            radius: root.innerRadius
+            color: Theme.bg
+        }
+        ArtCanvas {
+            id: portrait
+            visible: root.hasArt
+            width: Math.round(sq.height - band.height - 12 * root.u); height: width
             source: root.hasArt && !root.wide ? root.artUrl : ""
             mode: "halftone"
-            radius: root.radius
-            pitch: Math.max(4, Math.round(6 * root.u))
+            radius: root.innerRadius
+            pitch: Math.max(3, 3.6 * root.u)
+            fadeTop: 0
+            fadeBottom: 0
+        }
+        // playing without cover art: a note where the portrait would be
+        DotGlyph {
+            visible: root.hasMedia && !root.hasArt
+            x: -pitch * 0.14; y: -pitch * 0.14
+            icon: "note"
+            dimColor: "transparent"
+            litColor: Theme.fg2
+            width: Math.round(sq.height - band.height - 12 * root.u); height: width
+        }
+        PlayButton {
+            visible: root.hasMedia
+            anchors.right: parent.right; anchors.top: parent.top
+            diameter: Math.round(38 * root.u)
+        }
+        Column {
+            id: band
+            visible: root.hasMedia
+            anchors.left: parent.left; anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            spacing: Math.round(4 * root.u)
+            Status { bottomPadding: Math.round(2 * root.u) }
+            Marquee {
+                width: parent.width
+                text: root.title || "Unknown track"
+                color: Theme.fg
+                font.family: Theme.sans
+                font.pixelSize: Math.round(16 * root.u)
+                font.weight: Font.Medium
+            }
+            Marquee {
+                width: parent.width
+                visible: root.artist !== ""
+                text: root.artist
+                color: Theme.fg2
+                font.family: Theme.mono
+                font.pixelSize: Math.max(10, Math.round(10 * root.u))
+            }
         }
 
-        Item {
-            anchors.fill: parent
-            anchors.margins: root.padding
-
-            Status { id: sqStatus }
-
-            // playing / paused
-            Column {
-                visible: root.hasMedia
-                anchors.left: parent.left
-                anchors.right: sqPlay.left; anchors.rightMargin: Math.round(10 * root.u)
-                anchors.bottom: parent.bottom
-                spacing: Math.round(2 * root.u)
-                Marquee {
-                    width: parent.width
-                    text: root.title || "Unknown track"
-                    color: Theme.fg
-                    font.family: Theme.sans
-                    font.pixelSize: Math.round(16 * root.u)
-                    font.weight: Font.Medium
-                }
-                Marquee {
-                    width: parent.width
-                    visible: root.artist !== ""
-                    text: root.artist
-                    color: Theme.fg2
-                    font.family: Theme.mono
-                    font.pixelSize: Math.max(10, Math.round(10 * root.u))
-                }
-            }
-            PlayButton {
-                id: sqPlay
-                visible: root.hasMedia
-                anchors.right: parent.right; anchors.bottom: parent.bottom
-                diameter: Math.round(38 * root.u)
-            }
-
-            // idle, or playing without cover art
-            DotGlyph {
-                visible: !root.hasArt
-                anchors.right: parent.right; anchors.top: parent.top
-                width: Math.round(66 * root.u); height: width
-                icon: root.hasMedia ? "note" : "vinyl"
-                dimColor: "transparent"
-                litColor: Theme.fg2
-            }
-            Column {
-                visible: !root.hasMedia
-                anchors.left: parent.left; anchors.bottom: parent.bottom
-                spacing: Math.round(10 * root.u)
-                DotString { text: "IDLE"; size: Math.max(40, Math.round(44 * root.u)); width: implicitWidth; height: implicitHeight }
-                Label { size: Math.max(10, Math.round(10 * root.u)); color: Theme.fg3; text: "Nothing playing" }
-            }
+        // idle: vinyl + IDLE, nothing else
+        DotGlyph {
+            visible: !root.hasMedia
+            x: -pitch * 0.14; y: -pitch * 0.14
+            width: Math.round(72 * root.u); height: width
+            icon: "vinyl"
+            dimColor: "transparent"
+            litColor: Theme.fg2
+            halfColor: Theme.fg3
+        }
+        DotString {
+            visible: !root.hasMedia
+            anchors.left: parent.left; anchors.bottom: parent.bottom
+            text: "IDLE"
+            size: Math.max(40, Math.round(48 * root.u))
+            width: implicitWidth; height: implicitHeight
         }
     }
 
@@ -156,9 +170,10 @@ Card {
             visible: !artWide.ready
             DotGlyph {
                 anchors.centerIn: parent
-                width: parent.width * 0.66; height: width
+                width: parent.width * 0.62; height: width
                 icon: root.hasMedia ? "note" : "vinyl"
-                litColor: root.hasMedia ? Theme.fg2 : Theme.fg3
+                litColor: root.hasMedia ? Theme.fg2 : Theme.fg2
+                halfColor: Theme.fg3
                 dimColor: "transparent"
             }
         }
@@ -176,7 +191,7 @@ Card {
             anchors.right: parent.right
             anchors.top: parent.top; anchors.bottom: parent.bottom
 
-            Status { id: wStatus; y: Math.round(2 * root.u) }
+            Status { id: wStatus; visible: root.hasMedia; y: Math.round(2 * root.u) }
 
             Column {
                 visible: root.hasMedia
@@ -206,25 +221,22 @@ Card {
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left; anchors.leftMargin: -Math.round(8 * root.u)
                 spacing: Math.round(8 * root.u)
-                SkipButton { anchors.verticalCenter: parent.verticalCenter; glyph: "skip_previous"; can: root.canPrevious; onClicked: root.previous() }
+                SkipButton { anchors.verticalCenter: parent.verticalCenter; glyph: "prev"; can: root.canPrevious; onClicked: root.previous() }
                 PlayButton { diameter: Math.round(46 * root.u) }
-                SkipButton { anchors.verticalCenter: parent.verticalCenter; glyph: "skip_next"; can: root.canNext; onClicked: root.next() }
+                SkipButton { anchors.verticalCenter: parent.verticalCenter; glyph: "next"; can: root.canNext; onClicked: root.next() }
             }
 
-            // idle
-            DotString {
+            // idle: IDLE + one caption
+            Column {
                 visible: !root.hasMedia
-                anchors.verticalCenter: parent.verticalCenter
-                text: "IDLE"
-                size: Math.max(40, Math.round(52 * root.u))
-                width: implicitWidth; height: implicitHeight
-            }
-            Label {
-                visible: !root.hasMedia
-                anchors.bottom: parent.bottom
-                size: Math.max(10, Math.round(10 * root.u))
-                color: Theme.fg3
-                text: "Play something"
+                anchors.left: parent.left; anchors.bottom: parent.bottom
+                spacing: Math.round(12 * root.u)
+                DotString {
+                    text: "IDLE"
+                    size: Math.max(40, Math.round(56 * root.u))
+                    width: implicitWidth; height: implicitHeight
+                }
+                Label { size: Math.max(10, Math.round(10 * root.u)); color: Theme.fg3; text: "No media" }
             }
         }
     }

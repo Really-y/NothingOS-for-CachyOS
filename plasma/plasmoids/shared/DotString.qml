@@ -46,6 +46,7 @@ Canvas {
         const c = getContext("2d");
         c.reset();
         const p = pitch, r = dot / 2;
+        if (!(r > 0)) return;
         const s = String(text);
         let x0 = 0;
         for (let i = 0; i < cells.length; i++) {

@@ -38,15 +38,17 @@ PlasmoidItem {
         hoverEnabled: true
         onClicked: root.expanded = !root.expanded
 
-        DotTime {
+        // Dot type below 40px turns to mush; the panel uses Space Mono.
+        Text {
             id: label
             anchors.centerIn: parent
-            size: Math.max(20, Math.round(compact.thickness * 0.55 / 6.75) * 10)
-            dotRatio: 0.8
-            hours: root.use24h ? Qt.formatTime(root.now, "HH") : String((root.now.getHours() + 11) % 12 + 1)
-            minutes: Qt.formatTime(root.now, "mm")
-            width: implicitWidth; height: implicitHeight
-            opacity: compact.containsMouse || root.expanded ? 1 : 0.9
+            text: root.use24h ? Qt.formatTime(root.now, "HH:mm") : Qt.formatTime(root.now, "h:mm")
+            color: Theme.fg
+            font.family: Theme.mono
+            font.bold: true
+            font.pixelSize: Math.max(11, Math.round(compact.thickness * 0.42))
+            font.letterSpacing: 0.5
+            opacity: compact.containsMouse || root.expanded ? 1 : 0.92
         }
     }
 

@@ -1,7 +1,7 @@
 import QtQuick
 
-// Ring of dots used as a gauge (Nothing widget motif). Lit dots are white,
-// turning red above `warn`.
+// Ring of dots used as a gauge (Nothing widget motif). Lit dots are white;
+// only the lit dots past the `warn` mark turn red.
 Canvas {
     id: root
     property real value: 0
@@ -23,11 +23,12 @@ Canvas {
         ctx.reset();
         const cx = width / 2, cy = height / 2, rad = Math.min(width, height) / 2 - dotSize;
         const lit = Math.round(shown * dots);
+        if (!(rad > 0) || !(dotSize > 0)) return;
         for (let i = 0; i < dots; i++) {
             const a = -Math.PI / 2 + i / dots * Math.PI * 2;
             ctx.beginPath();
             ctx.arc(cx + Math.cos(a) * rad, cy + Math.sin(a) * rad, dotSize / 2, 0, Math.PI * 2);
-            ctx.fillStyle = i < lit ? (shown >= warn ? root.warnColor : root.litColor) : root.trackColor;
+            ctx.fillStyle = i < lit ? (i >= Math.floor(warn * dots) ? root.warnColor : root.litColor) : root.trackColor;
             ctx.fill();
         }
     }

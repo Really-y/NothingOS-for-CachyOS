@@ -13,8 +13,10 @@ Item {
     property string mode: "halftone"     // "halftone" | "mono"
     property real radius: 20
     property real pitch: 6
-    property real fadeTop: 0.36          // fraction of height faded at the top (halftone)
-    property real fadeBottom: 0.55       // ... and at the bottom
+    property real fadeTop: 0             // fraction of height kept clear at the top (halftone)
+    property real fadeBottom: 0.4        // ... and at the bottom (text band)
+    property real fadeRamp: 0.14         // soft ramp beyond the clear bands
+    property int levels: 4               // posterisation levels for dot sizes
     property color matte: Theme.widget   // colour behind the corners (mono mode)
     readonly property bool ready: probe.status === Image.Ready && String(source) !== ""
 
@@ -95,12 +97,16 @@ Item {
                             }
                         let l = n ? sum / n / 255 : 0;
                         const my = cy + p / 2;
-                        // fully clear under the overlaid text bands, soft ramp beyond
-                        const top = Math.min(1, Math.max(0, (my - ft * 0.5) / (ft * 0.5)));
-                        const bot = Math.min(1, Math.max(0, (h - my - fb * 0.5) / (fb * 0.5)));
-                        l *= Math.pow(top * bot, 1.5);
-                        const rad = p * 0.5 * Math.pow(l, 0.8);
-                        if (rad < 0.45 || !inside(cx + p / 2, my, p * 0.5)) continue;
+                        // posterise: clamp the mid-greys, few dot sizes → reads as a dot portrait
+                        l = Math.min(1, Math.max(0, (l - 0.18) / 0.6));
+                        l = Math.round(l * (root.levels - 1)) / (root.levels - 1);
+                        // clear under the text bands, short ramp beyond
+                        const ramp = Math.max(1, h * root.fadeRamp);
+                        const top = ft > 0 ? Math.min(1, Math.max(0, (my - ft) / ramp)) : 1;
+                        const bot = fb > 0 ? Math.min(1, Math.max(0, (h - fb - my) / ramp)) : 1;
+                        l *= top * bot;
+                        const rad = p * 0.46 * l;
+                        if (rad < 0.6 || !inside(cx + p / 2, my, p * 0.5)) continue;
                         c.beginPath();
                         c.arc(cx + p / 2, my, rad, 0, Math.PI * 2);
                         c.fill();

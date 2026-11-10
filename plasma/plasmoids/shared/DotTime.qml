@@ -12,15 +12,16 @@ Item {
     property color colonColor: color
     property real dotRatio: 0.75
     readonly property real pitch: size / 10
-    // gap between stacked rows: two empty dot rows
-    readonly property real rowGap: 2 * pitch + (pitch - pitch * dotRatio)
+    // empty dot rows between stacked hours and minutes
+    property int gapRows: 1
+    readonly property real rowGap: gapRows * pitch + (pitch - pitch * dotRatio)
 
     implicitWidth: stacked ? Math.max(h.implicitWidth, m.implicitWidth) : line.implicitWidth
     implicitHeight: stacked ? h.implicitHeight + rowGap + m.implicitHeight : line.implicitHeight
 
     // Widths for fitting before layout (hh:mm = 25 columns, stacked hh = 11).
     function inlineWidthFor(sz) { return line.widthFor(sz); }
-    function stackedHeightFor(sz) { return (6 + dotRatio) * sz / 10 * 2 + (3 - dotRatio) * sz / 10; }
+    function stackedHeightFor(sz) { return ((6 + dotRatio) * 2 + gapRows + 1 - dotRatio) * sz / 10; }
 
     DotString {
         id: line

@@ -44,13 +44,31 @@ Card {
             dots: 40
             dotSize: Math.max(3, 4 * root.u)
         }
-        DotString {
+        // fitColumns > 0: size for that many dot columns (17 = "100") so
+        // neighbouring gauges share one number size.
+        property int fitColumns: 0
+        property real numberOffset: 0
+        Row {
             anchors.centerIn: parent
-            text: root.pct(g.value)
-            // big, but always inside the ring (3 digits ≈ 17 columns)
-            size: Math.min(g.numberSize, g.width * 0.66 * 10 / (Math.max(columns, 2) - 1 + dotRatio))
-            color: root.ok(g.value) ? Theme.fg : Theme.fg3
-            width: implicitWidth; height: implicitHeight
+            anchors.horizontalCenterOffset: pctSign.visible ? (pctSign.width + spacing) / 2 : 0
+            anchors.verticalCenterOffset: g.numberOffset
+            spacing: Math.round(3 * root.u)
+            DotString {
+                id: num
+                text: root.pct(g.value)
+                size: Math.min(g.numberSize, g.width * 0.58 * 10 / (Math.max(g.fitColumns || columns, 2) - 1 + dotRatio))
+                color: root.ok(g.value) ? Theme.fg : Theme.fg3
+                width: implicitWidth; height: implicitHeight
+            }
+            Text {
+                id: pctSign
+                visible: root.ok(g.value)
+                text: "%"
+                color: Theme.fg2
+                font.family: Theme.mono
+                font.pixelSize: Math.max(10, Math.round(num.size * 0.16))
+                topPadding: -Math.round(font.pixelSize * 0.25)
+            }
         }
     }
 
@@ -65,11 +83,12 @@ Card {
             anchors.centerIn: parent
             width: Math.min(parent.width, parent.height); height: width
             value: root.cpu
-            numberSize: Math.max(40, Math.round(60 * root.u))
+            numberSize: Math.max(40, Math.round(84 * root.u))
         }
         Row {
             anchors.horizontalCenter: hero.horizontalCenter
-            anchors.bottom: hero.verticalCenter; anchors.bottomMargin: Math.round(30 * root.u)
+            anchors.verticalCenter: hero.verticalCenter
+            anchors.verticalCenterOffset: -Math.round(48 * root.u)
             spacing: Math.round(6 * root.u)
             Caption { text: "CPU" }
             Caption {
@@ -80,35 +99,39 @@ Card {
         }
         Caption {
             anchors.horizontalCenter: hero.horizontalCenter
-            anchors.top: hero.verticalCenter; anchors.topMargin: Math.round(30 * root.u)
+            anchors.verticalCenter: hero.verticalCenter
+            anchors.verticalCenterOffset: Math.round(48 * root.u)
             text: root.live ? ("RAM " + root.pct(root.mem) + "%") : "Offline"
             color: root.live ? Theme.fg2 : Theme.fg3
         }
     }
 
-    // ── Wide: CPU + RAM ───────────────────────────────────────────────────
+    // ── Wide: CPU + RAM (captions inside the rings) ───────────────────────
     Row {
+        id: wideRow
         visible: root.wide
         anchors.centerIn: parent
         spacing: Math.round(28 * root.u)
         readonly property real d: Math.min((root.width - 2 * root.padding - spacing) / 2,
-                                           root.height - 2 * root.padding - Math.round(26 * root.u))
+                                           root.height - 2 * root.padding)
 
         Repeater {
             model: [
                 { k: "CPU", v: root.cpu, extra: root.hasTemp ? Math.round(root.tempC) + "°C" : "" },
                 { k: "RAM", v: root.mem, extra: root.ok(root.memUsedGb) ? Number(root.memUsedGb).toFixed(1) + " GB" : "" }
             ]
-            Column {
-                spacing: Math.round(12 * root.u)
-                Gauge {
-                    width: parent.parent.d; height: width
-                    value: modelData.v
-                    numberSize: Math.max(40, Math.round(56 * root.u))
-                }
+            Gauge {
+                id: wg
+                width: wideRow.d; height: width
+                value: modelData.v
+                numberSize: Math.max(40, Math.round(60 * root.u))
+                fitColumns: 17
+                numberOffset: -Math.round(8 * root.u)
                 Row {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: Math.round(8 * root.u)
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.verticalCenterOffset: Math.round(34 * root.u)
+                    spacing: Math.round(6 * root.u)
                     Caption { text: modelData.k; color: Theme.fg }
                     Caption {
                         visible: text !== ""

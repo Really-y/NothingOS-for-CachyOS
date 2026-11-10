@@ -24,5 +24,14 @@ Rectangle {
                 }
             }
         }
+        Row {
+            spacing: 28
+            Repeater {
+                model: ["prev", "play", "pause", "next", "chevleft", "chevright"]
+                DotGlyph { width: 30; height: 30; icon: modelData; dimColor: "transparent" }
+            }
+            DotTime { hours: "21"; minutes: "47"; size: 40; stacked: true }
+            DotRing { width: 90; height: 90; value: 0.93 }
+        }
     }
 }

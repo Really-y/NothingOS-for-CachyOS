@@ -23,26 +23,39 @@ Card {
     }
     function reset() { year = today.getFullYear(); month = today.getMonth(); }
 
-    // Header: MONTH (dot type) · YEAR (dim) · flat chevrons
+    // Header: MONTH in dot type · year mono caption · dot chevrons
     Item {
         id: header
         x: root.pad; y: root.pad
-        width: parent.width - 2 * root.pad; height: 28
-        Row {
-            anchors.verticalCenter: parent.verticalCenter
-            spacing: 12
-            DotString { size: 26; text: root.en.standaloneMonthName(root.month, Locale.LongFormat).toUpperCase(); width: implicitWidth; height: implicitHeight }
-            DotString { size: 26; color: Theme.fg3; text: root.year; width: implicitWidth; height: implicitHeight }
+        width: parent.width - 2 * root.pad; height: monthDots.height
+        DotString {
+            id: monthDots
+            size: Math.min(40, (header.width - 90) * 10 / (Math.max(columns, 1) - 1 + dotRatio))
+            text: root.en.standaloneMonthName(root.month, Locale.LongFormat).toUpperCase()
+            width: implicitWidth; height: implicitHeight
+        }
+        Label {
+            anchors.left: monthDots.right; anchors.leftMargin: 10
+            anchors.bottom: monthDots.bottom; anchors.bottomMargin: -2
+            size: 11; color: Theme.fg2
+            text: root.year
         }
         Row {
-            anchors.right: parent.right; anchors.rightMargin: -6
+            anchors.right: parent.right; anchors.rightMargin: -8
             anchors.verticalCenter: parent.verticalCenter
             Repeater {
-                model: [{ i: "chevron_left", d: -1 }, { i: "chevron_right", d: 1 }]
+                model: [{ i: "chevleft", d: -1 }, { i: "chevright", d: 1 }]
                 Pressable {
                     width: 30; height: 30
                     onClicked: root.shift(modelData.d)
-                    Icon { anchors.centerIn: parent; name: modelData.i; size: 22; color: parent.containsMouse ? Theme.fg : Theme.fg2 }
+                    DotGlyph {
+                        anchors.centerIn: parent
+                        width: 9; height: 15
+                        icon: modelData.i
+                        dimColor: "transparent"
+                        dotRatio: 0.8
+                        litColor: parent.containsMouse ? Theme.fg : Theme.fg2
+                    }
                 }
             }
         }
@@ -51,7 +64,7 @@ Card {
     Grid {
         id: grid
         x: root.pad + ((parent.width - 2 * root.pad) - 7 * root.cell) / 2
-        anchors.top: header.bottom; anchors.topMargin: 14
+        anchors.top: header.bottom; anchors.topMargin: 18
         columns: 7
 
         // Weekday initials
@@ -61,8 +74,8 @@ Card {
                 width: root.cell; height: 24
                 Label {
                     anchors.centerIn: parent
-                    size: 10
-                    color: Theme.fg3
+                    size: 11
+                    color: Theme.fg2
                     text: root.en.dayName((root.firstDayOfWeek + index) % 7, Locale.ShortFormat).charAt(0)
                 }
             }

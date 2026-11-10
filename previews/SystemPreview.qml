@@ -19,6 +19,10 @@ Rectangle {
             S.SystemFace { width: 360; height: 180; cpu: 0.23; mem: 0.41; memUsedGb: 6.5; memTotalGb: 15.6; tempC: 48 }
             S.SystemFace { width: 360; height: 180; cpu: 1.0; mem: 0.88; memUsedGb: 13.7; memTotalGb: 15.6; tempC: 91 }
         }
-        S.SystemFace { width: 360; height: 180 }
+        Row {
+            spacing: 16
+            S.SystemFace { width: 360; height: 180; cpu: 0.07; mem: 0.52; memUsedGb: 8.1; memTotalGb: 15.6 }
+            S.SystemFace { width: 360; height: 180 }
+        }
     }
 }
