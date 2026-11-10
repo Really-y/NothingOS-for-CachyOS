@@ -53,5 +53,11 @@ if [ "${NOTHING_LAYOUT:-1}" = 1 ]; then
   echo "· layout";     qdbus6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "$(cat "$ROOT/plasma/layout/nothing-layout.js")" >/dev/null || true
 fi
 
+# notifications: Plasma-native (themed, counted by the control center) instead of dunst
+if [ -f "$D/dbus-1/services/org.freedesktop.Notifications.service" ] && grep -q dunst "$D/dbus-1/services/org.freedesktop.Notifications.service"; then
+  mkdir -p "$D/nothingos-backup/dunst"; mv "$D/dbus-1/services/org.freedesktop.Notifications.service" "$D/nothingos-backup/dunst/"
+fi
+systemctl --user mask dunst.service >/dev/null 2>&1 || true
+pkill -x dunst 2>/dev/null && (setsid -f plasmashell --replace >/dev/null 2>&1) || true
 qdbus6 org.kde.KWin /KWin reconfigure >/dev/null || true
 echo "Hazırdır. Kilid ekranı yenidən girişdən sonra aktiv olur. SDDM üçün: sudo $ROOT/sddm/install.sh"

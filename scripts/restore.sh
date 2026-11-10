@@ -8,6 +8,10 @@ SRC="${1:-$FIRST}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 pkill -x qs 2>/dev/null || true
 systemctl --user disable --now nothingd.service 2>/dev/null || true
+# give notifications back to dunst if that was the original setup
+systemctl --user unmask dunst.service 2>/dev/null || true
+[ -f "$HOME/.local/share/nothingos-backup/dunst/org.freedesktop.Notifications.service" ] && \
+  cp "$HOME/.local/share/nothingos-backup/dunst/org.freedesktop.Notifications.service" "$HOME/.local/share/dbus-1/services/"
 "$ROOT/plasma/lookandfeel/install.sh" --revert 2>/dev/null || true
 rm -f "$HOME/.config/autostart/nothingos-shell.desktop"
 rm -f "$HOME/.local/share/dbus-1/services/org.knopwob.dunst.service" "$HOME/.local/share/dbus-1/services/org.kde.plasma.Notifications.service"
