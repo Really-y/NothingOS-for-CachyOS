@@ -5,12 +5,19 @@ import QtQuick
 Canvas {
     id: root
     property real value: 0
-    property int dots: 28
+    property int dots: 40
     property real warn: 0.85
-    property real dotSize: 5
+    property real dotSize: 4
     property real shown: value
+    property color litColor: Theme.fg
+    property color warnColor: Theme.red
+    property color trackColor: Theme.dotDim
     Behavior on shown { NumberAnimation { duration: Theme.slow; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.emphasized } }
     onShownChanged: requestPaint()
+    onWidthChanged: requestPaint()
+    onHeightChanged: requestPaint()
+    onTrackColorChanged: requestPaint()
+    onLitColorChanged: requestPaint()
     onPaint: {
         const ctx = getContext("2d");
         ctx.reset();
@@ -20,7 +27,7 @@ Canvas {
             const a = -Math.PI / 2 + i / dots * Math.PI * 2;
             ctx.beginPath();
             ctx.arc(cx + Math.cos(a) * rad, cy + Math.sin(a) * rad, dotSize / 2, 0, Math.PI * 2);
-            ctx.fillStyle = i < lit ? (shown >= warn ? Theme.red : Theme.fg) : Theme.card3;
+            ctx.fillStyle = i < lit ? (shown >= warn ? root.warnColor : root.litColor) : root.trackColor;
             ctx.fill();
         }
     }

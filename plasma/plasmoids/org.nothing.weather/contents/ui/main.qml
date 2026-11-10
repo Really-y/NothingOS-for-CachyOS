@@ -19,8 +19,8 @@ PlasmoidItem {
     }
     readonly property var w: weather.result
 
-    toolTipMainText: w ? (w.city + "  " + Math.round(w.temp) + "°") : i18n("Weather")
-    toolTipSubText: w ? w.desc : i18n("Waiting for nothingd…")
+    toolTipMainText: w ? ((w.city || "") + "  " + Math.round(w.temp) + "°") : i18n("Weather")
+    toolTipSubText: w ? (w.desc || "") : i18n("Waiting for nothingd…")
 
     fullRepresentation: WeatherFace {
         Layout.minimumWidth: 140
@@ -30,7 +30,8 @@ PlasmoidItem {
         temp: root.w ? root.w.temp : null
         hi: root.w ? root.w.hi : null
         lo: root.w ? root.w.lo : null
-        icon: root.w && root.w.icon ? root.w.icon : "cloud"
+        icon: root.w && root.w.icon ? root.w.icon : ""
+        code: root.w && root.w.code !== undefined ? root.w.code : null
         desc: root.w ? root.w.desc : ""
         city: root.w ? root.w.city : ""
     }

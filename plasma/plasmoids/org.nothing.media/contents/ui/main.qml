@@ -20,9 +20,9 @@ PlasmoidItem {
     toolTipSubText: hasMedia ? player.artist : ""
 
     fullRepresentation: MediaFace {
-        Layout.minimumWidth: 280
-        Layout.minimumHeight: 140
-        Layout.preferredWidth: 360
+        Layout.minimumWidth: 150
+        Layout.minimumHeight: 150
+        Layout.preferredWidth: 180
         Layout.preferredHeight: 180
         hasMedia: root.hasMedia
         playing: root.playing

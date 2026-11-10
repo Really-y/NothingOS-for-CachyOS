@@ -23,10 +23,10 @@ PlasmoidItem {
                       : i18n("Waiting for nothingd…")
 
     fullRepresentation: SystemFace {
-        Layout.minimumWidth: 160
-        Layout.minimumHeight: 160
-        Layout.preferredWidth: 200
-        Layout.preferredHeight: 200
+        Layout.minimumWidth: 150
+        Layout.minimumHeight: 150
+        Layout.preferredWidth: 180
+        Layout.preferredHeight: 180
         cpu: root.s ? root.s.cpu : null
         mem: root.s ? root.s.mem : null
         memUsedGb: root.s ? root.s.memUsedGb : null

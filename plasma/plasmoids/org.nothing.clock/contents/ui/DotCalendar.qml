@@ -23,27 +23,26 @@ Card {
     }
     function reset() { year = today.getFullYear(); month = today.getMonth(); }
 
-    // Header: MONTH YEAR · ‹ ›
+    // Header: MONTH (dot type) · YEAR (dim) · flat chevrons
     Item {
         id: header
-        x: root.pad; y: root.pad - 4
+        x: root.pad; y: root.pad
         width: parent.width - 2 * root.pad; height: 28
         Row {
             anchors.verticalCenter: parent.verticalCenter
-            spacing: 10
-            Label { size: 12; color: Theme.fg; text: root.en.standaloneMonthName(root.month, Locale.LongFormat) }
-            Label { size: 12; color: Theme.fg3; text: root.year }
+            spacing: 12
+            DotString { size: 26; text: root.en.standaloneMonthName(root.month, Locale.LongFormat).toUpperCase(); width: implicitWidth; height: implicitHeight }
+            DotString { size: 26; color: Theme.fg3; text: root.year; width: implicitWidth; height: implicitHeight }
         }
         Row {
-            anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter
-            spacing: 4
+            anchors.right: parent.right; anchors.rightMargin: -6
+            anchors.verticalCenter: parent.verticalCenter
             Repeater {
                 model: [{ i: "chevron_left", d: -1 }, { i: "chevron_right", d: 1 }]
                 Pressable {
-                    width: 28; height: 28
+                    width: 30; height: 30
                     onClicked: root.shift(modelData.d)
-                    Rectangle { anchors.fill: parent; radius: width / 2; color: parent.containsMouse ? Theme.card3 : Theme.card2 }
-                    Icon { anchors.centerIn: parent; name: modelData.i; size: 18 }
+                    Icon { anchors.centerIn: parent; name: modelData.i; size: 22; color: parent.containsMouse ? Theme.fg : Theme.fg2 }
                 }
             }
         }
@@ -100,7 +99,7 @@ Card {
                     anchors.centerIn: parent
                     visible: !parent.inMonth
                     width: 4; height: 4; radius: 2
-                    color: Theme.card3
+                    color: Theme.dotDim
                 }
             }
         }

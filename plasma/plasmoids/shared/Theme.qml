@@ -8,6 +8,9 @@ QtObject {
     readonly property color card: "#111111"
     readonly property color card2: "#1c1c1c"
     readonly property color card3: "#262626"
+    readonly property color widget: "#1a1a1a"   // desktop widget surface (Card)
+    readonly property color widget2: "#2a2a2a"  // raised element on a widget
+    readonly property color dotDim: "#2c2c2c"   // unlit dot on a widget surface
     readonly property color line: "#2a2a2a"
     readonly property color fg: "#ffffff"
     readonly property color fg2: "#8e8e8e"

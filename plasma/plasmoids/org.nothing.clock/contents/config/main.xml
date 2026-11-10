@@ -8,5 +8,9 @@
       <label>Use 24-hour time</label>
       <default>true</default>
     </entry>
+    <entry name="showSeconds" type="Bool">
+      <label>Show a seconds dot strip on the wide card</label>
+      <default>false</default>
+    </entry>
   </group>
 </kcfg>

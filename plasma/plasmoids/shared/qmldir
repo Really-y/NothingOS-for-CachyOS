@@ -8,3 +8,6 @@ Tile 1.0 Tile.qml
 NSlider 1.0 NSlider.qml
 DotRing 1.0 DotRing.qml
 Card 1.0 Card.qml
+DotString 1.0 DotString.qml
+DotTime 1.0 DotTime.qml
+DotGlyph 1.0 DotGlyph.qml

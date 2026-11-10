@@ -29,28 +29,32 @@ PlasmoidItem {
     compactRepresentation: MouseArea {
         id: compact
         readonly property bool vertical: Plasmoid.formFactor === PlasmaCore.Types.Vertical
-        Layout.minimumWidth: vertical ? -1 : label.implicitWidth + 12
+        // Plain dots on the panel, no box: digit height ≈ 55% of panel thickness,
+        // pitch snapped to whole pixels so the dots stay crisp.
+        readonly property real thickness: vertical ? width / 2.2 : height
+        Layout.minimumWidth: vertical ? -1 : label.implicitWidth + 16
         Layout.preferredWidth: Layout.minimumWidth
-        Layout.minimumHeight: vertical ? label.implicitHeight + 8 : -1
+        Layout.minimumHeight: vertical ? label.implicitHeight + 10 : -1
         hoverEnabled: true
         onClicked: root.expanded = !root.expanded
 
-        DotText {
+        DotTime {
             id: label
             anchors.centerIn: parent
-            weight: 900
-            // Fit the panel thickness (36px panel → 24px digits).
-            size: Math.max(12, Math.round((compact.vertical ? compact.width / 3 : compact.height) * 0.66))
-            text: (root.use24h ? Qt.formatTime(root.now, "HH:mm") : Qt.formatTime(root.now, "h:mm"))
-            opacity: compact.containsMouse || root.expanded ? 1 : 0.92
+            size: Math.max(20, Math.round(compact.thickness * 0.55 / 6.75) * 10)
+            dotRatio: 0.8
+            hours: root.use24h ? Qt.formatTime(root.now, "HH") : String((root.now.getHours() + 11) % 12 + 1)
+            minutes: Qt.formatTime(root.now, "mm")
+            width: implicitWidth; height: implicitHeight
+            opacity: compact.containsMouse || root.expanded ? 1 : 0.9
         }
     }
 
     fullRepresentation: Item {
-        Layout.minimumWidth: root.inPanel ? 360 : 200
-        Layout.minimumHeight: root.inPanel ? 510 : 100
+        Layout.minimumWidth: root.inPanel ? 360 : 150
+        Layout.minimumHeight: root.inPanel ? 520 : 75
         Layout.preferredWidth: 360
-        Layout.preferredHeight: root.inPanel ? 510 : 180
+        Layout.preferredHeight: root.inPanel ? 520 : 180
 
         ClockFace {
             id: face
@@ -58,6 +62,8 @@ PlasmoidItem {
             height: root.inPanel ? 180 : parent.height
             now: root.now
             use24h: root.use24h
+            showSeconds: Plasmoid.configuration.showSeconds
+            variant: root.inPanel ? "wide" : "auto"
         }
         Loader {
             active: root.inPanel
