@@ -25,6 +25,8 @@ Card {
     readonly property bool wide: variant === "wide" || (variant === "auto" && width / Math.max(1, height) >= 1.5)
     readonly property real u: wide ? Math.min(width / 360, height / 180) : Math.min(width, height) / 180
     readonly property bool hasArt: hasMedia && artUrl !== ""
+    // small card: one art-tile size for playing, paused and idle
+    readonly property real smallTile: Math.round(70 * u)
 
     padding: Math.round(18 * u)
     implicitWidth: 180
@@ -40,7 +42,7 @@ Card {
         Label {
             size: Math.max(10, Math.round(10 * root.u))
             color: Theme.fg2
-            text: root.playing ? "Now playing" : "Paused"
+            text: !root.hasMedia ? "No media" : root.playing ? "Now playing" : "Paused"
         }
     }
 
@@ -95,7 +97,7 @@ Card {
         ArtCanvas {
             id: portrait
             visible: root.hasArt
-            width: Math.round(sq.height - band.height - 12 * root.u); height: width
+            width: root.smallTile; height: width
             source: root.hasArt && !root.wide ? root.artUrl : ""
             mode: "halftone"
             radius: root.innerRadius
@@ -128,7 +130,8 @@ Card {
             id: band
             visible: root.hasMedia
             anchors.left: parent.left; anchors.right: parent.right
-            anchors.bottom: parent.bottom
+            // fixed line positions shared with the idle layout
+            y: root.smallTile + Math.round(14 * root.u)
             spacing: Math.round(4 * root.u)
             Status { bottomPadding: Math.round(2 * root.u) }
             Marquee {
@@ -149,17 +152,15 @@ Card {
             }
         }
 
-        // idle: the black art tile with the vinyl inside, and IDLE in dots
+        // idle mirrors the playing layout: same tile, label row, IDLE on the title line
         Rectangle {
             visible: !root.hasMedia
-            // tile as wide as the IDLE word (pitch 5 is the smallest house step)
-            width: idleText.width
-            height: Math.round(sq.height - idleText.height - 12 * root.u)
+            width: root.smallTile; height: width
             radius: root.innerRadius
             color: Theme.bg
             DotGlyph {
                 anchors.centerIn: parent
-                width: Math.min(parent.width, parent.height) * 0.72; height: width
+                width: parent.width * 0.72; height: width
                 icon: "vinyl"
                 dimColor: "transparent"
                 litColor: Theme.fg2
@@ -167,13 +168,16 @@ Card {
                 redColor: Theme.fg2              // no red while idle
             }
         }
-        DotString {
-            id: idleText
+        Column {
             visible: !root.hasMedia
-            anchors.left: parent.left; anchors.bottom: parent.bottom
-            text: "IDLE"
-            pitch: 5
-            width: implicitWidth; height: implicitHeight
+            y: band.y
+            spacing: band.spacing
+            Status { bottomPadding: Math.round(2 * root.u) }
+            DotString {
+                text: "IDLE"
+                pitch: 5
+                width: implicitWidth; height: implicitHeight
+            }
         }
     }
 
@@ -251,18 +255,16 @@ Card {
                 SkipButton { anchors.verticalCenter: parent.verticalCenter; glyph: "next"; can: root.canNext; onClicked: root.next() }
             }
 
-            // idle: grey "NO MEDIA" where the status sits, IDLE where the title sits
-            Label {
+            // idle: "● NO MEDIA" on the label line, IDLE centred on the play-button line
+            Status {
                 id: idleStatus
                 visible: !root.hasMedia
                 y: Math.round(2 * root.u)
-                size: Math.max(10, Math.round(10 * root.u))
-                color: Theme.fg2
-                text: "No media"
             }
             DotString {
                 visible: !root.hasMedia
-                anchors.top: idleStatus.bottom; anchors.topMargin: Math.round(14 * root.u)
+                anchors.verticalCenter: parent.bottom
+                anchors.verticalCenterOffset: -Math.round(46 * root.u) / 2
                 text: "IDLE"
                 pitch: 5
                 width: implicitWidth; height: implicitHeight
