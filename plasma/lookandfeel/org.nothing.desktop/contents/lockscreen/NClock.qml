@@ -56,6 +56,7 @@ Column {
                 size: 13
                 color: clock.idle ? Theme.fg3 : Theme.fg
                 font.letterSpacing: 2.4
+                font.weight: Font.Normal
             }
 
             Label {
@@ -63,6 +64,7 @@ Column {
                 size: 13
                 color: clock.idle ? Theme.fg3 : Theme.fg2
                 font.letterSpacing: 2.4
+                font.weight: Font.Normal
             }
 
             Label {
@@ -71,6 +73,7 @@ Column {
                 size: 13
                 color: clock.idle ? Theme.fg3 : Theme.fg2
                 font.letterSpacing: 2.4
+                font.weight: Font.Normal
             }
 
         }

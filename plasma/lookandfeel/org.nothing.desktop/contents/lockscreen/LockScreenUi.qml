@@ -223,7 +223,7 @@ Item {
             visible: config.alwaysShowClock
             idle: !lockScreenRoot.uiVisible
             // dot pitch snapped to the system steps 5/8/12/15 px (size = 10 × pitch)
-            readonly property real fitPitch: Math.min(lockScreenRoot.height * 0.21, lockScreenRoot.width * 0.15) / 10
+            readonly property real fitPitch: Math.min(lockScreenRoot.height * 0.2, lockScreenRoot.width * 0.15) / 10   // same rule as SDDM
             size: 10 * (fitPitch >= 15 ? 15 : fitPitch >= 12 ? 12 : fitPitch >= 8 ? 8 : 5)
             anchors.horizontalCenter: parent.horizontalCenter
             y: lockScreenRoot.uiVisible
@@ -345,6 +345,7 @@ Item {
                 track: root.mockMedia.track
                 artist: root.mockMedia.artist
                 playing: root.mockMedia.playing
+                artUrl: root.mockMedia.artUrl || ""
             }
         }
 

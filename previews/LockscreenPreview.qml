@@ -4,5 +4,5 @@ LockscreenMock {
     showPrompt: true
     typed: "hunter22"
     notification: "Unlocking failed"
-    media: ({ track: "Dots & Lines", artist: "Glyph Ensemble", playing: true })
+    media: ({ track: "Dots & Lines", artist: "Glyph Ensemble", playing: true, artUrl: Qt.resolvedUrl("mock/art.png") })
 }

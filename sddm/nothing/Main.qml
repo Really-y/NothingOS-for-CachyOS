@@ -197,7 +197,7 @@ Rectangle {
                     hours: root.use24h ? (h < 10 ? "0" : "") + h : String((h + 11) % 12 + 1)
                     minutes: Qt.formatTime(root.now, "mm")
                     // dot pitch snapped to the system steps 5/8/12/15 px (size = 10 × pitch)
-                    readonly property real fitPitch: Math.min(root.height * 0.19, root.width * 0.15) / 10
+                    readonly property real fitPitch: Math.min(root.height * 0.2, root.width * 0.15) / 10   // same rule as the lock screen
                     size: 10 * (fitPitch >= 15 ? 15 : fitPitch >= 12 ? 12 : fitPitch >= 8 ? 8 : 5)
                     dotRatio: 0.65
                     color: root.fg
@@ -658,12 +658,12 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
-                Text {
+                Mono {
                     id: sessionName
 
                     anchors.verticalCenter: parent.verticalCenter
-                    font.family: root.fSans
-                    font.pixelSize: 14
+                    size: 11
+                    font.letterSpacing: 1.5
                     color: sessionMenu.open ? root.bg : root.fg
                     text: sessionRepeater.count > root.sessionIndex && sessionRepeater.itemAt(root.sessionIndex) ? sessionRepeater.itemAt(root.sessionIndex).sessionName : ""
                 }
@@ -729,7 +729,7 @@ Rectangle {
                             color: sessionItem.containsMouse ? "#2a2a2a" : "transparent"
                         }
 
-                        Text {
+                        Mono {
                             anchors.left: parent.left
                             anchors.leftMargin: 18
                             anchors.right: dotMark.left
@@ -738,8 +738,8 @@ Rectangle {
                             text: sessionItem.name
                             elide: Text.ElideRight
                             color: root.fg
-                            font.family: root.fSans
-                            font.pixelSize: 14
+                            size: 11
+                            font.letterSpacing: 1.5
                         }
 
                         Rectangle {

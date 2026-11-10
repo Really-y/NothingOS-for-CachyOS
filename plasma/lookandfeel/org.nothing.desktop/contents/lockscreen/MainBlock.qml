@@ -159,28 +159,29 @@ FocusScope {
                 Rectangle { anchors.fill: parent; radius: width / 2; color: "#2a2a2a" }
                 Text {
                     anchors.centerIn: parent
-                    visible: face.status !== Image.Ready
+                    visible: !face.ready
                     text: block.userName.charAt(0).toUpperCase()
                     color: Theme.fg
                     font.family: Theme.sans
                     font.pixelSize: 17
                     font.weight: Font.Medium
                 }
-                Image {
+                // User picture as a halftone dot dither on a black disc.
+                Rectangle {
+                    anchors.fill: parent; radius: width / 2
+                    color: "#000000"
+                    visible: face.ready
+                }
+                ArtCanvas {
                     id: face
                     anchors.fill: parent
+                    visible: ready
                     source: block.userIcon
-                    fillMode: Image.PreserveAspectCrop
-                    sourceSize.width: 80; sourceSize.height: 80
-                    asynchronous: true
-                    visible: status === Image.Ready
-                }
-                // Circular crop without layer effects.
-                Rectangle {
-                    anchors.fill: parent; anchors.margins: -8
-                    radius: width / 2; color: "transparent"
-                    border.width: 8; border.color: pill.color
-                    visible: face.visible
+                    mode: "halftone"
+                    radius: width / 2
+                    pitch: 3
+                    fadeTop: 0
+                    fadeBottom: 0
                 }
             }
 

@@ -25,27 +25,32 @@ Rectangle {
     radius: 24
     color: "#1a1a1a"
 
-    // Artwork, or a dot-matrix note when there is none.
-    Item {
+    // Artwork as a halftone dot dither on a black tile, or a dot-matrix note when there is none.
+    Rectangle {
         id: artBox
         x: 10; width: 44; height: 44
         anchors.verticalCenter: parent.verticalCenter
-        Rectangle { anchors.fill: parent; radius: 12; color: "#2a2a2a" }
-        Icon { anchors.centerIn: parent; name: "music_note"; size: 22; color: Theme.fg2; visible: art.status !== Image.Ready }
-        Image {
+        radius: 12
+        color: "#000000"
+        DotGlyph {
+            anchors.centerIn: parent
+            width: 26; height: 26
+            visible: !art.ready
+            icon: "note"
+            dimColor: "transparent"
+            litColor: Theme.fg2
+            halfColor: Theme.fg2
+        }
+        ArtCanvas {
             id: art
             anchors.fill: parent
+            visible: ready
             source: card.artUrl
-            asynchronous: true
-            fillMode: Image.PreserveAspectCrop
-            sourceSize.width: width * 2; sourceSize.height: height * 2
-            visible: status === Image.Ready
-        }
-        // Rounds the artwork corners without layer effects (works with software rendering).
-        Rectangle {
-            anchors.fill: parent; anchors.margins: -8
-            radius: 20; color: "transparent"
-            border.width: 8; border.color: card.color
+            mode: "halftone"
+            radius: 12
+            pitch: 3
+            fadeTop: 0
+            fadeBottom: 0
         }
     }
 
@@ -84,7 +89,7 @@ Rectangle {
             enabled: card.canGoPrevious
             opacity: enabled ? 1 : 0.35
             onClicked: card.previous()
-            Icon { anchors.centerIn: parent; name: "skip_previous"; size: 22 }
+            DotGlyph { anchors.centerIn: parent; width: 16; height: 16; icon: "prev"; dimColor: "transparent"; dotRatio: 0.9; litColor: Theme.fg }
             Accessible.role: Accessible.Button
             Accessible.name: i18ndc("plasma_shell_org.kde.plasma.desktop", "@action:button Accessible only", "Previous track")
         }
@@ -92,7 +97,13 @@ Rectangle {
             width: 40; height: 40
             onClicked: card.playPause()
             Rectangle { anchors.fill: parent; radius: width / 2; color: Theme.fg }
-            Icon { anchors.centerIn: parent; name: card.playing ? "pause" : "play_arrow"; size: 24; fill: 1; color: Theme.bg }
+            DotGlyph {
+                anchors.centerIn: parent
+                anchors.horizontalCenterOffset: card.playing ? 0 : 1
+                width: 16; height: 16
+                icon: card.playing ? "pause" : "play"
+                dimColor: "transparent"; dotRatio: 0.9; litColor: Theme.bg
+            }
             Accessible.role: Accessible.Button
             Accessible.name: i18ndc("plasma_shell_org.kde.plasma.desktop", "@action:button Accessible only", "Play or Pause media")
         }
@@ -102,7 +113,7 @@ Rectangle {
             enabled: card.canGoNext
             opacity: enabled ? 1 : 0.35
             onClicked: card.next()
-            Icon { anchors.centerIn: parent; name: "skip_next"; size: 22 }
+            DotGlyph { anchors.centerIn: parent; width: 16; height: 16; icon: "next"; dimColor: "transparent"; dotRatio: 0.9; litColor: Theme.fg }
             Accessible.role: Accessible.Button
             Accessible.name: i18ndc("plasma_shell_org.kde.plasma.desktop", "@action:button Accessible only", "Next track")
         }
