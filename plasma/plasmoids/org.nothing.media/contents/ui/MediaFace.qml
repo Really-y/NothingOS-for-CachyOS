@@ -67,7 +67,8 @@ Card {
     component SkipButton: Pressable {
         property string glyph
         property bool can: true
-        width: Math.round(36 * root.u); height: width
+        property int hit: Math.round(36 * root.u)
+        width: hit; height: hit
         enabled: can
         DotGlyph {
             anchors.centerIn: parent
@@ -119,12 +120,24 @@ Card {
                 litColor: Theme.fg2
             }
         }
-        // small disk at transport scale, aligned to the tile's bottom edge
-        PlayButton {
+        // transport row right of the tile, on the tile's bottom edge:
+        // prev · small play disk · next
+        Row {
             visible: root.hasMedia
             anchors.right: parent.right
             y: portrait.height - height
-            diameter: Math.round(30 * root.u)
+            spacing: Math.round(3 * root.u)
+            SkipButton {
+                anchors.verticalCenter: parent.verticalCenter
+                hit: Math.round(16 * root.u)
+                glyph: "prev"; can: root.canPrevious; onClicked: root.previous()
+            }
+            PlayButton { diameter: Math.round(28 * root.u) }
+            SkipButton {
+                anchors.verticalCenter: parent.verticalCenter
+                hit: Math.round(16 * root.u)
+                glyph: "next"; can: root.canNext; onClicked: root.next()
+            }
         }
         Column {
             id: band
