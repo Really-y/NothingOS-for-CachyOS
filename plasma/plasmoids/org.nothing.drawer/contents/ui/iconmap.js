@@ -91,7 +91,8 @@ function candidates(source, hint, available) {
 }
 
 // Greedy distinct assignment over the installed apps: each app takes its best glyph
-// that no earlier app took; apps whose candidates are all taken share their best one.
+// that no earlier app took; when all its candidates are taken it gets "" (mask of its
+// own icon). Entries with the same icon+name (duplicate .desktop files) share a key.
 // apps: [{ key, source, hint }] → { key: "<glyph>-symbolic" }
 function assign(apps, available) {
     const used = {}, map = {}, seen = {};
@@ -102,16 +103,17 @@ function assign(apps, available) {
                      .filter(x => x.c.length > 0)
                      .sort((x, y) => x.c.length - y.c.length);
     for (const x of list) {
-        // best unused good fit → unused weaker guess → share the best good fit
-        let g = x.t.good.find(n => !used[n]) || x.t.weak.find(n => !used[n]) || x.c[0];
-        used[g] = true;
-        map[x.a.key] = g + "-symbolic";
+        // best unused good fit → unused weaker guess → otherwise "" = flat silhouette of
+        // the app's own icon (never share a glyph with a different app)
+        const g = x.t.good.find(n => !used[n]) || x.t.weak.find(n => !used[n]);
+        if (g) { used[g] = true; map[x.a.key] = g + "-symbolic"; }
+        else map[x.a.key] = "";
     }
     return map;
 }
 
 function resolve(source, hint, available, assigned, key) {
-    if (assigned && key && assigned[key]) return assigned[key];
+    if (assigned && key && key in assigned) return assigned[key];   // "" → mask own icon
     const c = candidates(source, hint, available);
     return c.length ? c[0] + "-symbolic" : "";
 }
