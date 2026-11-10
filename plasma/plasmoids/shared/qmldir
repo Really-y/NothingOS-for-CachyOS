@@ -11,3 +11,4 @@ Card 1.0 Card.qml
 DotString 1.0 DotString.qml
 DotTime 1.0 DotTime.qml
 DotGlyph 1.0 DotGlyph.qml
+ArtCanvas 1.0 ArtCanvas.qml

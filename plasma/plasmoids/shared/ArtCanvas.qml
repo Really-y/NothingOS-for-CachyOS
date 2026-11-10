@@ -1,5 +1,4 @@
 import QtQuick
-import "nothing"
 
 // Album art rendered Nothing-style on a Canvas (works on every scene-graph
 // backend, no shaders):
