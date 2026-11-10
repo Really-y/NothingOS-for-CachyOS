@@ -40,6 +40,8 @@ kw --file kdeglobals --group Sounds --key Enable true
 echo "· wallpaper";    mkdir -p "$D/wallpapers/nothing"; cp "$ROOT"/wallpapers/*.png "$D/wallpapers/nothing/"
 plasma-apply-wallpaperimage "$D/wallpapers/nothing/nothing-sweep.png" >/dev/null || true
 
+echo "· icons";        python3 "$ROOT/icons/gen_icons.py" >/dev/null; mkdir -p "$D/icons"; rm -rf "$D/icons/Nothing"; cp -r "$ROOT/icons/Nothing" "$D/icons/"; /usr/lib/plasma-changeicons Nothing >/dev/null 2>&1 || true
+
 echo "· konsole";      mkdir -p "$D/konsole"; cp "$ROOT/terminal/Nothing.colorscheme" "$D/konsole/"
 
 echo "· shell"
