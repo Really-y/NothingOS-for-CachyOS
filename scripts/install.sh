@@ -15,7 +15,7 @@ for k in "font:Space Grotesk,10,-1,5,400,0,0,0,0,0" "menuFont:Space Grotesk,10,-
 kw --file kdeglobals --group WM --key activeFont "Space Grotesk,10,-1,5,500,0,0,0,0,0"
 echo "· kvantum";      mkdir -p "$HOME/.config/Kvantum"; cp -r "$ROOT/kvantum/NothingDark" "$HOME/.config/Kvantum/"
 kw --file "$HOME/.config/Kvantum/kvantum.kvconfig" --group General --key theme NothingDark
-kw --file kdeglobals --group KDE --key widgetStyle kvantum-dark
+kw --file kdeglobals --group KDE --key widgetStyle Breeze
 echo "· decoration";   python3 "$ROOT/plasma/aurorae/gen_aurorae.py" >/dev/null; mkdir -p "$D/aurorae/themes"; rm -rf "$D/aurorae/themes/Nothing"; cp -r "$ROOT/plasma/aurorae/Nothing" "$D/aurorae/themes/"
 kw --file kwinrc --group org.kde.kdecoration2 --key library org.kde.kwin.aurorae
 kw --file kwinrc --group org.kde.kdecoration2 --key theme __aurorae__svg__Nothing
