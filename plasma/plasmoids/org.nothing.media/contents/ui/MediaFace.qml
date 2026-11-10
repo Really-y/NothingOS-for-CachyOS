@@ -48,12 +48,29 @@ Card {
 
     // White circle, black dot glyph.
     component PlayButton: Pressable {
+        id: pb
         property int diameter: 44
+        property bool snapped: false     // small disk: fixed 4px dot grid
         width: diameter; height: diameter
         enabled: root.canPlayPause
         onClicked: root.playPause()
         Rectangle { anchors.fill: parent; radius: width / 2; color: Theme.fg }
+        // Small disk: play = 5×5 triangle, pause = two 5-dot bars, on an integer
+        // 4px pitch (3px dots, 1px gaps) ≈ 55 % of the disk — dots never merge.
         DotGlyph {
+            readonly property var grid: root.playing ? ["#...#", "#...#", "#...#", "#...#", "#...#"]
+                                                    : ["#....", "###..", "#####", "###..", "#...."]
+            visible: pb.snapped
+            rows: grid
+            dimColor: "transparent"
+            litColor: Theme.bg
+            dotRatio: 0.75
+            width: 20; height: 20
+            x: Math.round((pb.diameter - width) / 2) + (root.playing ? 0 : 1)
+            y: Math.round((pb.diameter - height) / 2)
+        }
+        DotGlyph {
+            visible: !pb.snapped
             anchors.centerIn: parent
             anchors.horizontalCenterOffset: root.playing ? 0 : 1
             width: Math.min(16, Math.round(parent.diameter * 0.4)); height: width
@@ -101,7 +118,9 @@ Card {
             source: root.hasArt && !root.wide ? root.artUrl : ""
             mode: "halftone"
             radius: root.innerRadius
-            pitch: 3
+            // small tile: coarse cells, round dots that never touch
+            pitch: 5
+            maxDot: 0.7
             fadeTop: 0
             fadeBottom: 0
         }
@@ -119,12 +138,13 @@ Card {
                 litColor: Theme.fg2
             }
         }
-        // small disk at transport scale, aligned to the tile's bottom edge
+        // small play/pause disk, aligned to the tile's bottom edge
         PlayButton {
             visible: root.hasMedia
             anchors.right: parent.right
             y: portrait.height - height
-            diameter: Math.round(30 * root.u)
+            diameter: 36
+            snapped: true
         }
         Column {
             id: band
