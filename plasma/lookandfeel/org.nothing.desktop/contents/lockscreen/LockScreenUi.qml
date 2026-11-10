@@ -213,15 +213,21 @@ Item {
             }
         }
 
-        // Clock: centred when idle, rises above the prompt when it appears.
+        // One vertical rhythm for clock + prompt: clock →48→ prompt, block centred.
+        readonly property real clockBlock: clock.visible ? clock.height + 48 : 0
+        readonly property real activeTop: Math.max(24, Math.round((height - clockBlock - mainBlock.contentHeight) / 2))
+
+        // Clock: AOD-style (dimmed, ~40 px above centre) when idle, rises above the prompt when it appears.
         NClock {
             id: clock
             visible: config.alwaysShowClock
-            size: Math.round(Math.min(lockScreenRoot.height * 0.2, lockScreenRoot.width * 0.14, 220))
+            idle: !lockScreenRoot.uiVisible
+            // multiple of 10 → integer dot pitch, so the canvas never clips the last row
+            size: Math.max(60, Math.floor(Math.min(lockScreenRoot.height * 0.21, lockScreenRoot.width * 0.15, 230) / 10) * 10)
             anchors.horizontalCenter: parent.horizontalCenter
             y: lockScreenRoot.uiVisible
-                ? Math.max(24, mainStack.height / 2 + 16 - Math.round(mainStack.height * 0.06) - 40 - height)
-                : Math.round((lockScreenRoot.height - height) / 2 - lockScreenRoot.height * 0.04)
+                ? lockScreenRoot.activeTop
+                : Math.round((lockScreenRoot.height - height) / 2 - 40)
             opacity: lockScreenRoot.uiVisible || !config.hideClockWhenIdle ? 1 : 0
             Behavior on y { NumberAnimation { duration: Theme.slow; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.emphasized } }
             Behavior on opacity { NumberAnimation { duration: Theme.normal } }
@@ -264,6 +270,7 @@ Item {
             initialItem: MainBlock {
                 id: mainBlock
                 lockScreenUiVisible: lockScreenRoot.uiVisible
+                promptTop: lockScreenRoot.activeTop + lockScreenRoot.clockBlock
 
                 enabled: !graceLockTimer.running
 
@@ -317,7 +324,8 @@ Item {
 
                 Loader {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: item && item.visible ? item.implicitHeight : 0
+                    visible: item !== null && item.hasMedia === true
+                    Layout.preferredHeight: visible ? item.implicitHeight : 0
                     active: config.showMediaControls
                     sourceComponent: root.mockMedia ? mockMediaComponent : mediaComponent
                 }

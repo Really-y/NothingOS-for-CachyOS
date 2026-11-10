@@ -39,6 +39,10 @@ FocusScope {
     readonly property string userName: userListModel && userListModel.count > 0 ? userListModel.get(0).name : ""
     readonly property string userIcon: userListModel && userListModel.count > 0 ? userListModel.get(0).icon : ""
 
+    // Where the prompt column starts (set by LockScreenUi so clock + prompt share one rhythm).
+    property real promptTop: height / 2
+    readonly property real contentHeight: column.implicitHeight
+
     signal passwordResult(string password)
 
     function playHighlightAnimation() {
@@ -86,18 +90,19 @@ FocusScope {
 
     ColumnLayout {
         id: column
-        anchors.top: parent.verticalCenter
-        anchors.topMargin: 16 - Math.round(block.height * 0.06)
+        // Rhythm: [status 16] →16→ pill 56 →12→ hints/media →32→ action tiles
+        anchors.top: parent.top
+        anchors.topMargin: block.promptTop
         anchors.horizontalCenter: parent.horizontalCenter
         width: Math.min(400, block.width - 48)
-        spacing: 14
+        spacing: 0
 
         // Status line: red dot + mono message (errors, caps lock, PAM prompts).
         Item {
             id: status
             property string message
             Layout.fillWidth: true
-            Layout.preferredHeight: Math.max(18, statusText.implicitHeight)
+            Layout.preferredHeight: Math.max(16, statusText.implicitHeight)
             opacity: message ? 1 : 0
             Behavior on opacity { NumberAnimation { duration: Theme.normal; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.emphasized } }
 
@@ -132,27 +137,25 @@ FocusScope {
         Rectangle {
             id: pill
             Layout.fillWidth: true
-            Layout.preferredHeight: 60
+            Layout.topMargin: 16
+            Layout.preferredHeight: 56
             radius: height / 2
-            color: Theme.card
-            border.width: 1
-            border.color: passwordBox.activeFocus ? "#3a3a3a" : Theme.line
-            Behavior on border.color { ColorAnimation { duration: Theme.fast } }
+            color: "#1a1a1a"
 
             // Avatar (user picture, or the initial in dot-matrix type).
             Item {
                 id: avatar
-                width: 44; height: 44
+                width: 40; height: 40
                 x: 8
                 anchors.verticalCenter: parent.verticalCenter
-                Rectangle { anchors.fill: parent; radius: width / 2; color: Theme.card3 }
+                Rectangle { anchors.fill: parent; radius: width / 2; color: "#2a2a2a" }
                 Text {
                     anchors.centerIn: parent
                     visible: face.status !== Image.Ready
                     text: block.userName.charAt(0).toUpperCase()
                     color: Theme.fg
                     font.family: Theme.sans
-                    font.pixelSize: 19
+                    font.pixelSize: 17
                     font.weight: Font.Medium
                 }
                 Image {
@@ -160,7 +163,7 @@ FocusScope {
                     anchors.fill: parent
                     source: block.userIcon
                     fillMode: Image.PreserveAspectCrop
-                    sourceSize.width: 88; sourceSize.height: 88
+                    sourceSize.width: 80; sourceSize.height: 80
                     asynchronous: true
                     visible: status === Image.Ready
                 }
@@ -189,12 +192,12 @@ FocusScope {
                 passwordMaskDelay: 0
                 inputMethodHints: Qt.ImhHiddenText | Qt.ImhSensitiveData | Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText
                 verticalAlignment: TextInput.AlignVCenter
-                color: Theme.fg
-                selectionColor: Theme.fg
+                // Hidden: glyphs (and caret) are transparent; the 8 px dot row below is the visual.
+                color: showPassword ? Theme.fg : "transparent"
+                selectionColor: showPassword ? Theme.fg : "transparent"
                 selectedTextColor: Theme.bg
                 font.family: Theme.sans
                 font.pixelSize: 17
-                font.letterSpacing: showPassword ? 0 : 3
                 placeholderText: i18ndc("plasma_shell_org.kde.plasma.desktop", "@info:placeholder in text field", "Password")
                 focus: true
                 enabled: !authenticator.graceLocked
@@ -233,6 +236,22 @@ FocusScope {
                     }
                 }
             }
+            // Password dots: 8 px, 8 px gaps, white; newest dots stay visible when long.
+            Item {
+                anchors.fill: passwordBox
+                clip: true
+                visible: !passwordBox.showPassword
+                Row {
+                    id: passwordDots
+                    anchors.verticalCenter: parent.verticalCenter
+                    x: Math.min(0, parent.width - width)
+                    spacing: 8
+                    Repeater {
+                        model: passwordBox.text.length
+                        Rectangle { width: 8; height: 8; radius: 4; color: Theme.fg }
+                    }
+                }
+            }
             Binding {
                 target: PasswordSync
                 property: "password"
@@ -253,7 +272,7 @@ FocusScope {
 
             Pressable {
                 id: loginButton
-                width: 44; height: 44
+                width: 40; height: 40
                 anchors.right: parent.right; anchors.rightMargin: 8
                 anchors.verticalCenter: parent.verticalCenter
                 activeFocusOnTab: true
@@ -265,7 +284,7 @@ FocusScope {
 
                 Rectangle {
                     anchors.fill: parent; radius: width / 2
-                    color: passwordBox.text.length > 0 ? Theme.fg : Theme.card3
+                    color: passwordBox.text.length > 0 ? Theme.fg : "#2a2a2a"
                     Behavior on color { ColorAnimation { duration: Theme.normal } }
                 }
                 Icon {
@@ -279,10 +298,12 @@ FocusScope {
         }
 
         FailableLabel {
+            Layout.topMargin: 12
             kind: ScreenLocker.Authenticator.Fingerprint
             label: i18ndc("plasma_shell_org.kde.plasma.desktop", "@info:usagetip", "(or scan your fingerprint on the reader)")
         }
         FailableLabel {
+            Layout.topMargin: 12
             kind: ScreenLocker.Authenticator.Smartcard
             label: i18ndc("plasma_shell_org.kde.plasma.desktop", "@info:usagetip", "(or scan your smartcard)")
         }
@@ -291,14 +312,14 @@ FocusScope {
         ColumnLayout {
             id: extras
             Layout.fillWidth: true
-            Layout.topMargin: 2
+            Layout.topMargin: implicitHeight > 0 ? 12 : 0
             spacing: 0
         }
 
         Row {
             id: actionRow
             Layout.alignment: Qt.AlignHCenter
-            Layout.topMargin: 6
+            Layout.topMargin: 32
             spacing: 28
         }
     }

@@ -13,8 +13,9 @@ Item {
     // Called when a control is used, so the prompt does not fade out mid-interaction.
     signal interacted()
 
-    visible: instantiator.count > 0
-    implicitHeight: 76
+    readonly property bool hasMedia: instantiator.count > 0
+    visible: hasMedia
+    implicitHeight: 64
     implicitWidth: 380
 
     Repeater {

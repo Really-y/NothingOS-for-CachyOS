@@ -12,6 +12,7 @@
 */
 
 import QtQuick
+import "components"
 
 Rectangle {
     id: root
@@ -174,7 +175,7 @@ Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
             anchors.verticalCenterOffset: -Math.round(root.height * 0.04)
-            spacing: Math.round(Math.min(56, root.height * 0.06))
+            spacing: 48
 
             // Clock + date.
             Column {
@@ -182,28 +183,26 @@ Rectangle {
 
                 visible: root.showClock
                 anchors.horizontalCenter: parent.horizontalCenter
-                spacing: Math.round(clockText.font.pixelSize * 0.12)
+                spacing: 32
 
-                Text {
+                // Same dot renderer as the desktop/lock screen clocks (real two-dot colon).
+                DotTime {
                     id: clockText
 
-                    readonly property int px: Math.round(Math.min(root.height * 0.2, root.width * 0.14, 220))
+                    readonly property int h: root.now.getHours()
 
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: Qt.formatTime(root.now, root.use24h ? "HH:mm" : "h:mm")
+                    hours: root.use24h ? (h < 10 ? "0" : "") + h : String((h + 11) % 12 + 1)
+                    minutes: Qt.formatTime(root.now, "mm")
+                    // multiple of 10 → integer dot pitch, so the canvas never clips the last row
+                    size: Math.max(60, Math.floor(Math.min(root.height * 0.19, root.width * 0.15, 230) / 10) * 10)
                     color: root.fg
-                    renderType: Text.QtRendering
-                    font.family: root.fDot
-                    font.pixelSize: px
-                    font.variableAxes: ({
-                        "ROND": 100,
-                        "wght": 800
-                    })
-                    font.letterSpacing: px * 0.02
+                    width: implicitWidth
+                    height: implicitHeight
                 }
 
                 Row {
-                    readonly property int sz: Math.max(12, Math.round(clockText.px * 0.1))
+                    readonly property int sz: 13
 
                     anchors.horizontalCenter: parent.horizontalCenter
                     spacing: 12
@@ -238,7 +237,8 @@ Rectangle {
 
                 width: Math.min(400, root.width - 48)
                 anchors.horizontalCenter: parent.horizontalCenter
-                spacing: 18
+                // users →8→ status 16 →8→ pill (32 between name labels and pill)
+                spacing: userList.visible ? 8 : 16
 
                 ListView {
                     id: userList
@@ -273,27 +273,22 @@ Rectangle {
                         Avatar {
                             id: face
 
-                            width: userDelegate.isCurrent ? 64 : 52
+                            width: userDelegate.isCurrent ? 64 : 56
                             height: width
+                            // all avatar centres on one line (y = 32)
                             anchors.horizontalCenter: parent.horizontalCenter
-                            anchors.top: parent.top
-                            anchors.topMargin: (64 - height) / 2
+                            anchors.verticalCenter: parent.top
+                            anchors.verticalCenterOffset: 32
                             source: userDelegate.icon
                             initial: (userDelegate.realName || userDelegate.name).charAt(0).toUpperCase()
-                            opacity: userDelegate.isCurrent ? 1 : 0.45
+                            fillColor: userDelegate.isCurrent ? "#2a2a2a" : "#1a1a1a"
+                            letterColor: userDelegate.isCurrent ? root.fg : root.fg2
 
                             Behavior on width {
                                 NumberAnimation {
                                     duration: 260
                                     easing.type: Easing.BezierSpline
                                     easing.bezierCurve: root.emphasized
-                                }
-
-                            }
-
-                            Behavior on opacity {
-                                NumberAnimation {
-                                    duration: 260
                                 }
 
                             }
@@ -321,7 +316,7 @@ Rectangle {
                             elide: Text.ElideRight
                             text: userDelegate.realName || userDelegate.name
                             size: 10
-                            color: userDelegate.isCurrent ? root.fg : root.fg3
+                            color: userDelegate.isCurrent ? root.fg : root.fg2
                         }
 
                         MouseArea {
@@ -341,11 +336,9 @@ Rectangle {
                 Rectangle {
                     visible: root.manualUser
                     width: parent.width
-                    height: 60
+                    height: 56
                     radius: height / 2
-                    color: root.card
-                    border.width: 1
-                    border.color: userField.activeFocus ? "#3a3a3a" : root.line
+                    color: "#1a1a1a"
 
                     Icon {
                         id: personIcon
@@ -402,7 +395,7 @@ Rectangle {
                     }
 
                     width: parent.width
-                    height: 18
+                    height: 16
                     opacity: text ? 1 : 0
 
                     Row {
@@ -439,21 +432,20 @@ Rectangle {
                     id: pill
 
                     width: parent.width
-                    height: 60
+                    height: 56
                     radius: height / 2
-                    color: root.card
-                    border.width: 1
-                    border.color: passwordField.activeFocus ? "#3a3a3a" : root.line
+                    color: "#1a1a1a"
 
                     Avatar {
                         id: pillAvatar
 
                         visible: !userList.visible && !root.manualUser
-                        width: 44
-                        height: 44
+                        width: 40
+                        height: 40
                         x: 8
                         anchors.verticalCenter: parent.verticalCenter
                         ringColor: pill.color
+                        fillColor: "#2a2a2a"
                         source: userList.currentItem ? userList.currentItem.icon : ""
                         initial: root.userName.charAt(0).toUpperCase()
                     }
@@ -480,12 +472,12 @@ Rectangle {
                         echoMode: TextInput.Password
                         passwordCharacter: "●"
                         passwordMaskDelay: 0
-                        color: root.fg
-                        selectionColor: root.fg
+                        // glyphs + caret transparent; the 8 px dot row below is the visual
+                        color: "transparent"
+                        selectionColor: "transparent"
                         selectedTextColor: root.bg
                         font.family: root.fSans
                         font.pixelSize: 17
-                        font.letterSpacing: 3
                         clip: true
                         focus: !root.manualUser
                         onAccepted: root.doLogin()
@@ -508,13 +500,36 @@ Rectangle {
 
                     }
 
+                    // Password dots: 8 px, 8 px gaps, white; newest stay visible when long.
+                    Item {
+                        anchors.fill: passwordField
+                        clip: true
+
+                        Row {
+                            anchors.verticalCenter: parent.verticalCenter
+                            x: Math.min(0, parent.width - width)
+                            spacing: 8
+
+                            Repeater {
+                                model: passwordField.text.length
+
+                                Rectangle {
+                                    width: 8
+                                    height: 8
+                                    radius: 4
+                                    color: root.fg
+                                }
+                            }
+                        }
+                    }
+
                     Press {
                         id: goButton
 
                         readonly property bool ready: passwordField.text.length > 0 || !root.needsPassword
 
-                        width: 44
-                        height: 44
+                        width: 40
+                        height: 40
                         anchors.right: parent.right
                         anchors.rightMargin: 8
                         anchors.verticalCenter: parent.verticalCenter
@@ -525,7 +540,7 @@ Rectangle {
                         Rectangle {
                             anchors.fill: parent
                             radius: width / 2
-                            color: goButton.ready ? root.fg : root.card3
+                            color: goButton.ready ? root.fg : "#2a2a2a"
 
                             Behavior on color {
                                 ColorAnimation {
@@ -599,7 +614,7 @@ Rectangle {
             Rectangle {
                 anchors.fill: parent
                 radius: height / 2
-                color: root.card2
+                color: "#1a1a1a"
             }
 
             Row {
@@ -642,7 +657,7 @@ Rectangle {
             Rectangle {
                 anchors.fill: parent
                 radius: height / 2
-                color: sessionMenu.open ? root.fg : root.card2
+                color: sessionMenu.open ? root.fg : "#1a1a1a"
             }
 
             Row {
@@ -658,10 +673,12 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
-                Mono {
+                Text {
                     id: sessionName
 
                     anchors.verticalCenter: parent.verticalCenter
+                    font.family: root.fSans
+                    font.pixelSize: 14
                     color: sessionMenu.open ? root.bg : root.fg
                     text: sessionRepeater.count > root.sessionIndex && sessionRepeater.itemAt(root.sessionIndex) ? sessionRepeater.itemAt(root.sessionIndex).sessionName : ""
                 }
@@ -688,9 +705,7 @@ Rectangle {
             width: Math.max(240, sessionColumn.implicitWidth + 16)
             height: sessionColumn.implicitHeight + 16
             radius: 24
-            color: root.card
-            border.width: 1
-            border.color: root.line
+            color: "#1a1a1a"
             visible: opacity > 0
             opacity: open ? 1 : 0
 
@@ -725,7 +740,8 @@ Rectangle {
                         Rectangle {
                             anchors.fill: parent
                             radius: height / 2
-                            color: sessionItem.current ? root.card3 : (sessionItem.containsMouse ? root.card2 : "transparent")
+                            // hover only; the selected session is marked by the white dot alone
+                            color: sessionItem.containsMouse ? "#2a2a2a" : "transparent"
                         }
 
                         Text {
@@ -738,7 +754,7 @@ Rectangle {
                             elide: Text.ElideRight
                             color: root.fg
                             font.family: root.fSans
-                            font.pixelSize: 15
+                            font.pixelSize: 14
                         }
 
                         Rectangle {
@@ -901,9 +917,7 @@ Rectangle {
             Rectangle {
                 anchors.fill: parent
                 radius: width / 2
-                color: disc.containsMouse || tile.activeFocus ? root.card3 : root.card2
-                border.width: tile.activeFocus ? 1 : 0
-                border.color: root.fg2
+                color: disc.containsMouse || tile.activeFocus ? "#2a2a2a" : "#1a1a1a"
             }
 
             Icon {
@@ -931,18 +945,20 @@ Rectangle {
         property string source
         property string initial
         property color ringColor: root.bg
+        property color fillColor: "#1a1a1a"
+        property color letterColor: root.fg
 
         Rectangle {
             anchors.fill: parent
             radius: width / 2
-            color: root.card3
+            color: av.fillColor
         }
 
         Text {
             anchors.centerIn: parent
             visible: img.status !== Image.Ready
             text: av.initial
-            color: root.fg
+            color: av.letterColor
             font.family: root.fSans
             font.pixelSize: Math.round(av.height * 0.42)
             font.weight: Font.Medium

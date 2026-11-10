@@ -15,23 +15,22 @@ Rectangle {
     property bool canControl: true
     property bool canGoPrevious: true
     property bool canGoNext: true
+    readonly property bool hasMedia: true
     signal previous()
     signal playPause()
     signal next()
 
     implicitWidth: 380
-    implicitHeight: 76
-    radius: Theme.r
-    color: Theme.card
-    border.width: 1
-    border.color: Theme.line
+    implicitHeight: 64
+    radius: 24
+    color: "#1a1a1a"
 
     // Artwork, or a dot-matrix note when there is none.
     Item {
         id: artBox
-        x: 14; width: 48; height: 48
+        x: 10; width: 44; height: 44
         anchors.verticalCenter: parent.verticalCenter
-        Rectangle { anchors.fill: parent; radius: 14; color: Theme.card2 }
+        Rectangle { anchors.fill: parent; radius: 12; color: "#2a2a2a" }
         Icon { anchors.centerIn: parent; name: "music_note"; size: 22; color: Theme.fg2; visible: art.status !== Image.Ready }
         Image {
             id: art
@@ -45,7 +44,7 @@ Rectangle {
         // Rounds the artwork corners without layer effects (works with software rendering).
         Rectangle {
             anchors.fill: parent; anchors.margins: -8
-            radius: 22; color: "transparent"
+            radius: 20; color: "transparent"
             border.width: 8; border.color: card.color
         }
     }
@@ -74,7 +73,7 @@ Rectangle {
 
     Row {
         id: controls
-        anchors.right: parent.right; anchors.rightMargin: 14
+        anchors.right: parent.right; anchors.rightMargin: 12
         anchors.verticalCenter: parent.verticalCenter
         spacing: 4
         enabled: card.canControl
@@ -90,7 +89,7 @@ Rectangle {
             Accessible.name: i18ndc("plasma_shell_org.kde.plasma.desktop", "@action:button Accessible only", "Previous track")
         }
         Pressable {
-            width: 44; height: 44
+            width: 40; height: 40
             onClicked: card.playPause()
             Rectangle { anchors.fill: parent; radius: width / 2; color: Theme.fg }
             Icon { anchors.centerIn: parent; name: card.playing ? "pause" : "play_arrow"; size: 24; fill: 1; color: Theme.bg }
