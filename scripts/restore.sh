@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Son ehtiyat nüsxəni (və ya verilən qovluğu) geri yükləyir.
+set -euo pipefail
+SRC="${1:-$HOME/.local/share/nothingos-backup/latest}"
+[ -d "$SRC" ] || { echo "Ehtiyat nüsxə tapılmadı: $SRC"; exit 1; }
+pkill -x qs 2>/dev/null || true
+rm -f "$HOME/.config/autostart/nothingos-shell.desktop"
+for f in "$SRC"/*; do
+  name=$(basename "$f")
+  rm -rf "$HOME/.config/$name"
+  cp -a "$f" "$HOME/.config/$name"
+done
+plasma-apply-colorscheme BreezeDark >/dev/null 2>&1 || true
+qdbus6 org.kde.KWin /KWin reconfigure 2>/dev/null || true
+systemctl --user restart plasma-plasmashell.service 2>/dev/null || (plasmashell --replace >/dev/null 2>&1 & disown)
+echo "Geri yükləndi: $SRC"

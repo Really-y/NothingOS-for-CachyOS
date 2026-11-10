@@ -1,0 +1,11 @@
+{
+    "KPlugin": {
+        "Authors": [{"Name": "NothingOS for CachyOS"}],
+        "Description": "Black, solid cards, hairlines",
+        "Id": "Nothing",
+        "License": "GPL-2.0-or-later",
+        "Name": "Nothing",
+        "Version": "1.0"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}
