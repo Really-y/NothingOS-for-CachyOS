@@ -1,0 +1,2 @@
+# shared UI kit copied into each plasmoid by scripts/build-plasmoids.sh
+plasma/plasmoids/*/contents/ui/nothing/
