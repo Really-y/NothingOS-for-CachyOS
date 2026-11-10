@@ -30,18 +30,19 @@ Item {
         Rectangle {
             anchors.fill: parent
             radius: width / 2
-            color: disc.containsMouse || tile.activeFocus ? Theme.card3 : Theme.card2
-            border.width: tile.activeFocus ? 1 : 0
-            border.color: Theme.fg2
+            // focus = white disk + black glyph (no hairlines)
+            color: tile.activeFocus ? Theme.fg : (disc.containsMouse ? "#2a2a2a" : "#1a1a1a")
             Behavior on color { ColorAnimation { duration: Theme.fast } }
         }
-        Icon { anchors.centerIn: parent; name: tile.iconName; size: 24 }
+        Icon { anchors.centerIn: parent; name: tile.iconName; size: 24; color: tile.activeFocus ? Theme.bg : Theme.fg }
     }
     Label {
         id: caption
         anchors.top: disc.bottom; anchors.topMargin: 10
         anchors.horizontalCenter: parent.horizontalCenter
         text: tile.plainText
-        size: 10
+        size: 11
+        color: Theme.fg2
+        font.letterSpacing: 1.5
     }
 }

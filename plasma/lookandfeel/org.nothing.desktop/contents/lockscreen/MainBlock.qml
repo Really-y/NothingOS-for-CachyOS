@@ -90,12 +90,20 @@ FocusScope {
 
     ColumnLayout {
         id: column
-        // Rhythm: [status 16] →16→ pill 56 →12→ hints/media →32→ action tiles
+        // Rhythm: [media →24→] [status 16] →16→ pill 56 →(12→ hints)→24→ action tiles
         anchors.top: parent.top
         anchors.topMargin: block.promptTop
         anchors.horizontalCenter: parent.horizontalCenter
         width: Math.min(400, block.width - 48)
         spacing: 0
+
+        // Extra content (media controls) supplied by LockScreenUi — above the status line.
+        ColumnLayout {
+            id: extras
+            Layout.fillWidth: true
+            Layout.bottomMargin: implicitHeight > 0 ? 24 : 0
+            spacing: 0
+        }
 
         // Status line: red dot + mono message (errors, caps lock, PAM prompts).
         Item {
@@ -308,18 +316,10 @@ FocusScope {
             label: i18ndc("plasma_shell_org.kde.plasma.desktop", "@info:usagetip", "(or scan your smartcard)")
         }
 
-        // Extra content (media controls) supplied by LockScreenUi.
-        ColumnLayout {
-            id: extras
-            Layout.fillWidth: true
-            Layout.topMargin: implicitHeight > 0 ? 12 : 0
-            spacing: 0
-        }
-
         Row {
             id: actionRow
             Layout.alignment: Qt.AlignHCenter
-            Layout.topMargin: 32
+            Layout.topMargin: 24
             spacing: 28
         }
     }

@@ -213,8 +213,8 @@ Item {
             }
         }
 
-        // One vertical rhythm for clock + prompt: clock →48→ prompt, block centred.
-        readonly property real clockBlock: clock.visible ? clock.height + 48 : 0
+        // One vertical rhythm for clock + prompt: date →24→ (media →24→) prompt, block centred.
+        readonly property real clockBlock: clock.visible ? clock.height + 24 : 0
         readonly property real activeTop: Math.max(24, Math.round((height - clockBlock - mainBlock.contentHeight) / 2))
 
         // Clock: AOD-style (dimmed, ~40 px above centre) when idle, rises above the prompt when it appears.

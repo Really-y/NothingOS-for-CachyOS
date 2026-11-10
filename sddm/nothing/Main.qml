@@ -172,9 +172,11 @@ Rectangle {
         Column {
             id: centre
 
+            // Fixed top, same formula as the lock screen's activeTop. The user row is left out
+            // on purpose so the clock never moves with the number of users.
+            readonly property real fixedPart: (clock.visible ? clock.height + 48 : 0) + 16 + 16 + 56 + 24 + powerRow.height
             anchors.horizontalCenter: parent.horizontalCenter
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.verticalCenterOffset: -Math.round(root.height * 0.04)
+            y: Math.max(24, Math.round((root.height - fixedPart) / 2))
             spacing: 48
 
             // Clock + date.
@@ -246,7 +248,7 @@ Rectangle {
                     visible: userModel.count > 1
                     anchors.horizontalCenter: parent.horizontalCenter
                     width: Math.min(contentWidth, root.width - 48)
-                    height: 64 + 10 + 16
+                    height: 56 + 10 + 16
                     orientation: ListView.Horizontal
                     spacing: 18
                     interactive: contentWidth > width
@@ -273,49 +275,28 @@ Rectangle {
                         Avatar {
                             id: face
 
-                            width: userDelegate.isCurrent ? 64 : 56
-                            height: width
-                            // all avatar centres on one line (y = 32)
+                            // 56 px for everyone; selected = white disk + black initial
+                            width: 56
+                            height: 56
                             anchors.horizontalCenter: parent.horizontalCenter
-                            anchors.verticalCenter: parent.top
-                            anchors.verticalCenterOffset: 32
+                            anchors.top: parent.top
                             source: userDelegate.icon
                             initial: (userDelegate.realName || userDelegate.name).charAt(0).toUpperCase()
-                            fillColor: userDelegate.isCurrent ? "#2a2a2a" : "#1a1a1a"
-                            letterColor: userDelegate.isCurrent ? root.fg : root.fg2
-
-                            Behavior on width {
-                                NumberAnimation {
-                                    duration: 260
-                                    easing.type: Easing.BezierSpline
-                                    easing.bezierCurve: root.emphasized
-                                }
-
-                            }
+                            fillColor: userDelegate.isCurrent ? root.fg : "#1a1a1a"
+                            letterColor: userDelegate.isCurrent ? root.bg : root.fg2
+                            Behavior on fillColor { ColorAnimation { duration: 260 } }
 
                         }
-                        // white ring on the selected user
-
-                        Rectangle {
-                            visible: userDelegate.isCurrent
-                            anchors.centerIn: face
-                            width: face.width + 8
-                            height: width
-                            radius: width / 2
-                            color: "transparent"
-                            border.width: 1.5
-                            border.color: root.fg
-                        }
-
                         Mono {
                             anchors.top: parent.top
-                            anchors.topMargin: 74
+                            anchors.topMargin: 66
                             anchors.horizontalCenter: parent.horizontalCenter
                             width: parent.width + 16
                             horizontalAlignment: Text.AlignHCenter
                             elide: Text.ElideRight
                             text: userDelegate.realName || userDelegate.name
-                            size: 10
+                            size: 11
+                            font.letterSpacing: 1.5
                             color: userDelegate.isCurrent ? root.fg : root.fg2
                         }
 
@@ -491,7 +472,7 @@ Rectangle {
                             verticalAlignment: Text.AlignVCenter
                             visible: !parent.text && !parent.preeditText
                             elide: Text.ElideRight
-                            text: !root.needsPassword ? "No password needed" : root.userName ? "Password for " + root.userName : "Password"
+                            text: !root.needsPassword ? "No password needed" : "Enter password"
                             color: root.fg3
                             font.family: root.fSans
                             font.pixelSize: 16
@@ -569,12 +550,14 @@ Rectangle {
 
         }
 
-        // Power tiles, bottom-centre.
+        // Power tiles: 24 px under the password pill, like the lock screen's action row.
         Row {
+            id: powerRow
+
             anchors.horizontalCenter: parent.horizontalCenter
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: Math.round(root.height * 0.05)
-            spacing: 20
+            anchors.top: centre.bottom
+            anchors.topMargin: 24
+            spacing: 28
 
             PowerTile {
                 visible: sddm.canSuspend
@@ -933,7 +916,9 @@ Rectangle {
             anchors.topMargin: 10
             anchors.horizontalCenter: parent.horizontalCenter
             text: tile.label
-            size: 10
+            size: 11
+            color: root.fg2
+            font.letterSpacing: 1.5
         }
 
     }

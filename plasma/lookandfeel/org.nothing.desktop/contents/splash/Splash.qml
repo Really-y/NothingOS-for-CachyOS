@@ -37,7 +37,7 @@ Rectangle {
     readonly property real pitch: Math.round(Math.max(6, Math.min(width, height) * 0.0145))
     readonly property real dot: pitch * 0.75                 // wordmark dot
     readonly property real bigDot: dot * 2                   // progress dot = 2× wordmark dot
-    readonly property real bigPitch: bigDot * 2.4            // progress pitch = 2.4× progress dot
+    readonly property real bigPitch: pitch * 4                // progress dots sit on wordmark columns 2 + 4·i
 
     // Wordmark dot positions in grid units: [{c, r}], plus total columns.
     readonly property var cells: {
@@ -101,17 +101,18 @@ Rectangle {
                 }
             }
 
-            Row {
+            Item {
                 id: progress
-                spacing: root.bigPitch - root.bigDot
-                anchors.horizontalCenter: parent.horizontalCenter
-                y: grid.progressRow * root.pitch + root.dot / 2 - root.bigDot / 2
+                anchors.fill: parent
 
                 Repeater {
                     model: root.dotCount
                     Rectangle {
                         id: pdot
                         required property int index
+                        // centred under wordmark column 2 + 4·i, on grid row `progressRow`
+                        x: (2 + index * 4) * root.pitch + root.dot / 2 - root.bigDot / 2
+                        y: grid.progressRow * root.pitch + root.dot / 2 - root.bigDot / 2
                         readonly property bool isLast: index === root.dotCount - 1
                         readonly property bool isLit: isLast ? root.done : index < root.lit
                         // The next dot to fill breathes in grey so the screen never looks frozen.

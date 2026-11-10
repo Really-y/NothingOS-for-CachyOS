@@ -34,7 +34,9 @@ Column {
         hours: clock.use24h ? (h < 10 ? "0" : "") + h : String((h + 11) % 12 + 1)
         minutes: Qt.formatTime(clock.now, "mm")
         size: clock.size
-        color: clock.idle ? "#d9d9d9" : Theme.fg
+        // AOD: ~60% grey, thinner dots
+        color: clock.idle ? "#9a9a9a" : Theme.fg
+        dotRatio: clock.idle ? 0.6 : 0.75
         width: implicitWidth
         height: implicitHeight
         Accessible.role: Accessible.StaticText
@@ -52,13 +54,14 @@ Column {
             Label {
                 text: Qt.formatDate(clock.now, "dddd")
                 size: 13
-                color: clock.idle ? "#d9d9d9" : Theme.fg
+                color: clock.idle ? Theme.fg3 : Theme.fg
                 font.letterSpacing: 2.4
             }
 
             Label {
                 text: Qt.formatDate(clock.now, "d MMMM")
                 size: 13
+                color: clock.idle ? Theme.fg3 : Theme.fg2
                 font.letterSpacing: 2.4
             }
 
@@ -66,6 +69,7 @@ Column {
                 visible: !clock.use24h
                 text: Qt.formatTime(clock.now, "AP")
                 size: 13
+                color: clock.idle ? Theme.fg3 : Theme.fg2
                 font.letterSpacing: 2.4
             }
 
