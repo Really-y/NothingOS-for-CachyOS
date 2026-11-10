@@ -10,13 +10,18 @@ Item {
     id: root
     property url source
     property string mode: "halftone"     // "halftone" | "mono"
+    // preset "small" — the one recipe for every art tile ≤ 90px (media 2×2, control
+    // center, lockscreen): 5px pitch, 3px round pixel-stamp dots (≈3.5px optical), binary (dot or
+    // no dot), the cover square-cropped into a centred dot grid that fills ~80 % of
+    // the tile. Overrides pitch / maxDot / levels / fades.
+    property string preset: ""
+    readonly property int smallPitch: 5       // 3px dot stamp + 2px pure-black gap
     property real radius: 20
     property real pitch: 6
     property real fadeTop: 0             // fraction of height kept clear at the top (halftone)
     property real fadeBottom: 0.4        // ... and at the bottom (text band)
     property real fadeRamp: 0.14         // soft ramp beyond the clear bands
     property int levels: 4               // posterisation levels for dot sizes
-    property int edgeCut: 0x40           // alpha below this is dropped (no grey links)
     property real minDot: 2.5            // px; smaller dots are dropped
     property real maxDot: 0.92           // largest dot diameter as a fraction of the cell (< 0.75 keeps clear gaps)
     property color matte: Theme.widget   // colour behind the corners (mono mode)
@@ -34,6 +39,9 @@ Item {
     Canvas {
         id: canvas
         anchors.fill: parent
+        // nearest sampling: if the tile lands on a fractional scene position the
+        // canvas texture must not be bilinear-filtered (that adds grey halos/bridges)
+        smooth: false
         onWidthChanged: requestPaint()
         onHeightChanged: requestPaint()
         Connections { target: root; function onModeChanged() { canvas.requestPaint(); } function onPitchChanged() { canvas.requestPaint(); } }
@@ -47,6 +55,39 @@ Item {
             c.closePath();
         }
 
+        function paintSmall(c, w, h, iw, ih) {
+            const p = root.smallPitch, n = Math.max(1, Math.round(0.8 * Math.min(w, h) / p));
+            const G = n * p;
+            const gx = Math.floor((w - G) / 2), gy = Math.floor((h - G) / 2);
+            // square cover-crop of the art into the grid area
+            const sq = Math.min(iw, ih);
+            c.drawImage(probe, (iw - sq) / 2, (ih - sq) / 2, sq, sq, gx, gy, G, G);
+            const d = c.getImageData(gx, gy, G, G).data;
+            c.clearRect(0, 0, w, h);
+            c.fillStyle = Theme.fg;
+            // Each dot is a pixel stamp — a 3×3 disc (corners at 85 %) on whole pixels —
+            // instead of an antialiased arc, whose faint fringe bridged neighbours.
+            const corner = Qt.rgba(1, 1, 1, 0.85);
+            for (let j = 0; j < n; j++)
+                for (let i = 0; i < n; i++) {
+                    let sum = 0, k = 0;
+                    for (let y = j * p; y < (j + 1) * p; y++)
+                        for (let x = i * p; x < (i + 1) * p; x++) {
+                            const q = (y * G + x) * 4;
+                            sum += 0.2126 * d[q] + 0.7152 * d[q + 1] + 0.0722 * d[q + 2];
+                            k++;
+                        }
+                    if (sum / k / 255 < 0.5) continue;          // binary: dot or nothing
+                    const x0 = gx + i * p + Math.floor(p / 2) - 1, y0 = gy + j * p + Math.floor(p / 2) - 1;
+                    c.fillStyle = Theme.fg;
+                    c.fillRect(x0 + 1, y0, 1, 3);
+                    c.fillRect(x0, y0 + 1, 3, 1);
+                    c.fillStyle = corner;
+                    c.fillRect(x0, y0, 1, 1); c.fillRect(x0 + 2, y0, 1, 1);
+                    c.fillRect(x0, y0 + 2, 1, 1); c.fillRect(x0 + 2, y0 + 2, 1, 1);
+                }
+        }
+
         onPaint: {
             const c = getContext("2d");
             const w = Math.round(width), h = Math.round(height);
@@ -54,8 +95,10 @@ Item {
             c.reset();
             if (!root.ready || w < 2 || h < 2) return;
 
-            // 1. draw the art cropped to fill (PreserveAspectCrop)
             const iw = probe.implicitWidth, ih = probe.implicitHeight;
+            if (root.preset === "small") { paintSmall(c, w, h, iw, ih); return; }
+
+            // 1. draw the art cropped to fill (PreserveAspectCrop)
             const s = Math.max(w / iw, h / ih);
             const sw = w / s, sh = h / s;
             c.drawImage(probe, (iw - sw) / 2, (ih - sh) / 2, sw, sh, 0, 0, w, h);
@@ -120,10 +163,6 @@ Item {
                         c.fill();
                     }
                 }
-                // edge threshold: faint antialias fringe between close dots → pure black
-                const out = c.getImageData(0, 0, w, h), o = out.data;
-                for (let i = 3; i < o.length; i += 4) if (o[i] < root.edgeCut) { o[i] = 0; o[i - 1] = o[i - 2] = o[i - 3] = 0; }
-                c.putImageData(out, 0, 0);
             }
         }
     }

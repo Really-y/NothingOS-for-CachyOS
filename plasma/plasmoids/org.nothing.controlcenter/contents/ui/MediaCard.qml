@@ -33,12 +33,11 @@ Rectangle {
             ArtCanvas {
                 id: art
                 anchors.fill: parent
-                anchors.margins: 6          // subject inset inside the tile, no bleed
                 visible: root.art !== ""
                 source: root.art
                 mode: "halftone"
                 radius: 4
-                pitch: 6; maxDot: 0.6
+                preset: "small"             // shared small-tile recipe (media 2×2, lockscreen)
                 fadeTop: 0
                 fadeBottom: 0
                 matte: "#1a1a1a"

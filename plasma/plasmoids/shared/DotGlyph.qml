@@ -29,6 +29,7 @@ Canvas {
     // for small glyphs that would otherwise blur into a grey grille.
     property bool snap: false
     property real minDot: 3
+    smooth: !snap          // snapped glyphs: nearest sampling, no halo at fractional positions
     readonly property int nRows: shown.length
     readonly property int nCols: nRows ? shown[0].length : 0
     readonly property real pitch: nRows ? (snap ? Math.max(1, Math.floor(Math.min(width / nCols, height / nRows)))
@@ -60,6 +61,17 @@ Canvas {
             for (let x = 0; x < nCols; x++) {
                 const f = col[shown[y][x]];
                 if (!f || f.a === 0) continue;
+                if (snap && r * 2 <= 4) {
+                    // whole-pixel 3×3 disc stamp: no antialias fringe between dots
+                    const x0 = Math.floor(cxOf(x)) - 1, y0 = Math.floor(cyOf(y)) - 1;
+                    c.fillStyle = f;
+                    c.fillRect(x0 + 1, y0, 1, 3);
+                    c.fillRect(x0, y0 + 1, 3, 1);
+                    c.fillStyle = Qt.rgba(f.r, f.g, f.b, f.a * 0.85);
+                    c.fillRect(x0, y0, 1, 1); c.fillRect(x0 + 2, y0, 1, 1);
+                    c.fillRect(x0, y0 + 2, 1, 1); c.fillRect(x0 + 2, y0 + 2, 1, 1);
+                    continue;
+                }
                 c.beginPath();
                 c.arc(cxOf(x), cyOf(y), r, 0, Math.PI * 2);
                 c.fillStyle = f;

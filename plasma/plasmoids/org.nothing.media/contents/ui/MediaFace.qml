@@ -119,9 +119,7 @@ Card {
             source: root.hasArt && !root.wide ? root.artUrl : ""
             mode: "halftone"
             radius: root.innerRadius
-            // small tile: coarse cells, round dots that never touch
-            pitch: 5
-            maxDot: 0.7
+            preset: "small"             // shared small-tile recipe (control center, lockscreen)
             fadeTop: 0
             fadeBottom: 0
         }
@@ -183,7 +181,10 @@ Card {
             color: Theme.bg
             DotGlyph {
                 anchors.centerIn: parent
-                width: parent.width * 0.72; height: width
+                // 11×11 vinyl on a whole 5px pitch (55px), dots on pixel centres
+                width: Math.max(55, Math.floor(parent.width * 0.8 / 11) * 11); height: width
+                snap: true
+                minDot: 3.5
                 icon: "vinyl"
                 dimColor: "transparent"
                 litColor: Theme.fg2
