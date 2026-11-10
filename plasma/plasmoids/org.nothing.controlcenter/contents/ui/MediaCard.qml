@@ -37,7 +37,7 @@ Rectangle {
                 source: root.art
                 mode: "halftone"
                 radius: 4
-                pitch: 3
+                pitch: 4; maxDot: 0.7
                 fadeTop: 0
                 fadeBottom: 0
                 matte: "#1a1a1a"

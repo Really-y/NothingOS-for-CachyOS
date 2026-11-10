@@ -106,7 +106,8 @@ Item {
                         const bot = fb > 0 ? Math.min(1, Math.max(0, (h - fb - my) / ramp)) : 1;
                         l *= top * bot;
                         const rad = p * root.maxDot / 2 * l;
-                        if (rad < 0.6 || !inside(cx + p / 2, my, p * 0.5)) continue;
+                        // < 2px dots read as specks: drop them
+                        if (rad < 1.0 || !inside(cx + p / 2, my, p * 0.5)) continue;
                         c.beginPath();
                         c.arc(cx + p / 2, my, rad, 0, Math.PI * 2);
                         c.fill();

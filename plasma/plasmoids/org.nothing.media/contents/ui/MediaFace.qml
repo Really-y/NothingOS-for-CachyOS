@@ -58,14 +58,15 @@ Card {
         // Small disk: play = 5×5 triangle, pause = two 5-dot bars, on an integer
         // 4px pitch (3px dots, 1px gaps) ≈ 55 % of the disk — dots never merge.
         DotGlyph {
+            // play ends in one centred apex dot
             readonly property var grid: root.playing ? ["#...#", "#...#", "#...#", "#...#", "#...#"]
-                                                    : ["#....", "###..", "#####", "###..", "#...."]
+                                                    : ["#..", "##.", "###", "##.", "#.."]
             visible: pb.snapped
             rows: grid
             dimColor: "transparent"
             litColor: Theme.bg
             dotRatio: 0.75
-            width: 20; height: 20
+            width: grid[0].length * 4; height: 20
             x: Math.round((pb.diameter - width) / 2) + (root.playing ? 0 : 1)
             y: Math.round((pb.diameter - height) / 2)
         }
@@ -229,7 +230,9 @@ Card {
             visible: root.hasArt
             source: root.hasArt && root.wide ? root.artUrl : ""
             mode: "halftone"
-            pitch: 4
+            // round dots with clear gaps: 7px cells, dots ≤ 0.7 of a cell
+            pitch: 7
+            maxDot: 0.7
             fadeTop: 0
             fadeBottom: 0
             radius: root.innerRadius
