@@ -16,7 +16,12 @@ def frame_svg(r, fill, border, prefixes=("",)):
     """Nine-slice frame with radius r. Each prefix gets its own copy."""
     parts, oy = [], 0
     c, gap = r, 2
+    base_fill, base_border = fill, border
     for p in prefixes:
+        # a prefix may be (name, fill, border) to override colours for that edge
+        fill, border = base_fill, base_border
+        if isinstance(p, tuple):
+            p, fill, border = p
         pre = f"{p}-" if p else ""
 
         def g(name, x, y, w, h, body):
@@ -57,7 +62,9 @@ FILES = {
     "dialogs/background.svg": (30, "#000000", "#2a2a2a", ("",)),
     "widgets/background.svg": (24, "#111111", "#1f1f1f", ("",)),
     "widgets/tooltip.svg": (12, "#1c1c1c", "#2a2a2a", ("",)),
-    "widgets/panel-background.svg": (22, "#111111", "#2a2a2a", ("", "north", "south", "east", "west")),
+    # floating dock = card with hairline; docked top bar = pure black, no line
+    "widgets/panel-background.svg": (22, "#111111", "#2a2a2a",
+                                     ("", ("north", "#000000", "#000000"), "south", "east", "west")),
     "widgets/plasmoidheading.svg": (20, "#111111", "#111111", ("header", "footer")),
 }
 
