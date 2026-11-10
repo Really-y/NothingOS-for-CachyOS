@@ -15,7 +15,7 @@ Item {
 
     readonly property bool hasMedia: instantiator.count > 0
     visible: hasMedia
-    implicitHeight: 64
+    implicitHeight: 72
     implicitWidth: 380
 
     Repeater {

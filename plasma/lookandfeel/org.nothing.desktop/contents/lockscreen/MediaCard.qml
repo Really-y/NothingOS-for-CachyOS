@@ -21,20 +21,20 @@ Rectangle {
     signal next()
 
     implicitWidth: 380
-    implicitHeight: 64
+    implicitHeight: 72
     radius: 24
     color: "#1a1a1a"
 
     // Artwork as a halftone dot dither on a black tile, or a dot-matrix note when there is none.
     Rectangle {
         id: artBox
-        x: 10; width: 44; height: 44
+        x: 10; width: 52; height: 52
         anchors.verticalCenter: parent.verticalCenter
         radius: 12
         color: "#000000"
         DotGlyph {
             anchors.centerIn: parent
-            width: 26; height: 26
+            width: 30; height: 30
             visible: !art.ready
             icon: "note"
             dimColor: "transparent"
@@ -67,12 +67,15 @@ Rectangle {
             font.family: Theme.sans; font.pixelSize: 15; font.weight: Font.Medium
             textFormat: Text.PlainText
         }
-        Label {
+        // sentence case as delivered by MPRIS, like the control center
+        Text {
             width: parent.width
             text: card.artist
             elide: Text.ElideRight
             textFormat: Text.PlainText
             visible: text !== ""
+            color: Theme.fg2
+            font.family: Theme.sans; font.pixelSize: 13; font.weight: Font.Normal
         }
     }
 
