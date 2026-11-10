@@ -33,6 +33,7 @@ Item {
     property int zone: 0
     property int sel: 0
     property bool keyboardNav: false     // arrows/tab used since opening → show focus disc
+    property var glyphMap: ({})          // key → distinct glyph (see iconmap.js assign)
     property var symbolicNames: ({})     // set of "<icon>-symbolic" names available in the icon theme
     readonly property color widgetFill: "#1a1a1a"
     readonly property real viewY: flick.contentY
@@ -109,7 +110,7 @@ Item {
         RowLayout {
             Layout.fillWidth: true
             spacing: 12
-            DotString { text: root.searching ? "FIND" : "APPS"; size: 48 }
+            DotString { text: root.searching ? "FIND" : "APPS"; size: 50; dotRatio: 0.65 }   // pitch 5px
             Item { Layout.fillWidth: true }
             Rectangle {
                 visible: root.busy
@@ -156,7 +157,7 @@ Item {
                     visible: !search.text
                     text: "Search apps, files, settings"
                     color: Theme.fg3
-                    font: search.font
+                    font.family: Theme.sans; font.pixelSize: 15; font.weight: Font.Normal
                     anchors.verticalCenter: parent.verticalCenter
                 }
             }
@@ -225,8 +226,6 @@ Item {
                         readonly property bool selected: root.zone === 2 && root.sel === index && (root.keyboardNav || root.searching)
                         width: resultsList.width
                         height: 56
-                        readonly property real cut: resultsList.y + y + height - root.viewY - root.viewHeight
-                        opacity: Math.max(0, Math.min(1, 1 - cut / (height * 0.5)))
                         pressScale: 0.98
                         acceptedButtons: Qt.LeftButton | Qt.RightButton
                         onClicked: mouse => {
@@ -278,6 +277,19 @@ Item {
                 }
                 Item { width: 1; height: 8 }
             }
+            Rectangle {
+                // 40px fade at the bottom edge = opacity mask 0→100% over the solid black card;
+                // only while there is more content below
+                parent: flick
+                anchors.left: parent.left; anchors.right: parent.right; anchors.bottom: parent.bottom
+                height: 40
+                opacity: flick.atYEnd ? 0 : 1
+                Behavior on opacity { NumberAnimation { duration: Theme.fast } }
+                gradient: Gradient {
+                    GradientStop { position: 0; color: "#00000000" }
+                    GradientStop { position: 1; color: Theme.bg }
+                }
+            }
         }
     }
 
@@ -304,11 +316,6 @@ Item {
             required property var model
             readonly property bool selected: panel.zone === grid.zoneId && panel.sel === index && (panel.keyboardNav || panel.searching)
             width: grid.cellWidth; height: grid.cellHeight
-            // bottom of this cell in viewport coordinates; once its label is cut off the
-            // whole cell (icon + label) fades out, so there are no crisp icons over hidden labels
-            readonly property real cut: Math.max(grid.y + y + height - panel.viewY - panel.viewHeight,
-                                                 panel.viewY - (grid.y + y))
-            opacity: Math.max(0, Math.min(1, 1 - cut / (height * 0.4)))
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             onClicked: mouse => {
                 if (mouse.button === Qt.RightButton) panel.requestMenu(grid.zoneId, index, cell);
@@ -326,7 +333,8 @@ Item {
                 readonly property bool target: cell.selected && !focused        // Enter target while typing
                 color: focused ? Theme.fg : (target ? "#2a2a2a" : (cell.containsMouse ? Theme.card3 : panel.widgetFill))
                 Behavior on color { ColorAnimation { duration: Theme.fast } }
-                MonoIcon { anchors.centerIn: parent; size: 26; source: cell.model.decoration; hint: (cell.model.display || "") + " " + (cell.model.description || ""); symbolicNames: panel.symbolicNames; dark: disc.focused }
+                MonoIcon { anchors.centerIn: parent; size: 28; source: cell.model.decoration;   // 16px symbolic art has ~1px padding: 28px box ≈ 24px visible glyph
+                     hint: (cell.model.display || "") + " " + (cell.model.description || ""); key: cell.model.decoration + "|" + cell.model.display; glyphMap: panel.glyphMap; symbolicNames: panel.symbolicNames; dark: disc.focused }
             }
             Text {
                 anchors.top: disc.bottom; anchors.topMargin: 8

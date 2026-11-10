@@ -12,10 +12,12 @@ Item {
     id: root
     property var source
     property string hint: ""                 // app name / generic name for category matching
-    property int size: 26
+    property int size: 24
     property bool dark: false
     property var symbolicNames: ({})
-    readonly property string glyph: IconMap.resolve(source, hint, symbolicNames)
+    property var glyphMap: ({})              // distinct per-app glyphs from IconMap.assign()
+    property string key: ""
+    readonly property string glyph: IconMap.resolve(source, hint, symbolicNames, glyphMap, key)
     readonly property var iconSource: glyph !== "" ? glyph : source
     readonly property color ink: dark ? "#000000" : "#ffffff"
     readonly property bool gpu: GraphicsInfo.api !== GraphicsInfo.Software

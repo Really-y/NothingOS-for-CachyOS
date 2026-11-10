@@ -8,6 +8,7 @@ import org.kde.plasma.private.kicker as Kicker
 import org.kde.kitemmodels as KItemModels
 import org.kde.ksvg as KSvg
 import "nothing"
+import "iconmap.js" as IconMap
 
 // Nothing OS app drawer. Lists/launches apps through the Kicker models (same as
 // Kickoff), so launches feed KActivities recents, favourites stay in sync and
@@ -102,6 +103,28 @@ PlasmoidItem {
             root.symbolicNames = set;
             disconnectSource(source);
         }
+    }
+
+    // distinct glyph per installed app (recomputed when apps or the icon scan change)
+    property var glyphMap: ({})
+    function updateGlyphs() {
+        if (!allApps || Object.keys(symbolicNames).length === 0) return;
+        const R = allApps.KItemModels.KRoleNames;
+        const dec = R.role("decoration"), disp = R.role("display"), desc = R.role("description");
+        const apps = [];
+        for (let i = 0; i < allApps.count; i++) {
+            const ix = allApps.index(i, 0);
+            const d = allApps.data(ix, dec), n = allApps.data(ix, disp);
+            apps.push({ key: d + "|" + n, source: d, hint: n + " " + (allApps.data(ix, desc) || "") });
+        }
+        glyphMap = IconMap.assign(apps, symbolicNames);
+    }
+    onAllAppsChanged: updateGlyphs()
+    onSymbolicNamesChanged: updateGlyphs()
+    Connections {
+        target: root.allApps
+        ignoreUnknownSignals: true
+        function onCountChanged() { root.updateGlyphs(); }
     }
 
     // ── context menu: .desktop actions + favourites (like Kickoff's ActionMenu) ──
@@ -209,6 +232,7 @@ PlasmoidItem {
             totalApps: root.allApps ? root.allApps.count : 0
             busy: root.runnerModel.querying
             symbolicNames: root.symbolicNames
+            glyphMap: root.glyphMap
 
             onActivate: (zone, row) => root.activate(zone, row)
             onRequestMenu: (zone, row, item) => root.openMenu(zone, row, item)

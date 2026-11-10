@@ -109,7 +109,7 @@ Item {
             ColumnLayout {
                 spacing: 12
                 Layout.topMargin: 6
-                DotTime { id: clock; hours: Qt.formatTime(root.now, "HH"); minutes: Qt.formatTime(root.now, "mm"); size: 56 }
+                DotTime { id: clock; hours: Qt.formatTime(root.now, "HH"); minutes: Qt.formatTime(root.now, "mm"); size: 80; dotRatio: 0.65 }   // pitch 8px, white colon
                 RowLayout {
                     id: dateRow
                     spacing: 10
@@ -163,7 +163,7 @@ Item {
                         onClicked: root.power(modelData.a)
                         Rectangle {
                             anchors.fill: parent
-                            radius: 14
+                            radius: 16
                             color: pw.containsMouse ? Theme.card3 : Theme.card2
                             Behavior on color { ColorAnimation { duration: Theme.fast } }
                         }

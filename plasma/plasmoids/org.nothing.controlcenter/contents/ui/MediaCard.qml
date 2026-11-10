@@ -18,7 +18,7 @@ Rectangle {
     signal next()
 
     implicitHeight: 92
-    radius: 14
+    radius: 16
     color: "#1a1a1a"   // flat widget fill, no border (design review rule)
 
     RowLayout {

@@ -1,6 +1,7 @@
 import QtQuick
 import "../plasma/plasmoids/shared"
 import "../plasma/plasmoids/org.nothing.drawer/contents/ui"
+import "../plasma/plasmoids/org.nothing.drawer/contents/ui/iconmap.js" as IconMap
 
 // App drawer mock: panel glyph (closed/open), idle drawer, searching drawer.
 Rectangle {
@@ -11,8 +12,19 @@ Rectangle {
         const n = ["firefox", "system-file-manager", "utilities-terminal", "accessories-calculator", "kate", "utilities-system-monitor",
                    "vlc", "audio-x-generic", "video-x-generic", "web-browser", "preferences-system", "image-x-generic",
                    "package-x-generic", "applications-games", "applications-development", "system-software-install",
-                   "im-user", "x-office-document", "applications-internet", "help-browser"];
+                   "im-user", "x-office-document", "applications-internet", "help-browser", "draw-brush", "applications-graphics",
+                   "accessories-text-editor", "text-editor", "dialog-scripts", "system-run", "emblem-photos", "folder-open",
+                   "emblem-music", "media-playback-start", "code-context", "applications-all", "accessories-screenshot",
+                   "settings-configure", "input-gaming", "preferences-system-network"];
         const o = {}; for (const k of n) o[k + "-symbolic"] = true; return o;
+    }
+    // same distinct assignment main.qml does over the installed apps
+    readonly property var glyphs: {
+        const a = [];
+        for (const m of [pinned, apps, found]) for (let i = 0; i < m.count; i++) {
+            const e = m.get(i); a.push({ key: e.decoration + "|" + e.display, source: e.decoration, hint: e.display });
+        }
+        return IconMap.assign(a, sym);
     }
     ListModel {
         id: pinned
@@ -72,6 +84,7 @@ Rectangle {
             pinnedModel: pinned; pinnedCount: pinned.count
             appsModel: apps; appsCount: apps.count; totalApps: 88
             symbolicNames: sym
+            glyphMap: glyphs
         }
         DrawerPanel {
             width: 600; height: 560
@@ -81,6 +94,7 @@ Rectangle {
             totalApps: 88
             busy: true
             symbolicNames: sym
+            glyphMap: glyphs
         }
     }
 }

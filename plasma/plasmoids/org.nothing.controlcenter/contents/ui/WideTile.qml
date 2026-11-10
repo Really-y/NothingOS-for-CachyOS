@@ -9,7 +9,7 @@ Pressable {
     property string title
     property string subtitle: ""
     property bool active: false
-    property real radius: 14
+    property real radius: 16
     implicitHeight: 76
     implicitWidth: 180
 
