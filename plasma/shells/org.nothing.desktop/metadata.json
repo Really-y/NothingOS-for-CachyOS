@@ -1,0 +1,17 @@
+{
+    "KPackageStructure": "Plasma/Shell",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "NothingOS for CachyOS"
+            }
+        ],
+        "Description": "Lock screen carrier for the Nothing look: only contents/lockscreen, everything else falls back to org.kde.plasma.desktop. Selected for the screen locker only (PLASMA_DEFAULT_SHELL in kwin's environment), never for plasmashell.",
+        "Id": "org.nothing.desktop",
+        "License": "GPL-2.0+",
+        "Name": "Nothing (lock screen)",
+        "Version": "1.0"
+    },
+    "X-Plasma-APIVersion": "2",
+    "X-Plasma-FallbackPackage": "org.kde.plasma.desktop"
+}

@@ -1,2 +1,6 @@
 # shared UI kit copied into each plasmoid by scripts/build-plasmoids.sh
 plasma/plasmoids/*/contents/ui/nothing/
+# shared kit copied into the lock screen, and the lock screen copied into the shell carrier package
+# by plasma/lookandfeel/install.sh
+plasma/lookandfeel/org.nothing.desktop/contents/lockscreen/nothing/
+plasma/shells/org.nothing.desktop/contents/

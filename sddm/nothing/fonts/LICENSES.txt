@@ -1,0 +1,24 @@
+Fonts bundled with the "nothing" SDDM theme
+===========================================
+
+SDDM runs the greeter as the `sddm` user, which cannot see fonts installed in a
+user's home, so the theme ships its own copies and loads them with FontLoader.
+
+Doto                      Copyright 2024 The Doto Project Authors
+                          https://github.com/oliverlalan/Doto
+                          SIL Open Font License 1.1 (full text: OFL-Doto.txt)
+
+Space Grotesk             Copyright 2020 The Space Grotesk Project Authors
+                          https://github.com/floriankarsten/space-grotesk
+                          SIL Open Font License 1.1 (same text as OFL-Doto.txt)
+
+Space Mono                Copyright 2016 Google Inc. / Colophon Foundry
+                          https://github.com/googlefonts/spacemono
+                          SIL Open Font License 1.1 (same text as OFL-Doto.txt)
+
+Material Symbols Rounded  Copyright Google LLC
+                          https://github.com/google/material-design-icons
+                          Apache License 2.0 — https://www.apache.org/licenses/LICENSE-2.0
+
+The fonts are unmodified. In the git repository these files are symlinks to
+../../../fonts/; sddm/install.sh copies the real files.

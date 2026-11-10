@@ -1,0 +1,19 @@
+{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "NothingOS for CachyOS"
+            }
+        ],
+        "Category": "",
+        "Description": "Nothing OS inspired: pure black, white, one red accent, dot-matrix type",
+        "Id": "org.nothing.desktop",
+        "License": "GPL-2.0+",
+        "Name": "Nothing",
+        "Version": "1.0",
+        "Website": ""
+    },
+    "Keywords": "Desktop;Workspace;Appearance;Look and Feel;Lock;Splash;Nothing;",
+    "X-Plasma-APIVersion": "2"
+}
