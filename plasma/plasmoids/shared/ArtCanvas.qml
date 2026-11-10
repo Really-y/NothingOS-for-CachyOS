@@ -16,6 +16,7 @@ Item {
     property real fadeBottom: 0.4        // ... and at the bottom (text band)
     property real fadeRamp: 0.14         // soft ramp beyond the clear bands
     property int levels: 4               // posterisation levels for dot sizes
+    property real minDot: 2.5            // px; smaller dots are dropped
     property real maxDot: 0.92           // largest dot diameter as a fraction of the cell (< 0.75 keeps clear gaps)
     property color matte: Theme.widget   // colour behind the corners (mono mode)
     readonly property bool ready: probe.status === Image.Ready && String(source) !== ""
@@ -106,10 +107,13 @@ Item {
                         const bot = fb > 0 ? Math.min(1, Math.max(0, (h - fb - my) / ramp)) : 1;
                         l *= top * bot;
                         const rad = p * root.maxDot / 2 * l;
-                        // < 2px dots read as specks: drop them
-                        if (rad < 1.0 || !inside(cx + p / 2, my, p * 0.5)) continue;
+                        // dots under minDot px read as specks: drop them
+                        if (rad * 2 < root.minDot || !inside(cx + p / 2, my, p * 0.5)) continue;
+                        // Centre each dot on a pixel centre: a small circle centred on a
+                        // pixel corner rasterises as a 2×2 square with a grey cross halo.
+                        const px = Math.floor(cx + p / 2) + 0.5, py = Math.floor(my) + 0.5;
                         c.beginPath();
-                        c.arc(cx + p / 2, my, rad, 0, Math.PI * 2);
+                        c.arc(px, py, rad, 0, Math.PI * 2);
                         c.fill();
                     }
                 }

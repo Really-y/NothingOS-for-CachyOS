@@ -48,7 +48,7 @@ Rectangle {
             source: card.artUrl
             mode: "halftone"
             radius: 12
-            pitch: 4; maxDot: 0.7
+            pitch: 6; maxDot: 0.6
             fadeTop: 0
             fadeBottom: 0
         }

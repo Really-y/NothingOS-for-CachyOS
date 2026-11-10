@@ -33,11 +33,12 @@ Rectangle {
             ArtCanvas {
                 id: art
                 anchors.fill: parent
+                anchors.margins: 6          // subject inset inside the tile, no bleed
                 visible: root.art !== ""
                 source: root.art
                 mode: "halftone"
                 radius: 4
-                pitch: 4; maxDot: 0.7
+                pitch: 6; maxDot: 0.6
                 fadeTop: 0
                 fadeBottom: 0
                 matte: "#1a1a1a"
@@ -52,21 +53,23 @@ Rectangle {
                 litColor: Theme.fg2
                 halfColor: Theme.fg2
             }
-            // live dot: the one red accent, only while playing
-            Rectangle {
-                visible: root.playing
-                width: 8; height: 8; radius: 4
-                color: root.accent ? Theme.red : Theme.fg
-                border.color: "#1a1a1a"; border.width: 2
-                anchors.right: parent.right; anchors.top: parent.top
-                anchors.rightMargin: -2; anchors.topMargin: -2
-            }
         }
 
         ColumnLayout {
             Layout.fillWidth: true
             spacing: 3
-            Label { Layout.fillWidth: true; visible: root.app !== ""; text: root.app; size: 9; color: Theme.fg3; elide: Text.ElideRight }
+            // "● SPOTIFY": the live dot (the one red accent, only while playing) before the source
+            Row {
+                Layout.fillWidth: true
+                visible: root.app !== ""
+                spacing: 6
+                Rectangle {
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: 6; height: 6; radius: 3
+                    color: root.playing ? (root.accent ? Theme.red : Theme.fg) : Theme.fg3
+                }
+                Label { text: root.app; size: 9; color: Theme.fg3; elide: Text.ElideRight }
+            }
             Text {
                 Layout.fillWidth: true
                 text: root.title
