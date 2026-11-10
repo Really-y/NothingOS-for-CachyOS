@@ -1,0 +1,16 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "X-Plasma-Provides": [ "org.kde.plasma.launchermenu" ],
+    "KPlugin": {
+        "Id": "org.nothing.drawer",
+        "Name": "Nothing App Drawer",
+        "Description": "Nothing OS app drawer: dot-matrix launcher with monochrome icons and KRunner search",
+        "Icon": "start-here-kde-symbolic",
+        "Category": "Application Launchers",
+        "Version": "1.0",
+        "License": "GPL-3.0-or-later",
+        "Authors": [ { "Name": "NothingOS for CachyOS" } ],
+        "FormFactors": [ "desktop", "tablet" ]
+    }
+}

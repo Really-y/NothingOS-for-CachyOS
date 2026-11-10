@@ -1,0 +1,15 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "KPlugin": {
+        "Id": "org.nothing.controlcenter",
+        "Name": "Nothing Control Center",
+        "Description": "Nothing OS quick settings: network, Bluetooth, volume, focus, night light, media and power",
+        "Icon": "preferences-system",
+        "Category": "System Information",
+        "Version": "1.0",
+        "License": "GPL-3.0-or-later",
+        "Authors": [ { "Name": "NothingOS for CachyOS" } ],
+        "FormFactors": [ "desktop", "tablet" ]
+    }
+}
