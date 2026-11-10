@@ -10,7 +10,7 @@ PanelWindow {
     id: win
     required property var modelData
     screen: modelData
-    readonly property bool open: State.launcherScreen === modelData
+    readonly property bool open: Ui.launcherScreen === modelData
     visible: open || sheet.opacity > 0
     anchors { top: true; bottom: true; left: true; right: true }
     color: "transparent"
@@ -37,14 +37,14 @@ PanelWindow {
         scored.sort((x, y) => y.s - x.s || x.n.localeCompare(y.n));
         return scored.map(x => x.a);
     }
-    function launch(a) { if (!a) return; a.execute(); State.closeAll(); }
+    function launch(a) { if (!a) return; a.execute(); Ui.closeAll(); }
 
     Rectangle {
         anchors.fill: parent
         color: "#000000"
         opacity: win.open ? 0.72 : 0
         Behavior on opacity { NumberAnimation { duration: Theme.normal } }
-        MouseArea { anchors.fill: parent; onClicked: State.closeAll() }
+        MouseArea { anchors.fill: parent; onClicked: Ui.closeAll() }
     }
 
     Rectangle {
@@ -83,7 +83,7 @@ PanelWindow {
                     color: Theme.fg; font.family: Theme.sans; font.pixelSize: 17
                     selectionColor: Theme.fg; selectedTextColor: Theme.bg
                     onTextChanged: grid.currentIndex = 0
-                    Keys.onEscapePressed: State.closeAll()
+                    Keys.onEscapePressed: Ui.closeAll()
                     Keys.onReturnPressed: win.launch(win.apps[grid.currentIndex])
                     Keys.onDownPressed: grid.moveCurrentIndexDown()
                     Keys.onUpPressed: grid.moveCurrentIndexUp()

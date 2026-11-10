@@ -5,7 +5,7 @@ import Quickshell.Wayland
 // Toasts in the top-right of the primary screen.
 PanelWindow {
     id: win
-    screen: Quickshell.screens[0]
+    screen: Ui.primary
     anchors { top: true; right: true }
     margins { top: 44; right: 10 }
     implicitWidth: 380
@@ -21,7 +21,7 @@ PanelWindow {
     Connections {
         target: Notifs
         function onArrived(n) {
-            if (State.qsScreen) return;            // panel already shows them
+            if (Ui.qsScreen) return;            // panel already shows them
             win.items = [n].concat(win.items).slice(0, 4);
         }
     }

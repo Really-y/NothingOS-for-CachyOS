@@ -1,0 +1,7 @@
+[Sound Theme]
+Name=Nothing
+Comment=Short, digital, dot-like tones
+Directories=stereo
+
+[stereo]
+OutputProfile=stereo

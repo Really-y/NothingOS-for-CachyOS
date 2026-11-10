@@ -8,18 +8,24 @@ Singleton {
     id: root
     property var qsScreen: null        // quick settings open on this screen (null = closed)
     property var launcherScreen: null
-    property var lastScreen: Quickshell.screens[0]
+    readonly property var primary: {
+        const ss = Quickshell.screens;
+        for (const s of ss) if (s.name === Theme.primaryScreen) return s;
+        return ss.length ? ss[0] : null;
+    }
+    property var lastScreen: null
+    function pick(s) { return s || lastScreen || primary; }
     property bool nightLight: false
 
     function toggleQs(screen) {
         launcherScreen = null;
-        qsScreen = (qsScreen === screen) ? null : screen;
+        const s = pick(screen);
+        qsScreen = (qsScreen === s) ? null : s;
         if (qsScreen) Notifs.markRead();
     }
     function toggleLauncher(screen) {
         qsScreen = null;
-        const s = screen || lastScreen;
-        launcherScreen = launcherScreen ? null : s;
+        launcherScreen = launcherScreen ? null : pick(screen);
     }
     function closeAll() { qsScreen = null; launcherScreen = null; }
 

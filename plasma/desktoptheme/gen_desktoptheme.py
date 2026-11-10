@@ -57,7 +57,7 @@ FILES = {
     "dialogs/background.svg": (20, "#111111", "#2a2a2a", ("",)),
     "widgets/background.svg": (24, "#111111", "#1f1f1f", ("",)),
     "widgets/tooltip.svg": (12, "#1c1c1c", "#2a2a2a", ("",)),
-    "widgets/panel-background.svg": (1, "#000000", "#000000", ("", "north", "south", "east", "west")),
+    "widgets/panel-background.svg": (22, "#111111", "#2a2a2a", ("", "north", "south", "east", "west")),
     "widgets/plasmoidheading.svg": (20, "#111111", "#111111", ("header", "footer")),
 }
 

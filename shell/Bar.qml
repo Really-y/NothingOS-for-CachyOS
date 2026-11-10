@@ -27,7 +27,7 @@ PanelWindow {
         // 3x3 dot grid: app drawer
         Pressable {
             Layout.preferredWidth: 22; Layout.preferredHeight: 22
-            onClicked: { State.lastScreen = bar.screen; State.toggleLauncher(bar.screen); }
+            onClicked: { Ui.lastScreen = bar.screen; Ui.toggleLauncher(bar.screen); }
             Grid {
                 anchors.centerIn: parent; columns: 3; spacing: 3
                 Repeater {
@@ -35,7 +35,7 @@ PanelWindow {
                     Rectangle {
                         required property int index
                         width: 4; height: 4; radius: 2
-                        color: index === 4 && State.launcherScreen === bar.screen ? Theme.red : (parent.parent.containsMouse ? Theme.fg : Theme.fg2)
+                        color: index === 4 && Ui.launcherScreen === bar.screen ? Theme.red : (parent.parent.containsMouse ? Theme.fg : Theme.fg2)
                         Behavior on color { ColorAnimation { duration: Theme.fast } }
                     }
                 }
@@ -127,17 +127,17 @@ PanelWindow {
             pressScale: 0.96
             Layout.preferredHeight: 26
             Layout.preferredWidth: statusRow.implicitWidth + 22
-            onClicked: { State.lastScreen = bar.screen; State.toggleQs(bar.screen); }
+            onClicked: { Ui.lastScreen = bar.screen; Ui.toggleQs(bar.screen); }
             Rectangle {
                 anchors.fill: parent; radius: height / 2
-                color: State.qsScreen === bar.screen ? Theme.fg : (pill.containsMouse ? Theme.card2 : Theme.card)
+                color: Ui.qsScreen === bar.screen ? Theme.fg : (pill.containsMouse ? Theme.card2 : Theme.card)
                 Behavior on color { ColorAnimation { duration: Theme.fast } }
             }
             Row {
                 id: statusRow
                 anchors.centerIn: parent
                 spacing: 8
-                readonly property color c: State.qsScreen === bar.screen ? Theme.bg : Theme.fg
+                readonly property color c: Ui.qsScreen === bar.screen ? Theme.bg : Theme.fg
                 Icon { name: Net.icon; size: 16; color: statusRow.c }
                 Icon { visible: Net.btOn; name: Net.btConnected > 0 ? "bluetooth_connected" : "bluetooth"; size: 16; color: statusRow.c }
                 Icon { name: Audio.icon; size: 16; color: statusRow.c }

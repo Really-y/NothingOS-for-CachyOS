@@ -16,11 +16,11 @@ ShellRoot {
     // `qs -p <path> ipc call launcher toggle` etc.
     IpcHandler {
         target: "launcher"
-        function toggle(): void { State.toggleLauncher(null); }
+        function toggle(): void { Ui.toggleLauncher(null); }
     }
     IpcHandler {
         target: "quicksettings"
-        function toggle(): void { State.toggleQs(State.lastScreen); }
+        function toggle(): void { Ui.toggleQs(Ui.lastScreen); }
     }
     IpcHandler {
         target: "dnd"

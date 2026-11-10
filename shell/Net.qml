@@ -16,7 +16,7 @@ Singleton {
                                   : wifiOn ? "wifi_find" : "wifi_off"
 
     readonly property var bt: Bluetooth.defaultAdapter
-    readonly property bool btOn: bt ? bt.enabled : false
+    readonly property bool btOn: !!(bt && bt.enabled)
     readonly property int btConnected: {
         if (!bt) return 0;
         let c = 0;

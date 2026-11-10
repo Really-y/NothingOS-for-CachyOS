@@ -1,6 +1,7 @@
 pragma Singleton
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import Quickshell.Services.Notifications
 
 Singleton {
@@ -23,8 +24,16 @@ Singleton {
             n.tracked = true;
             root.times[n.id] = Date.now();
             root.unread++;
-            if (!root.dnd || n.urgency === NotificationUrgency.Critical) root.arrived(n);
+            if (!root.dnd || n.urgency === NotificationUrgency.Critical) {
+                root.arrived(n);
+                if (!sound.running) sound.running = true;
+            }
         }
+    }
+
+    Process {
+        id: sound
+        command: ["pw-play", Quickshell.env("HOME") + "/.local/share/sounds/nothing/stereo/message-new-instant.oga"]
     }
 
     function clearAll() {

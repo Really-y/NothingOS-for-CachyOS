@@ -5,6 +5,8 @@ SRC="${1:-$HOME/.local/share/nothingos-backup/latest}"
 [ -d "$SRC" ] || { echo "Ehtiyat nüsxə tapılmadı: $SRC"; exit 1; }
 pkill -x qs 2>/dev/null || true
 rm -f "$HOME/.config/autostart/nothingos-shell.desktop"
+rm -f "$HOME/.local/share/dbus-1/services/org.knopwob.dunst.service" "$HOME/.local/share/dbus-1/services/org.kde.plasma.Notifications.service"
+rm -f "$HOME"/.local/share/applications/nothingos-*.desktop
 for f in "$SRC"/*; do
   name=$(basename "$f")
   rm -rf "$HOME/.config/$name"

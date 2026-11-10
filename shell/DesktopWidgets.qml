@@ -7,7 +7,7 @@ import Quickshell.Widgets
 // Nothing-style widgets pinned under windows on the primary screen.
 PanelWindow {
     id: win
-    screen: Quickshell.screens[0]
+    screen: Ui.primary
     anchors { top: true; left: true }
     margins { top: 64; left: 40 }
     implicitWidth: grid.implicitWidth

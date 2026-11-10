@@ -5,7 +5,7 @@ import Quickshell.Wayland
 // Volume OSD: vertical pill on the right edge, like Nothing OS.
 PanelWindow {
     id: win
-    screen: State.lastScreen
+    screen: Ui.pick(null)
     anchors { right: true }
     margins { right: 18 }
     implicitWidth: 56; implicitHeight: 220
@@ -22,7 +22,7 @@ PanelWindow {
         function onVolumeChanged() { win.poke(); }
         function onMutedChanged() { win.poke(); }
     }
-    function poke() { if (!ready || State.qsScreen) return; shown = true; hide.restart(); }
+    function poke() { if (!ready || Ui.qsScreen) return; shown = true; hide.restart(); }
     Timer { id: hide; interval: 1400; onTriggered: win.shown = false }
     Timer { interval: 1500; running: true; onTriggered: win.ready = true }   // ignore startup values
 

@@ -35,4 +35,7 @@ Singleton {
     readonly property real lat: 40.4093
     readonly property real lon: 49.8671
     readonly property string city: "BAKU"
+
+    // monitor for widgets, toasts and OSD (KDE primary)
+    readonly property string primaryScreen: "DP-1"
 }

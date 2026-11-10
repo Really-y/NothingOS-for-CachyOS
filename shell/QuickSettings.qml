@@ -9,7 +9,7 @@ PanelWindow {
     id: win
     required property var modelData
     screen: modelData
-    readonly property bool open: State.qsScreen === modelData
+    readonly property bool open: Ui.qsScreen === modelData
     visible: open || panel.opacity > 0
     anchors { top: true; bottom: true; left: true; right: true }
     color: "transparent"
@@ -18,7 +18,7 @@ PanelWindow {
     WlrLayershell.namespace: "nothing-quicksettings"
     WlrLayershell.keyboardFocus: open ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
-    MouseArea { anchors.fill: parent; onClicked: State.closeAll() }
+    MouseArea { anchors.fill: parent; onClicked: Ui.closeAll() }
 
     SystemClock { id: clock; precision: SystemClock.Minutes }
 
@@ -38,7 +38,7 @@ PanelWindow {
         Behavior on y { NumberAnimation { duration: Theme.normal; easing.type: Easing.BezierSpline; easing.bezierCurve: win.open ? Theme.emphasized : Theme.accelerate } }
         Behavior on scale { NumberAnimation { duration: Theme.normal; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.emphasized } }
         MouseArea { anchors.fill: parent }   // swallow clicks
-        Keys.onEscapePressed: State.closeAll()
+        Keys.onEscapePressed: Ui.closeAll()
         focus: win.open
 
         Flickable {
@@ -83,7 +83,7 @@ PanelWindow {
                             required property var modelData
                             Layout.fillWidth: true; implicitHeight: 56
                             icon: modelData.i; title: modelData.t
-                            onClicked: { State.closeAll(); State.run(modelData.c); }
+                            onClicked: { Ui.closeAll(); Ui.run(modelData.c); }
                         }
                     }
                 }
@@ -97,7 +97,7 @@ PanelWindow {
                         title: Net.kind === "ethernet" ? "Ethernet" : "Internet"
                         subtitle: Net.name || (Net.wifiOn ? "Not connected" : "Off")
                         onClicked: if (Net.kind !== "ethernet") Net.toggleWifi()
-                        onPressAndHold: { State.closeAll(); State.run(["systemsettings", "kcm_networkmanagement"]); }
+                        onPressAndHold: { Ui.closeAll(); Ui.run(["systemsettings", "kcm_networkmanagement"]); }
                     }
                     Tile {
                         Layout.fillWidth: true
@@ -105,7 +105,7 @@ PanelWindow {
                         title: "Bluetooth"
                         subtitle: !Net.bt ? "Unavailable" : Net.btOn ? (Net.btConnected > 0 ? Net.btConnected + " connected" : "On") : "Off"
                         onClicked: Net.toggleBt()
-                        onPressAndHold: { State.closeAll(); State.run(["systemsettings", "kcm_bluetooth"]); }
+                        onPressAndHold: { Ui.closeAll(); Ui.run(["systemsettings", "kcm_bluetooth"]); }
                     }
                 }
 
@@ -114,13 +114,13 @@ PanelWindow {
                     spacing: 0
                     Tile { round: true; icon: "do_not_disturb_on"; active: Notifs.dnd; onClicked: Notifs.dnd = !Notifs.dnd }
                     Item { Layout.fillWidth: true }
-                    Tile { round: true; icon: "nightlight"; active: State.nightLight; onClicked: State.toggleNightLight() }
+                    Tile { round: true; icon: "nightlight"; active: Ui.nightLight; onClicked: Ui.toggleNightLight() }
                     Item { Layout.fillWidth: true }
-                    Tile { round: true; icon: "screenshot_region"; onClicked: { State.closeAll(); State.run(["sh", "-c", "sleep 0.3; spectacle -r"]); } }
+                    Tile { round: true; icon: "screenshot_region"; onClicked: { Ui.closeAll(); Ui.run(["sh", "-c", "sleep 0.3; spectacle -r"]); } }
                     Item { Layout.fillWidth: true }
-                    Tile { round: true; icon: "settings"; onClicked: { State.closeAll(); State.run(["systemsettings"]); } }
+                    Tile { round: true; icon: "settings"; onClicked: { Ui.closeAll(); Ui.run(["systemsettings"]); } }
                     Item { Layout.fillWidth: true }
-                    Tile { round: true; icon: "grid_view"; onClicked: State.toggleLauncher(win.screen) }
+                    Tile { round: true; icon: "grid_view"; onClicked: Ui.toggleLauncher(win.screen) }
                 }
 
                 NSlider {
