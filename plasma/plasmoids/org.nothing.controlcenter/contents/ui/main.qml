@@ -53,11 +53,7 @@ PlasmoidItem {
     readonly property string netName: {
         if (netKind === "wifi") return wirelessStatus.wifiSSID;
         if (netKind === "ethernet") {
-            // "Wired Ethernet: Connected to <name>" (first line) → "<name>"
-            const first = (networkStatus.activeConnections || "").split("\n")[0];
-            const afterColon = first.indexOf(": ") >= 0 ? first.slice(first.indexOf(": ") + 2) : first;
-            const m = afterColon.match(/^\S+\s+\S+\s+(.+)$/);   // drop the localized "Connected to"
-            return m ? m[1] : afterColon;
+            return i18n("Connected");   // profile names ("Wired connection 1") are noise
         }
         return "";
     }
@@ -279,7 +275,7 @@ PlasmoidItem {
             id: panel
             anchors.fill: parent
             bleed: full.frameMargin
-            pad: Math.max(4, 20 - full.frameMargin)
+            pad: 20 - full.frameMargin      // may be negative: content reaches into the frame so the visible inset is 20px
             cardRadius: Math.max(8, full.frameMargin)
             now: root.now
 

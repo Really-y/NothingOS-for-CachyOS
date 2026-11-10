@@ -19,7 +19,7 @@ Item {
     property bool open: false
     property bool hovered: false
 
-    readonly property int glyph: 16
+    readonly property int glyph: 14
 
     implicitHeight: 26
     implicitWidth: row.implicitWidth + 24
@@ -39,7 +39,7 @@ Item {
     Row {
         id: row
         anchors.centerIn: pill
-        spacing: 9
+        spacing: 8
         readonly property color ink: root.open ? Theme.bg : Theme.fg
 
         Rectangle {

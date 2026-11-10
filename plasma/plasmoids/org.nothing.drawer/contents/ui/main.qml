@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import org.kde.plasma.plasmoid
 import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.extras as PlasmaExtras
+import org.kde.plasma.plasma5support as P5Support
 import org.kde.plasma.private.kicker as Kicker
 import org.kde.kitemmodels as KItemModels
 import org.kde.ksvg as KSvg
@@ -84,6 +85,22 @@ PlasmoidItem {
         if (!t.model || t.row < 0) return;
         t.model.trigger(t.row, "", null);
         root.expanded = false;
+    }
+
+    // ── which "<icon>-symbolic" glyphs the icon themes ship (scanned once) ──
+    property var symbolicNames: ({})
+    P5Support.DataSource {
+        id: iconScan
+        engine: "executable"
+        readonly property string cmd: "find -L /usr/share/icons \"$HOME/.local/share/icons\" /var/lib/flatpak/exports/share/icons \"$HOME/.local/share/flatpak/exports/share/icons\" -name '*-symbolic.svg' -printf '%f\\n' 2>/dev/null | sort -u"
+        connectedSources: [cmd]
+        onNewData: (source, data) => {
+            const set = {};
+            for (const f of String(data.stdout || "").split("\n"))
+                if (f) set[f.replace(/\.svg$/, "")] = true;
+            root.symbolicNames = set;
+            disconnectSource(source);
+        }
     }
 
     // ── context menu: .desktop actions + favourites (like Kickoff's ActionMenu) ──
@@ -179,7 +196,7 @@ PlasmoidItem {
             id: panel
             anchors.fill: parent
             bleed: full.frameMargin
-            pad: Math.max(6, 24 - full.frameMargin)
+            pad: 24 - full.frameMargin      // may be negative: visible inset stays 24px
             cardRadius: Math.max(8, full.frameMargin)
 
             pinnedModel: root.favorites
@@ -190,6 +207,7 @@ PlasmoidItem {
             resultsCount: runnerOther.count
             totalApps: root.allApps ? root.allApps.count : 0
             busy: root.runnerModel.querying
+            symbolicNames: root.symbolicNames
 
             onActivate: (zone, row) => root.activate(zone, row)
             onRequestMenu: (zone, row, item) => root.openMenu(zone, row, item)

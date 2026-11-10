@@ -18,7 +18,7 @@ Rectangle {
     signal next()
 
     implicitHeight: 92
-    radius: Theme.r
+    radius: 14
     color: "#1a1a1a"   // flat widget fill, no border (design review rule)
 
     RowLayout {
@@ -28,8 +28,8 @@ Rectangle {
 
         Item {
             Layout.preferredWidth: 64; Layout.preferredHeight: 64
-            Rectangle { id: artMask; anchors.fill: parent; radius: 10; color: "white"; visible: false; layer.enabled: true }
-            Rectangle { anchors.fill: parent; radius: 10; color: Theme.card3 }
+            Rectangle { id: artMask; anchors.fill: parent; radius: 4; color: "white"; visible: false; layer.enabled: true }
+            Rectangle { anchors.fill: parent; radius: 4; color: Theme.card3 }
             Image {
                 id: artImg
                 anchors.fill: parent

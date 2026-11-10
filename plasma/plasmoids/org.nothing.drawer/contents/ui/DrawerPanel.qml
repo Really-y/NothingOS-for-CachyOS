@@ -32,6 +32,10 @@ Item {
     // ── selection across zones ───────────────────────────────────────────
     property int zone: 0
     property int sel: 0
+    property bool keyboardNav: false     // arrows/tab used since opening → show focus disc
+    property string iconFallback: "grey" // non-symbolic icons: "grey" (desaturated) or "mask" (flat silhouette)
+    property var symbolicNames: ({})     // set of "<icon>-symbolic" names available in the icon theme
+    readonly property color widgetFill: "#1a1a1a"
     readonly property bool pinnedShown: !searching && pinnedCount > 0
     readonly property bool resultsShown: searching && resultsCount > 0
     readonly property int cols: Math.max(1, Math.floor((width - pad * 2) / 112))
@@ -40,10 +44,11 @@ Item {
     function firstZone() { for (let z = 0; z < 3; z++) if (zoneCount(z) > 0) return z; return 1; }
     function resetSelection() { zone = firstZone(); sel = 0; flick.contentY = 0; }
     function focusSearch() { search.forceActiveFocus(); }
-    function clear() { search.text = ""; resetSelection(); }
+    function clear() { search.text = ""; keyboardNav = false; resetSelection(); }
     function triggerCurrent() { if (zoneCount(zone) === 0) resetSelection(); if (zoneCount(zone) > 0) root.activate(zone, Math.min(sel, zoneCount(zone) - 1)); }
 
     function move(dx, dy) {
+        if (!keyboardNav) { keyboardNav = true; if (zoneCount(zone) > 0) return; }
         if (zoneCount(zone) === 0) { resetSelection(); return; }
         const isGrid = zone !== 2;
         if (isGrid && dx !== 0) {
@@ -92,7 +97,6 @@ Item {
         anchors.margins: -root.bleed
         radius: root.cardRadius
         color: Theme.bg
-        border.color: Theme.line; border.width: 1
     }
 
     ColumnLayout {
@@ -104,15 +108,15 @@ Item {
         RowLayout {
             Layout.fillWidth: true
             spacing: 12
-            DotText { text: root.searching ? "FIND" : "APPS"; size: 40; weight: 800 }
+            DotString { text: root.searching ? "FIND" : "APPS"; size: 48 }
             Item { Layout.fillWidth: true }
             Rectangle {
                 visible: root.busy
-                width: 6; height: 6; radius: 3; color: Theme.red
+                width: 6; height: 6; radius: 3; color: Theme.fg2
                 Layout.alignment: Qt.AlignVCenter
                 SequentialAnimation on opacity { running: root.busy; loops: Animation.Infinite; NumberAnimation { to: 0.2; duration: 420 } NumberAnimation { to: 1; duration: 420 } }
             }
-            Label {
+            SectionLabel {
                 Layout.alignment: Qt.AlignVCenter
                 text: root.searching ? (root.appsCount + root.resultsCount) + " found" : root.totalApps + " apps"
             }
@@ -175,7 +179,7 @@ Item {
                 width: flick.width
                 spacing: 10
 
-                Label { visible: root.pinnedShown; text: "Pinned"; size: 10; color: Theme.fg3; leftPadding: 4 }
+                SectionLabel { visible: root.pinnedShown; text: "Pinned"; leftPadding: 4 }
                 AppGrid {
                     id: pinnedGrid
                     panel: root
@@ -185,8 +189,8 @@ Item {
                     model: root.pinnedShown ? root.pinnedModel : null
                     count: root.pinnedShown ? root.pinnedCount : 0
                 }
-                Rectangle { visible: root.pinnedShown; width: parent.width; height: 1; color: Theme.line }
-                Label { visible: root.pinnedShown || root.searching; text: root.searching ? "Apps" : "All apps"; size: 10; color: Theme.fg3; leftPadding: 4 }
+                Item { visible: root.pinnedShown; width: 1; height: 0 }    // grid cells already leave ~24px of air: no divider
+                SectionLabel { visible: root.pinnedShown || root.searching; text: root.searching ? "Apps" : "All apps"; leftPadding: 4 }
 
                 AppGrid {
                     id: appsGrid
@@ -205,7 +209,7 @@ Item {
                     color: Theme.fg3; font.family: Theme.mono; font.pixelSize: 12; font.weight: Font.Normal
                 }
 
-                Label { visible: root.resultsShown; text: "Files, settings & more"; size: 10; color: Theme.fg3; leftPadding: 4; topPadding: 6 }
+                SectionLabel { visible: root.resultsShown; text: "Files, settings & more"; leftPadding: 4; topPadding: 14 }
                 ListView {
                     id: resultsList
                     visible: root.resultsShown
@@ -218,7 +222,7 @@ Item {
                         id: row
                         required property int index
                         required property var model
-                        readonly property bool selected: root.zone === 2 && root.sel === index
+                        readonly property bool selected: root.zone === 2 && root.sel === index && (root.keyboardNav || root.searching)
                         width: resultsList.width
                         height: 56
                         pressScale: 0.98
@@ -227,19 +231,18 @@ Item {
                             if (mouse.button === Qt.RightButton) root.requestMenu(2, index, row);
                             else root.activate(2, index);
                         }
-                        onEntered: { root.zone = 2; root.sel = index; }
+                        onEntered: { root.keyboardNav = false; root.zone = 2; root.sel = index; }
                         Rectangle {
                             anchors.fill: parent
                             radius: height / 2
-                            color: row.selected ? Theme.card2 : (row.containsMouse ? Theme.card : "transparent")
-                            border.color: row.selected ? Theme.line : "transparent"; border.width: 1
+                            color: row.selected ? root.widgetFill : (row.containsMouse ? Theme.card : "transparent")
                         }
                         Rectangle {
                             id: rdisc
                             width: 40; height: 40; radius: 20
                             x: 8; anchors.verticalCenter: parent.verticalCenter
-                            color: row.selected ? Theme.fg : Theme.card2
-                            MonoIcon { anchors.centerIn: parent; size: 22; source: row.model.decoration; dark: row.selected }
+                            color: row.selected && root.keyboardNav ? Theme.fg : (row.selected ? Theme.card3 : root.widgetFill)
+                            MonoIcon { anchors.centerIn: parent; size: 18; source: row.model.decoration; symbolicNames: root.symbolicNames; fallback: root.iconFallback; dark: row.selected && root.keyboardNav }
                         }
                         Column {
                             anchors.left: rdisc.right; anchors.leftMargin: 14
@@ -262,18 +265,35 @@ Item {
                                 font.family: Theme.mono; font.pixelSize: 10; font.weight: Font.Normal
                             }
                         }
-                        Label {
+                        SectionLabel {
                             id: grp
                             anchors.right: parent.right; anchors.rightMargin: 18
                             anchors.verticalCenter: parent.verticalCenter
                             text: row.model.group || ""
-                            size: 9; color: Theme.fg3
                         }
                     }
                 }
-                Item { width: 1; height: 4 }
+                Item { width: 1; height: 48 }   // room to scroll the last row out of the fade
+            }
+            Rectangle {
+                // last 48px fade into the black card so rows never end in a hard cut
+                parent: flick
+                anchors.left: parent.left; anchors.right: parent.right; anchors.bottom: parent.bottom
+                height: 48
+                visible: flick.contentHeight > flick.height
+                gradient: Gradient {
+                    GradientStop { position: 0; color: "transparent" }
+                    GradientStop { position: 1; color: Theme.bg }
+                }
             }
         }
+    }
+
+    component SectionLabel: Label {
+        size: 11
+        color: Theme.fg2
+        font.letterSpacing: 1.8
+        font.weight: Font.Normal
     }
 
     // ── app grid (pinned + all apps) ─────────────────────────────────────
@@ -285,37 +305,44 @@ Item {
                 height: Math.ceil(count / panel.cols) * cellHeight
         interactive: false
         cellWidth: Math.floor(width / panel.cols)
-        cellHeight: 112
+        cellHeight: 118
         delegate: Pressable {
             id: cell
             required property int index
             required property var model
-            readonly property bool selected: panel.zone === grid.zoneId && panel.sel === index
+            readonly property bool selected: panel.zone === grid.zoneId && panel.sel === index && (panel.keyboardNav || panel.searching)
             width: grid.cellWidth; height: grid.cellHeight
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             onClicked: mouse => {
                 if (mouse.button === Qt.RightButton) panel.requestMenu(grid.zoneId, index, cell);
                 else panel.activate(grid.zoneId, index);
             }
-            onEntered: { panel.zone = grid.zoneId; panel.sel = index; }
+            onEntered: { panel.keyboardNav = false; panel.zone = grid.zoneId; panel.sel = index; }
             Rectangle {
                 id: disc
                 width: 64; height: 64; radius: 32
                 anchors.horizontalCenter: parent.horizontalCenter
                 y: 8
-                color: cell.selected ? Theme.fg : (cell.containsMouse ? Theme.card3 : Theme.card2)
+                // white disc + black glyph only for keyboard focus; the Enter target while
+                // typing gets a quiet ring instead
+                readonly property bool focused: cell.selected && panel.keyboardNav
+                color: focused ? Theme.fg : (cell.containsMouse ? Theme.card3 : panel.widgetFill)
+                border.width: cell.selected && !focused && panel.searching ? 1 : 0
+                border.color: Theme.fg3
                 Behavior on color { ColorAnimation { duration: Theme.fast } }
-                MonoIcon { anchors.centerIn: parent; size: 34; source: cell.model.decoration; dark: cell.selected }
+                MonoIcon { anchors.centerIn: parent; size: 26; source: cell.model.decoration; symbolicNames: panel.symbolicNames; fallback: panel.iconFallback; dark: disc.focused }
             }
             Text {
                 anchors.top: disc.bottom; anchors.topMargin: 8
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: parent.width - 12
                 horizontalAlignment: Text.AlignHCenter
-                elide: Text.ElideRight
-                maximumLineCount: 1
+                wrapMode: Text.Wrap
+                maximumLineCount: 2
+                elide: Text.ElideRight          // last resort for very long names
+                lineHeight: 0.95
                 text: cell.model.display || ""
-                color: cell.selected ? Theme.fg : Theme.fg2
+                color: disc.focused || cell.containsMouse ? Theme.fg : Theme.fg2
                 font.family: Theme.sans; font.pixelSize: 12; font.weight: Font.Normal
             }
         }

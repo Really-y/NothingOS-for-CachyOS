@@ -5,6 +5,9 @@ import "../plasma/plasmoids/org.nothing.drawer/contents/ui"
 // App drawer mock: panel glyph (closed/open), idle drawer, searching drawer.
 Rectangle {
     color: "#060606"
+    // mock of the theme scan in main.qml (names that really ship as -symbolic here)
+    readonly property var sym: ({ "firefox-symbolic": true, "system-file-manager-symbolic": true, "utilities-terminal-symbolic": true,
+        "accessories-calculator-symbolic": true, "kate-symbolic": true, "utilities-system-monitor-symbolic": true, "vlc-symbolic": true })
     ListModel {
         id: pinned
         ListElement { display: "Firefox"; decoration: "firefox" }
@@ -59,19 +62,19 @@ Rectangle {
     Row {
         x: 16; y: 52; spacing: 20
         DrawerPanel {
-            width: 712; height: 620
+            width: 712; height: 560
             pinnedModel: pinned; pinnedCount: pinned.count
             appsModel: apps; appsCount: apps.count; totalApps: 88
-            sel: 2
+            symbolicNames: sym
         }
         DrawerPanel {
-            width: 600; height: 620
+            width: 600; height: 560
             query: "fi"
             appsModel: found; appsCount: found.count
             resultsModel: other; resultsCount: other.count
             totalApps: 88
             busy: true
-            Component.onCompleted: { zone = 2; sel = 0 }
+            symbolicNames: sym
         }
     }
 }

@@ -39,7 +39,7 @@ Rectangle {
             width: 420; height: implicitHeight
             now: fixed
             hasBattery: true; batteryPercent: 82; charging: true
-            netKind: "ethernet"; netName: "Wired connection 1"
+            netKind: "ethernet"; netName: "Connected"
             btAvailable: false
             dnd: true
             volume: 0.3; muted: true; volIcon: "volume_off"

@@ -75,8 +75,9 @@ Item {
 
     // Explicit height: ColumnLayout's implicitHeight goes stale while the popup is hidden
     // (no polish), which would size the Plasma dialog wrongly.
-    readonly property real contentHeight: header.implicitHeight + header.Layout.bottomMargin
-        + col.spacing + powerBox.Layout.preferredHeight + powerBox.Layout.topMargin
+    readonly property real headerHeight: Math.max(6 + clock.implicitHeight + 12 + dateRow.implicitHeight, 6 + 48)
+    readonly property real contentHeight: headerHeight + header.Layout.bottomMargin
+        + col.spacing + powerBox.Layout.preferredHeight
         + col.spacing + bigRow.implicitHeight
         + col.spacing + roundRow.Layout.topMargin + roundRow.implicitHeight
         + (volAvailable ? col.spacing + volBox.Layout.topMargin + volBox.implicitHeight : 0)
@@ -89,8 +90,6 @@ Item {
         anchors.margins: -root.bleed
         radius: root.cardRadius
         color: Theme.bg
-        border.color: Theme.line
-        border.width: 1
     }
 
     ColumnLayout {
@@ -104,13 +103,15 @@ Item {
         RowLayout {
             id: header
             Layout.fillWidth: true
+            Layout.preferredHeight: root.headerHeight
             Layout.bottomMargin: 4
             spacing: 10
             ColumnLayout {
                 spacing: 12
                 Layout.topMargin: 6
-                DotTime { hours: Qt.formatTime(root.now, "HH"); minutes: Qt.formatTime(root.now, "mm"); size: 56 }
+                DotTime { id: clock; hours: Qt.formatTime(root.now, "HH"); minutes: Qt.formatTime(root.now, "mm"); size: 56 }
                 RowLayout {
+                    id: dateRow
                     spacing: 10
                     Label { text: Qt.formatDate(root.now, "ddd, d MMM") }
                     Rectangle { visible: root.hasBattery; width: 3; height: 3; radius: 1.5; color: Theme.fg3 }
@@ -138,11 +139,9 @@ Item {
             id: powerBox
             Layout.fillWidth: true
             Layout.preferredHeight: root.powerOpen ? powerRow.implicitHeight : 0
-            Layout.topMargin: root.powerOpen ? 0 : -12
             clip: true
             opacity: root.powerOpen ? 1 : 0
             Behavior on Layout.preferredHeight { NumberAnimation { duration: root.powerOpen ? Theme.normal : Theme.fast; easing.type: Easing.BezierSpline; easing.bezierCurve: root.powerOpen ? Theme.emphasized : Theme.accelerate } }
-            Behavior on Layout.topMargin { NumberAnimation { duration: root.powerOpen ? Theme.normal : Theme.fast } }
             Behavior on opacity { NumberAnimation { duration: root.powerOpen ? Theme.normal : Theme.fast } }
 
             RowLayout {
@@ -164,7 +163,7 @@ Item {
                         onClicked: root.power(modelData.a)
                         Rectangle {
                             anchors.fill: parent
-                            radius: Theme.r
+                            radius: 14
                             color: pw.containsMouse ? Theme.card3 : Theme.card2
                             Behavior on color { ColorAnimation { duration: Theme.fast } }
                         }
@@ -192,7 +191,7 @@ Item {
             id: bigRow
             Layout.fillWidth: true
             spacing: 10
-            Tile {
+            WideTile {
                 Layout.fillWidth: true
                 Layout.preferredWidth: 1
                 icon: root.netKind === "ethernet" ? "lan" : root.netIcon
@@ -204,7 +203,7 @@ Item {
                 onClicked: root.wifiAvailable ? root.toggleWifi() : root.openNetworkSettings()
                 onPressAndHold: root.openNetworkSettings()
             }
-            Tile {
+            WideTile {
                 Layout.fillWidth: true
                 Layout.preferredWidth: 1
                 icon: !root.btAvailable ? "bluetooth_disabled" : root.btConnected > 0 ? "bluetooth_connected" : "bluetooth"
@@ -286,7 +285,6 @@ Item {
             id: micBox
             Layout.fillWidth: true
             visible: root.micAvailable
-            implicitHeight: 44
             value: root.micMuted ? 0 : root.micVolume
             icon: root.micMuted ? "mic_off" : "mic"
             onMoved: v => root.setMic(v)
