@@ -174,12 +174,12 @@ Item {
                             y: 15
                             color: pw.modelData.a === "shutdown" && pw.containsMouse ? Theme.red : Theme.fg
                         }
-                        Text {
+                        Label {
                             anchors.horizontalCenter: parent.horizontalCenter
-                            anchors.top: pwIcon.bottom; anchors.topMargin: 6
-                            text: pw.modelData.t
+                            anchors.top: pwIcon.bottom; anchors.topMargin: 8
+                            text: pw.modelData.t      // uppercase mono, like the toggle captions
+                            size: 11
                             color: Theme.fg2
-                            font.family: Theme.sans; font.pixelSize: 12; font.weight: Font.Normal
                         }
                     }
                 }
@@ -263,7 +263,7 @@ Item {
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.bottom: parent.bottom
                         text: rt.modelData.t
-                        size: 9
+                        size: 11
                         color: rt.on ? Theme.fg : (rt.avail ? Theme.fg2 : Theme.fg3)   // off ≠ unavailable
                     }
                 }
@@ -302,6 +302,7 @@ Item {
             art: root.mediaArt
             app: root.mediaApp
             playing: root.mediaPlaying
+            accent: !(root.hasBattery && root.batteryPercent <= 15 && !root.charging)   // one red per surface
             canPrev: root.mediaCanPrev
             canNext: root.mediaCanNext
             onPrev: root.mediaPrev()

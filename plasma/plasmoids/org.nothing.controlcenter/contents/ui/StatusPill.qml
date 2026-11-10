@@ -20,6 +20,8 @@ Item {
     property bool hovered: false
 
     readonly property int glyph: 14
+    // one red per surface: a critical battery outranks the unread dot (which turns white)
+    readonly property bool batteryCritical: hasBattery && batteryPercent <= 15 && !charging
 
     implicitHeight: 26
     implicitWidth: row.implicitWidth + 24
@@ -44,7 +46,7 @@ Item {
             visible: root.unread
             width: 6; height: 6; radius: 3
             anchors.verticalCenter: parent.verticalCenter
-            color: Theme.red
+            color: root.batteryCritical ? row.ink : Theme.red
         }
         Icon {
             visible: root.dnd
@@ -79,7 +81,7 @@ Item {
                     Rectangle {
                         x: 2; y: 2; height: 6; radius: 1
                         width: Math.max(1, 14 * Math.max(0, Math.min(100, root.batteryPercent)) / 100)
-                        color: root.batteryPercent <= 15 && !root.charging ? Theme.red : row.ink
+                        color: root.batteryCritical ? Theme.red : row.ink
                     }
                 }
                 Rectangle { x: 18; y: 3; width: 2; height: 4; radius: 1; color: row.ink }

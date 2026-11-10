@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Effects
 import "nothing"
 
 // Now-playing mini card: monochrome art, title/artist, transport.
@@ -13,6 +12,7 @@ Rectangle {
     property bool playing: false
     property bool canPrev: true
     property bool canNext: true
+    property bool accent: true          // false when another red (critical battery) owns the surface
     signal prev()
     signal playPause()
     signal next()
@@ -28,32 +28,35 @@ Rectangle {
 
         Item {
             Layout.preferredWidth: 64; Layout.preferredHeight: 64
-            Rectangle { id: artMask; anchors.fill: parent; radius: 4; color: "white"; visible: false; layer.enabled: true }
-            Rectangle { anchors.fill: parent; radius: 4; color: Theme.card3 }
-            Image {
-                id: artImg
+            // cover art as a halftone dot portrait on a black tile (shared kit, same as the media widget)
+            Rectangle { anchors.fill: parent; radius: 4; color: Theme.bg }
+            ArtCanvas {
+                id: art
                 anchors.fill: parent
+                visible: root.art !== ""
                 source: root.art
-                fillMode: Image.PreserveAspectCrop
-                asynchronous: true
-                visible: false
-                sourceSize: Qt.size(128, 128)
+                mode: "halftone"
+                radius: 4
+                pitch: 3
+                fadeTop: 0
+                fadeBottom: 0
+                matte: "#1a1a1a"
             }
-            MultiEffect {
-                anchors.fill: parent
-                source: artImg
-                visible: artImg.status === Image.Ready
-                saturation: -1
-                contrast: 0.1
-                maskEnabled: true
-                maskSource: artMask
+            // no cover art: dot note pictogram on black
+            DotGlyph {
+                anchors.centerIn: parent
+                visible: !art.ready
+                width: 36; height: 36
+                icon: "note"
+                dimColor: "transparent"
+                litColor: Theme.fg2
+                halfColor: Theme.fg2
             }
-            Icon { anchors.centerIn: parent; visible: artImg.status !== Image.Ready; name: "music_note"; color: Theme.fg2 }
             // live dot: the one red accent, only while playing
             Rectangle {
                 visible: root.playing
                 width: 8; height: 8; radius: 4
-                color: Theme.red
+                color: root.accent ? Theme.red : Theme.fg
                 border.color: "#1a1a1a"; border.width: 2
                 anchors.right: parent.right; anchors.top: parent.top
                 anchors.rightMargin: -2; anchors.topMargin: -2
@@ -83,22 +86,38 @@ Rectangle {
 
         Row {
             spacing: 2
-            Pressable {
-                width: 34; height: 44; enabled: root.canPrev; opacity: enabled ? 1 : 0.35
-                onClicked: root.prev()
-                Icon { anchors.centerIn: parent; name: "skip_previous"; fill: 1; size: 22 }
+            component Transport: Pressable {
+                id: t
+                property string glyph
+                property bool can: true
+                width: 34; height: 44
+                enabled: can
+                DotGlyph {
+                    anchors.centerIn: parent
+                    width: 16; height: 16
+                    icon: t.glyph
+                    dimColor: "transparent"
+                    dotRatio: 0.9
+                    litColor: t.can ? Theme.fg : "#4a4a4a"
+                    opacity: t.can && !t.containsMouse ? 0.9 : 1
+                }
             }
+            Transport { glyph: "prev"; can: root.canPrev; onClicked: root.prev() }
             Pressable {
                 width: 44; height: 44
                 onClicked: root.playPause()
                 Rectangle { anchors.fill: parent; radius: 22; color: Theme.fg }
-                Icon { anchors.centerIn: parent; name: root.playing ? "pause" : "play_arrow"; fill: 1; color: Theme.bg; size: 24 }
+                DotGlyph {
+                    anchors.centerIn: parent
+                    anchors.horizontalCenterOffset: root.playing ? 0 : 1
+                    width: 16; height: 16
+                    icon: root.playing ? "pause" : "play"
+                    dimColor: "transparent"
+                    litColor: Theme.bg
+                    dotRatio: 0.9
+                }
             }
-            Pressable {
-                width: 34; height: 44; enabled: root.canNext; opacity: enabled ? 1 : 0.35
-                onClicked: root.next()
-                Icon { anchors.centerIn: parent; name: "skip_next"; fill: 1; size: 22 }
-            }
+            Transport { glyph: "next"; can: root.canNext; onClicked: root.next() }
         }
     }
 }

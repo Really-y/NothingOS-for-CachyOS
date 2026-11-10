@@ -18,7 +18,8 @@ Rectangle {
             spacing: 18
             StatusPill { height: 36; netIcon: "lan"; volIcon: "volume_up"; unread: true }
             StatusPill { height: 36; netIcon: "network_wifi_3_bar"; btOn: true; btConnected: true; volIcon: "volume_down"; hasBattery: true; batteryPercent: 64; dnd: true }
-            StatusPill { height: 36; netIcon: "wifi"; volIcon: "volume_off"; hasBattery: true; batteryPercent: 12; open: true }
+            StatusPill { height: 36; netIcon: "wifi"; volIcon: "volume_off"; hasBattery: true; batteryPercent: 12; unread: true }
+            StatusPill { height: 36; netIcon: "wifi"; volIcon: "volume_up"; open: true }
         }
     }
 
@@ -34,6 +35,7 @@ Rectangle {
             micAvailable: true; micVolume: 0.35
             mediaActive: true; mediaPlaying: true
             mediaTitle: "Glyph Interface"; mediaArtist: "Teenage Engineering"; mediaApp: "Spotify"
+            mediaArt: "file:///usr/share/wallpapers/Altai/contents/images/1080x1920.png"   // mock cover
         }
         ControlPanel {
             width: 420; height: implicitHeight
@@ -44,6 +46,7 @@ Rectangle {
             dnd: true
             volume: 0.3; muted: true; volIcon: "volume_off"
             powerOpen: true
+            mediaActive: true; mediaPlaying: false; mediaTitle: "Phone (3)"; mediaArtist: "No cover art"; mediaApp: "mpv"; mediaCanPrev: false
         }
     }
 }
