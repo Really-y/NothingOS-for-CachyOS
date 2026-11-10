@@ -35,7 +35,7 @@ Rectangle {
             micAvailable: true; micVolume: 0.35
             mediaActive: true; mediaPlaying: true
             mediaTitle: "Glyph Interface"; mediaArtist: "Teenage Engineering"; mediaApp: "Spotify"
-            mediaArt: "file:///usr/share/wallpapers/Altai/contents/images/1080x1920.png"   // mock cover
+            mediaArt: Qt.resolvedUrl("mock-art.png")   // mock cover (high-contrast square portrait)
         }
         ControlPanel {
             width: 420; height: implicitHeight

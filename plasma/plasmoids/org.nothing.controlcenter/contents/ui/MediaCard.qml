@@ -47,8 +47,10 @@ Rectangle {
             DotGlyph {
                 anchors.centerIn: parent
                 visible: !art.ready
-                width: 36; height: 36
-                icon: "note"
+                // 7×7 note at a whole 5px pitch, 3px+ dots on pixel centres
+                width: 35; height: 35
+                icon: "note_s"
+                snap: true
                 dimColor: "transparent"
                 litColor: Theme.fg2
                 halfColor: Theme.fg2
@@ -68,7 +70,7 @@ Rectangle {
                     width: 6; height: 6; radius: 3
                     color: root.playing ? (root.accent ? Theme.red : Theme.fg) : Theme.fg3
                 }
-                Label { text: root.app; size: 9; color: Theme.fg3; elide: Text.ElideRight }
+                Label { text: root.app; size: 11; color: Theme.fg2; elide: Text.ElideRight }
             }
             Text {
                 Layout.fillWidth: true

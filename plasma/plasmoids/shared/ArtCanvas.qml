@@ -16,6 +16,7 @@ Item {
     property real fadeBottom: 0.4        // ... and at the bottom (text band)
     property real fadeRamp: 0.14         // soft ramp beyond the clear bands
     property int levels: 4               // posterisation levels for dot sizes
+    property int edgeCut: 0x40           // alpha below this is dropped (no grey links)
     property real minDot: 2.5            // px; smaller dots are dropped
     property real maxDot: 0.92           // largest dot diameter as a fraction of the cell (< 0.75 keeps clear gaps)
     property color matte: Theme.widget   // colour behind the corners (mono mode)
@@ -87,8 +88,10 @@ Item {
                     return ax * ax + ay * ay <= (r - m) * (r - m);
                 };
                 const ft = h * root.fadeTop, fb = h * root.fadeBottom;
-                for (let cy = 0; cy + p <= h + 0.01; cy += p) {
-                    for (let cx = 0; cx + p <= w + 0.01; cx += p) {
+                // centre the dot grid on the tile (leftover split evenly on both sides)
+                const gx = (w - Math.floor(w / p) * p) / 2, gy = (h - Math.floor(h / p) * p) / 2;
+                for (let cy = gy; cy + p <= h + 0.01; cy += p) {
+                    for (let cx = gx; cx + p <= w + 0.01; cx += p) {
                         let sum = 0, n = 0;
                         for (let y = Math.floor(cy); y < Math.min(h, cy + p); y += 2)
                             for (let x = Math.floor(cx); x < Math.min(w, cx + p); x += 2) {
@@ -117,6 +120,10 @@ Item {
                         c.fill();
                     }
                 }
+                // edge threshold: faint antialias fringe between close dots → pure black
+                const out = c.getImageData(0, 0, w, h), o = out.data;
+                for (let i = 3; i < o.length; i += 4) if (o[i] < root.edgeCut) { o[i] = 0; o[i - 1] = o[i - 2] = o[i - 3] = 0; }
+                c.putImageData(out, 0, 0);
             }
         }
     }

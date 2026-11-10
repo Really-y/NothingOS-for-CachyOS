@@ -133,8 +133,10 @@ Card {
             color: Theme.bg
             DotGlyph {
                 anchors.centerIn: parent
-                width: parent.width * 0.62; height: width
-                icon: "note"
+                // 7×7 note at a whole-pixel pitch (≥ 5px), dots on pixel centres
+                width: Math.max(35, Math.floor(parent.width * 0.62 / 7) * 7); height: width
+                icon: "note_s"
+                snap: true
                 dimColor: "transparent"
                 litColor: Theme.fg2
             }

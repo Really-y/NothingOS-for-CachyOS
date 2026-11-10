@@ -25,9 +25,14 @@ Canvas {
     property color dimColor: Theme.dotDim
     property real dotRatio: Theme.dotRatio
     property bool alignTop: false      // pin the grid to the top edge instead of centring
+    // snap: whole-pixel pitch, dot centres on pixel centres, dots ≥ minDot px —
+    // for small glyphs that would otherwise blur into a grey grille.
+    property bool snap: false
+    property real minDot: 3
     readonly property int nRows: shown.length
     readonly property int nCols: nRows ? shown[0].length : 0
-    readonly property real pitch: nRows ? Math.min(width / nCols, height / nRows) : 0
+    readonly property real pitch: nRows ? (snap ? Math.max(1, Math.floor(Math.min(width / nCols, height / nRows)))
+                                                 : Math.min(width / nCols, height / nRows)) : 0
 
     implicitWidth: 110
     implicitHeight: 110
@@ -44,16 +49,19 @@ Canvas {
         const c = getContext("2d");
         c.reset();
         if (!nRows) return;
-        const p = pitch, r = p * dotRatio / 2;
+        const p = pitch, r = snap ? Math.max(minDot, p * dotRatio) / 2 : p * dotRatio / 2;
         if (!(r > 0)) return;
-        const ox = (width - p * nCols) / 2, oy = (height - p * nRows) / 2;
+        let ox = (width - p * nCols) / 2, oy = alignTop ? 0 : (height - p * nRows) / 2;
+        if (snap) { ox = Math.round(ox); oy = Math.round(oy); }
+        const cxOf = (x) => snap ? Math.floor(ox + (x + 0.5) * p) + 0.5 : ox + (x + 0.5) * p;
+        const cyOf = (y) => snap ? Math.floor(oy + (y + 0.5) * p) + 0.5 : oy + (y + 0.5) * p;
         const col = { "#": litColor, "+": halfColor, "r": redColor, ".": dimColor };
         for (let y = 0; y < nRows; y++)
             for (let x = 0; x < nCols; x++) {
                 const f = col[shown[y][x]];
                 if (!f || f.a === 0) continue;
                 c.beginPath();
-                c.arc(ox + (x + 0.5) * p, oy + (y + 0.5) * p, r, 0, Math.PI * 2);
+                c.arc(cxOf(x), cyOf(y), r, 0, Math.PI * 2);
                 c.fillStyle = f;
                 c.fill();
             }
