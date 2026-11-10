@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # Son ehtiyat nüsxəni (və ya verilən qovluğu) geri yükləyir.
 set -euo pipefail
-SRC="${1:-$HOME/.local/share/nothingos-backup/latest}"
+# default: the very first backup = the pre-Nothing original
+FIRST=$(ls -d "$HOME"/.local/share/nothingos-backup/2* 2>/dev/null | sort | head -1)
+SRC="${1:-$FIRST}"
 [ -d "$SRC" ] || { echo "Ehtiyat nüsxə tapılmadı: $SRC"; exit 1; }
 pkill -x qs 2>/dev/null || true
 rm -f "$HOME/.config/autostart/nothingos-shell.desktop"

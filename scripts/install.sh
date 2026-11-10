@@ -44,38 +44,14 @@ echo "· icons";        python3 "$ROOT/icons/gen_icons.py" >/dev/null; mkdir -p 
 
 echo "· konsole";      mkdir -p "$D/konsole"; cp "$ROOT/terminal/Nothing.colorscheme" "$D/konsole/"
 
-echo "· shell"
-mkdir -p "$D/nothingos" "$HOME/.config/autostart" "$D/dbus-1/services" "$D/applications"
-ln -sfn "$ROOT/shell" "$D/nothingos/shell"
-cp "$ROOT/scripts/start-shell.sh" "$D/nothingos/"
-for f in org.knopwob.dunst org.kde.plasma.Notifications; do
-  printf '[D-BUS Service]\nName=org.freedesktop.Notifications\nExec=%s\n' "$D/nothingos/start-shell.sh" > "$D/dbus-1/services/$f.service"
-done
-cat > "$HOME/.config/autostart/nothingos-shell.desktop" <<EOD
-[Desktop Entry]
-Type=Application
-Name=Nothing Shell
-Exec=$D/nothingos/start-shell.sh
-X-KDE-autostart-phase=2
-EOD
-for t in launcher quicksettings; do
-  cat > "$D/applications/nothingos-$t.desktop" <<EOD
-[Desktop Entry]
-Type=Application
-Name=Nothing ${t^}
-Exec=qs -p $D/nothingos/shell ipc call $t toggle
-NoDisplay=true
-EOD
-done
-kw --file kglobalshortcutsrc --group services --group nothingos-launcher.desktop --key _launch "Meta+Space"
-kw --file kglobalshortcutsrc --group services --group nothingos-quicksettings.desktop --key _launch "Meta+N"
-kw --file kwinrc --group ModifierOnlyShortcuts --key Meta "org.kde.kglobalaccel,/component/nothingos_launcher_desktop,org.kde.kglobalaccel.Component,invokeShortcut,_launch"
-
-if [ "${NOTHING_DOCK:-1}" = 1 ]; then
-  echo "· dock"; qdbus6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "$(cat "$ROOT/plasma/layout/dock.js")" >/dev/null || true
+echo "· nothingd (Rust)"; "$ROOT/daemon/install.sh" >/dev/null
+echo "· plasmoids";    "$ROOT/scripts/build-plasmoids.sh" >/dev/null
+echo "· splash+lock";  "$ROOT/plasma/lookandfeel/install.sh" >/dev/null
+# bare Meta opens the launcher-provider applet (org.nothing.drawer)
+kw --file kwinrc --group ModifierOnlyShortcuts --key Meta "org.kde.plasmashell,/PlasmaShell,org.kde.PlasmaShell,activateLauncherMenu"
+if [ "${NOTHING_LAYOUT:-1}" = 1 ]; then
+  echo "· layout";     qdbus6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "$(cat "$ROOT/plasma/layout/nothing-layout.js")" >/dev/null || true
 fi
 
 qdbus6 org.kde.KWin /KWin reconfigure >/dev/null || true
-pkill -x dunst 2>/dev/null || true
-pgrep -f "qs -p $D/nothingos/shell" >/dev/null || setsid -f "$D/nothingos/start-shell.sh"
-echo "Hazırdır. Qısayollar tam olaraq yenidən girişdən sonra işləyir."
+echo "Hazırdır. Kilid ekranı yenidən girişdən sonra aktiv olur. SDDM üçün: sudo $ROOT/sddm/install.sh"
