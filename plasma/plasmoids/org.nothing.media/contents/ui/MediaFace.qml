@@ -4,8 +4,8 @@ import "nothing"
 // Nothing now-playing card. Pure view: feed it track data, listen to the signals.
 //  square: posterised halftone dot portrait inside the content box, white
 //          play/pause top-right, status + title + artist in the bottom band
-//  wide:   desaturated art (concentric radius), status, marquee title/artist,
-//          dot prev/next glyphs around a white play circle
+//  wide:   halftone art (4px grid) on black, status, marquee title/artist,
+//          dot prev/next glyphs around a white play disk
 //  idle:   vinyl pictogram + "IDLE" in dots
 Card {
     id: root
@@ -51,12 +51,14 @@ Card {
         enabled: root.canPlayPause
         onClicked: root.playPause()
         Rectangle { anchors.fill: parent; radius: width / 2; color: Theme.fg }
-        FlatGlyph {
+        DotGlyph {
             anchors.centerIn: parent
-            anchors.horizontalCenterOffset: root.playing ? 0 : Math.round(parent.diameter * 0.03)
-            width: Math.round(parent.diameter * 0.4); height: width
-            glyph: root.playing ? "pause" : "play"
-            color: Theme.bg
+            anchors.horizontalCenterOffset: root.playing ? 0 : 1
+            width: 16; height: 16
+            icon: root.playing ? "pause" : "play"
+            dimColor: "transparent"
+            litColor: Theme.bg
+            dotRatio: 0.9
         }
     }
 
@@ -65,11 +67,14 @@ Card {
         property bool can: true
         width: Math.round(36 * root.u); height: width
         enabled: can
-        FlatGlyph {
+        DotGlyph {
             anchors.centerIn: parent
-            width: Math.round(20 * root.u); height: width
-            glyph: parent.glyph
-            color: !parent.can ? Theme.fg3 : parent.containsMouse ? Theme.fg : Theme.fg2
+            width: 16; height: 16
+            icon: parent.glyph
+            dimColor: "transparent"
+            dotRatio: 0.9
+            litColor: !parent.can ? "#4a4a4a" : Theme.fg
+            opacity: parent.can && !parent.containsMouse ? 0.9 : 1
         }
     }
 
@@ -94,18 +99,23 @@ Card {
             source: root.hasArt && !root.wide ? root.artUrl : ""
             mode: "halftone"
             radius: root.innerRadius
-            pitch: Math.max(3, 3.6 * root.u)
+            pitch: 3
             fadeTop: 0
             fadeBottom: 0
         }
-        // playing without cover art: a note where the portrait would be
-        DotGlyph {
+        // playing without cover art: the same tile, a dot note on black
+        Rectangle {
             visible: root.hasMedia && !root.hasArt
-            x: -pitch * 0.14; y: -pitch * 0.14
-            icon: "note"
-            dimColor: "transparent"
-            litColor: Theme.fg2
-            width: Math.round(sq.height - band.height - 12 * root.u); height: width
+            width: portrait.width; height: width
+            radius: root.innerRadius
+            color: Theme.bg
+            DotGlyph {
+                anchors.centerIn: parent
+                width: parent.width * 0.62; height: width
+                icon: "note"
+                dimColor: "transparent"
+                litColor: Theme.fg2
+            }
         }
         PlayButton {
             visible: root.hasMedia
@@ -145,7 +155,7 @@ Card {
             icon: "vinyl"
             dimColor: "transparent"
             litColor: Theme.fg2
-            halfColor: Theme.fg3
+            halfColor: Theme.fg2
         }
         DotString {
             visible: !root.hasMedia
@@ -166,14 +176,14 @@ Card {
             id: artBox
             width: parent.height; height: width
             radius: root.innerRadius
-            color: Theme.widget2
-            visible: !artWide.ready
+            color: Theme.bg
             DotGlyph {
                 anchors.centerIn: parent
                 width: parent.width * 0.62; height: width
+                visible: !artWide.ready
                 icon: root.hasMedia ? "note" : "vinyl"
-                litColor: root.hasMedia ? Theme.fg2 : Theme.fg2
-                halfColor: Theme.fg3
+                litColor: Theme.fg2
+                halfColor: Theme.fg2
                 dimColor: "transparent"
             }
         }
@@ -182,7 +192,10 @@ Card {
             anchors.fill: artBox
             visible: root.hasArt
             source: root.hasArt && root.wide ? root.artUrl : ""
-            mode: "mono"
+            mode: "halftone"
+            pitch: 4
+            fadeTop: 0
+            fadeBottom: 0
             radius: root.innerRadius
         }
 

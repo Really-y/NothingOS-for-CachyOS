@@ -23,6 +23,18 @@ QtObject {
     readonly property string icons: "Material Symbols Rounded"
 
     readonly property int r: 24      // card radius
+    readonly property int tileRadius: 16
+
+    // One dot renderer (DotString / DotTime / DotGlyph): round dots, dot = 0.65 × pitch,
+    // and only these pitches (px) for dot-matrix numerals and words.
+    readonly property real dotRatio: 0.65
+    readonly property var dotPitches: [5, 8, 12, 15]
+    // Largest allowed pitch ≤ maxPitch (never below the smallest step).
+    function dotPitch(maxPitch) {
+        let p = dotPitches[0];
+        for (let i = 0; i < dotPitches.length; i++) if (dotPitches[i] <= maxPitch + 0.001) p = dotPitches[i];
+        return p;
+    }
     readonly property int rSmall: 14
     readonly property int gap: 10
 

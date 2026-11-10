@@ -23,7 +23,7 @@ Canvas {
     property color halfColor: Theme.fg2
     property color redColor: Theme.red
     property color dimColor: Theme.dotDim
-    property real dotRatio: 0.72
+    property real dotRatio: Theme.dotRatio
     property bool alignTop: false      // pin the grid to the top edge instead of centring
     readonly property int nRows: shown.length
     readonly property int nCols: nRows ? shown[0].length : 0

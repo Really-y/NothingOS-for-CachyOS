@@ -1,6 +1,7 @@
 import QtQuick
 import "nothing"
 import "nothing/doticons.js" as DotIcons
+import "nothing/dotfont.js" as DotFont
 
 // Nothing weather card. Pure view; null temperature renders "--" at full size.
 //  square: city (top-left) · dot pictogram (top-right) · big temp + H/L (bottom-left)
@@ -17,10 +18,21 @@ Card {
     property string variant: "auto"  // "auto" | "square" | "wide"
 
     readonly property bool wide: variant === "wide" || (variant === "auto" && width / Math.max(1, height) >= 1.5)
-    readonly property bool live: temp !== null && temp !== undefined && !isNaN(temp)
+    function num(v) { return v !== null && v !== undefined && !isNaN(v); }
+    // Partial data (e.g. temp without H/L) shows the whole-card placeholder.
+    readonly property bool live: num(temp) && num(hi) && num(lo)
     readonly property real u: wide ? Math.min(width / 360, height / 180) : Math.min(width, height) / 180
     readonly property string glyph: live ? DotIcons.forWeather(code, icon) : "cloudoff"
     readonly property string tempText: live ? Math.round(temp) + "°" : "--°"
+    readonly property string tempBare: live ? String(Math.round(temp)) : "--"
+    // Hero temperature at a fixed pitch: drop "°" before ever shrinking.
+    function dotWidth(t, p) {
+        let n = 0;
+        for (let i = 0; i < t.length; i++) n += DotFont.glyph(t[i])[0].length + (i ? 1 : 0);
+        return (n - 1 + Theme.dotRatio) * p;
+    }
+    function heroText(maxWidth, p) { return dotWidth(tempText, p) <= maxWidth + 0.5 ? tempText : tempBare; }
+    function probe12(w) { return dotWidth(tempBare, 12) <= w + 0.5; }
     readonly property string cityText: {
         let c = (city || "--").toUpperCase().trim();
         const cap = wide ? 16 : 10;
@@ -82,8 +94,11 @@ Card {
             id: pict
             anchors.right: parent.right; anchors.rightMargin: -pitch * 0.14
             y: root.capTop - pitch * 0.14
-            width: Math.round(52 * root.u); height: heightForWidth(width)
-            icon: root.glyph
+            // 7×7 pictogram at a 6px pitch (4px dots), no off-dots
+            width: 7 * Math.round(6 * root.u); height: heightForWidth(width)
+            icon: root.glyph + "_s"
+            dotRatio: 0.67
+            dimColor: "transparent"
             trimTop: true; trimBottom: true
             litColor: root.live ? Theme.fg : Theme.fg3
             halfColor: root.live ? Theme.fg2 : Theme.fg3
@@ -99,10 +114,10 @@ Card {
             id: bigTemp
             anchors.left: parent.left
             anchors.bottom: hl.top; anchors.bottomMargin: Math.round(10 * root.u)
-            text: root.tempText
+            // one pitch for every 2×2 card (8px, 0.65 dots); long values lose the "°"
+            pitch: root.u >= 1.4 ? 12 : 8
+            text: root.heroText(sq.width, pitch)
             color: root.live ? Theme.fg : Theme.fg3
-            size: Math.max(1, Math.min(96 * root.u, sq.width * 10 / (Math.max(columns, 1) - 1 + dotRatio),
-                           (sq.height - hl.height - 10 * root.u - pict.y - pict.height - 8 * root.u) * 10 / (6 + dotRatio)))
             width: implicitWidth; height: implicitHeight
         }
     }
@@ -122,10 +137,12 @@ Card {
             height: gridH * (1 + 0.28 / 11)
             width: height
             icon: root.glyph
+            dimColor: Theme.card3
             litColor: root.live ? Theme.fg : Theme.fg3
             halfColor: root.live ? Theme.fg2 : Theme.fg3
         }
         Item {
+            id: wCol
             anchors.left: wpict.right; anchors.leftMargin: Math.round(18 * root.u)
             anchors.right: parent.right
             anchors.top: parent.top; anchors.bottom: parent.bottom
@@ -140,9 +157,10 @@ Card {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.verticalCenterOffset: Math.round(2 * root.u)
-                text: root.tempText
+                readonly property bool fits12: root.probe12(wCol.width)
+                pitch: fits12 ? 12 : 8
+                text: root.heroText(wCol.width, pitch)
                 color: root.live ? Theme.fg : Theme.fg3
-                size: Math.min(104 * root.u, parent.width * 10 / (Math.max(columns, 1) - 1 + dotRatio))
                 width: implicitWidth; height: implicitHeight
             }
             Caption {

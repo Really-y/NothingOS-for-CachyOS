@@ -30,8 +30,10 @@ Card {
         width: parent.width - 2 * root.pad; height: monthDots.height
         DotString {
             id: monthDots
-            size: Math.min(40, (header.width - 90) * 10 / (Math.max(columns, 1) - 1 + dotRatio))
-            text: root.en.standaloneMonthName(root.month, Locale.LongFormat).toUpperCase()
+            // pitch 5; long month names fall back to the 3-letter form
+            readonly property string longName: root.en.standaloneMonthName(root.month, Locale.LongFormat).toUpperCase()
+            pitch: 5
+            text: longName.length * 6 - 1 <= Math.floor((header.width - 110) / 5) ? longName : longName.slice(0, 3)
             width: implicitWidth; height: implicitHeight
         }
         Label {
@@ -64,7 +66,7 @@ Card {
     Grid {
         id: grid
         x: root.pad + ((parent.width - 2 * root.pad) - 7 * root.cell) / 2
-        anchors.top: header.bottom; anchors.topMargin: 18
+        anchors.top: header.bottom; anchors.topMargin: 12
         columns: 7
 
         // Weekday initials
@@ -91,7 +93,7 @@ Card {
                 readonly property bool inMonth: date.getMonth() === root.month
                 readonly property bool isToday: date.toDateString() === root.today.toDateString()
                 readonly property bool weekend: date.getDay() === 0 || date.getDay() === 6
-                width: root.cell; height: Math.min(root.cell, 38)
+                width: root.cell; height: Math.min(root.cell, 35)
 
                 Rectangle {
                     anchors.centerIn: parent

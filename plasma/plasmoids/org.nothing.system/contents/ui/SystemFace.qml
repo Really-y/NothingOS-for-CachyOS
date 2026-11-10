@@ -4,7 +4,7 @@ import "nothing"
 // Nothing system card. Pure view; null values render "--".
 //  square: one hero CPU dot ring (like Nothing's battery widget), RAM as caption
 //  wide:   CPU and RAM rings side by side
-// Red only for warnings: ring above 85 %, temperature above 80 °C.
+// Red only as the warning signal: ring dots past the 80 % mark.
 Card {
     id: root
     property var cpu: null        // 0..1
@@ -18,7 +18,6 @@ Card {
     readonly property real u: wide ? Math.min(width / 360, height / 180) : Math.min(width, height) / 180
     readonly property bool live: ok(cpu) && ok(mem)
     readonly property bool hasTemp: ok(tempC)
-    readonly property bool hot: hasTemp && tempC > 80
     function ok(v) { return v !== null && v !== undefined && !isNaN(v); }
     function pct(v) { return ok(v) ? String(Math.round(v * 100)) : "--"; }
 
@@ -37,38 +36,36 @@ Card {
     component Gauge: Item {
         id: g
         property var value: null
-        property real numberSize: 44
+        property real maxPitch: 8          // largest house pitch to try
+        property real fixedPitch: 0        // > 0: always this pitch (shared by neighbours)
+        property real numberOffset: 0
         DotRing {
             anchors.fill: parent
             value: root.ok(g.value) ? g.value : 0
+            warn: 0.8                      // only dots past 80 % at the leading end turn red
             dots: 40
             dotSize: Math.max(3, 4 * root.u)
         }
-        // fitColumns > 0: size for that many dot columns (17 = "100") so
-        // neighbouring gauges share one number size.
-        property int fitColumns: 0
-        property real numberOffset: 0
-        Row {
+        DotString {
+            id: num
             anchors.centerIn: parent
-            anchors.horizontalCenterOffset: pctSign.visible ? (pctSign.width + spacing) / 2 : 0
+            anchors.horizontalCenterOffset: pctSign.visible ? -(pctSign.width + 3) / 2 : 0
             anchors.verticalCenterOffset: g.numberOffset
-            spacing: Math.round(3 * root.u)
-            DotString {
-                id: num
-                text: root.pct(g.value)
-                size: Math.min(g.numberSize, g.width * 0.58 * 10 / (Math.max(g.fitColumns || columns, 2) - 1 + dotRatio))
-                color: root.ok(g.value) ? Theme.fg : Theme.fg3
-                width: implicitWidth; height: implicitHeight
-            }
-            Text {
-                id: pctSign
-                visible: root.ok(g.value)
-                text: "%"
-                color: Theme.fg2
-                font.family: Theme.mono
-                font.pixelSize: Math.max(10, Math.round(num.size * 0.16))
-                topPadding: -Math.round(font.pixelSize * 0.25)
-            }
+            text: root.pct(g.value)
+            pitch: g.fixedPitch > 0 ? g.fixedPitch : fitPitch(g.width * 0.66, g.maxPitch)
+            color: root.ok(g.value) ? Theme.fg : Theme.fg3
+            width: implicitWidth; height: implicitHeight
+        }
+        // "%": 11px mono, baseline on the bottom dot row
+        Text {
+            id: pctSign
+            visible: root.ok(g.value)
+            anchors.left: num.right; anchors.leftMargin: 3
+            anchors.baseline: num.bottom
+            text: "%"
+            color: Theme.fg2
+            font.family: Theme.mono
+            font.pixelSize: 11
         }
     }
 
@@ -83,7 +80,7 @@ Card {
             anchors.centerIn: parent
             width: Math.min(parent.width, parent.height); height: width
             value: root.cpu
-            numberSize: Math.max(40, Math.round(84 * root.u))
+            maxPitch: root.u >= 1.4 ? 12 : 8
         }
         Row {
             anchors.horizontalCenter: hero.horizontalCenter
@@ -94,7 +91,7 @@ Card {
             Caption {
                 visible: root.hasTemp
                 text: root.hasTemp ? Math.round(root.tempC) + "°C" : ""
-                color: root.hot ? Theme.red : Theme.fg3
+                color: Theme.fg3
             }
         }
         Caption {
@@ -124,8 +121,7 @@ Card {
                 id: wg
                 width: wideRow.d; height: width
                 value: modelData.v
-                numberSize: Math.max(40, Math.round(60 * root.u))
-                fitColumns: 17
+                fixedPitch: 5
                 numberOffset: -Math.round(8 * root.u)
                 Row {
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -136,7 +132,7 @@ Card {
                     Caption {
                         visible: text !== ""
                         text: modelData.extra
-                        color: modelData.k === "CPU" && root.hot ? Theme.red : Theme.fg2
+                        color: Theme.fg2
                     }
                 }
             }

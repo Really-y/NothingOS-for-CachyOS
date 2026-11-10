@@ -7,7 +7,7 @@ Rectangle {
     color: Theme.bg
     ColumnLayout {
         anchors.fill: parent; anchors.margins: 24; spacing: 14
-        DotTime { hours: "12"; minutes: "45"; size: 72; colonColor: Theme.red }
+        DotTime { hours: "12"; minutes: "45"; size: 72 }
         Label { text: "Tuesday, 11 November" }
         RowLayout {
             spacing: 10

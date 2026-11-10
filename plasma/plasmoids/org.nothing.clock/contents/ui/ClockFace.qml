@@ -38,8 +38,18 @@ Card {
             size: Math.max(10, Math.round(11 * root.u))
             text: root.day + " " + root.now.getDate() + " " + root.mon
         }
-        Label {
+        // The single red accent: the "now" dot (the seconds strip takes over when shown).
+        Rectangle {
+            id: nowDot
             anchors.right: parent.right
+            anchors.verticalCenter: dateLabel.verticalCenter
+            visible: !root.showSeconds
+            width: Math.round(7 * root.u); height: width; radius: width / 2
+            color: Theme.red
+        }
+        Label {
+            anchors.right: nowDot.visible ? nowDot.left : parent.right
+            anchors.rightMargin: nowDot.visible ? Math.round(8 * root.u) : 0
             anchors.verticalCenter: dateLabel.verticalCenter
             visible: !root.use24h
             size: dateLabel.size
@@ -61,9 +71,8 @@ Card {
                 anchors.bottom: parent.bottom
                 hours: root.use24h ? String(root.h24).padStart(2, "0") : String(root.h12)
                 minutes: root.mm
-                colonColor: Theme.red
-                // fill the width of a 24h "HH:mm" (25 dot columns), capped by height
-                size: Math.min(wide.width * 10 / (25 - 1 + dotRatio), timeArea.height * 10 / (6 + dotRatio) * 0.92)
+                // house pitch that fits a 24h "HH:mm" (25 dot columns) and the height
+                pitch: Theme.dotPitch(Math.min(wide.width / (25 - 1 + dotRatio), timeArea.height / (6 + dotRatio)))
                 width: implicitWidth; height: implicitHeight
             }
         }
@@ -106,7 +115,7 @@ Card {
             hours: String(root.use24h ? root.h24 : root.h12).padStart(2, "0")
             minutes: root.mm
             // 11 columns wide, 16 rows tall; leave room for the date column
-            size: Math.min(sq.height * 10 / (14 + dotRatio), (sq.width - dateCol.width - 8 * root.u) * 10 / (10 + dotRatio))
+            pitch: Theme.dotPitch(Math.min(sq.height / (14 + dotRatio), (sq.width - dateCol.width - 8 * root.u) / (10 + dotRatio)))
             width: implicitWidth; height: implicitHeight
         }
 

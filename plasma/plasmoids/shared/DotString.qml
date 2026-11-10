@@ -3,17 +3,24 @@ import "dotfont.js" as DotFont
 
 // Dot-matrix text drawn dot by dot from Doto's 5×7 grid: crisp at any size,
 // tabular digits, a real two-dot colon, 3-dot minus and a dot-ring degree.
-// `size` matches Doto's font px (dot pitch = size / 10); the item's box is
-// tight to the dots (no ascender/descender padding).
+//
+// Sizing API (pick one):
+//   pitch: 8          — dot pitch in px (centre to centre). Use Theme.dotPitch(max)
+//                       to snap to the house steps 5 / 8 / 12 / 15.
+//   size: 80          — legacy: Doto font px; pitch defaults to size / 10.
+// Dot diameter = pitch × dotRatio (Theme.dotRatio = 0.65). Glyphs are 7 dots
+// tall, digits 5 wide, one empty column between glyphs. The item's box is tight
+// to the dots: width = (columns − 1 + dotRatio) × pitch, height = (6 + dotRatio) × pitch.
+// fitPitch(maxWidth, maxPitch) returns the largest house pitch that fits.
 Canvas {
     id: root
     property string text: ""
     property real size: 60
-    property real dotRatio: 0.75             // dot diameter / pitch (Doto ≈ 0.75)
+    property real dotRatio: Theme.dotRatio   // dot diameter / pitch
     property color color: Theme.fg
     property color colonColor: color         // e.g. Theme.red for a red clock colon
     property color dimColor: "transparent"   // unlit dots inside each glyph cell
-    readonly property real pitch: size / 10
+    property real pitch: size / 10
     readonly property real dot: pitch * dotRatio
     readonly property var cells: {
         const out = [];
@@ -27,15 +34,25 @@ Canvas {
         for (let i = 0; i < cells.length; i++) n += cells[i][0].length + (i ? 1 : 0);
         return n;
     }
-    // Width of the dot box for a given size (useful for fitting): (cols-1)·pitch + dot
-    function widthFor(sz) { return columns > 0 ? ((columns - 1) + dotRatio) * sz / 10 : 0; }
-    function heightFor(sz) { return (6 + dotRatio) * sz / 10; }
+    // Box size at a given pitch, and the legacy size-based variants.
+    function widthAtPitch(p) { return columns > 0 ? ((columns - 1) + dotRatio) * p : 0; }
+    function heightAtPitch(p) { return (6 + dotRatio) * p; }
+    function widthFor(sz) { return widthAtPitch(sz / 10); }
+    function heightFor(sz) { return heightAtPitch(sz / 10); }
+    // Largest house pitch (5/8/12/15) ≤ maxPitch whose width fits maxWidth.
+    function fitPitch(maxWidth, maxPitch) {
+        const steps = Theme.dotPitches;
+        for (let i = steps.length - 1; i >= 0; i--)
+            if (steps[i] <= maxPitch + 0.001 && widthAtPitch(steps[i]) <= maxWidth + 0.5) return steps[i];
+        return steps[0];
+    }
 
-    implicitWidth: widthFor(size)
-    implicitHeight: heightFor(size)
+    implicitWidth: widthAtPitch(pitch)
+    implicitHeight: heightAtPitch(pitch)
 
     onCellsChanged: requestPaint()
     onSizeChanged: requestPaint()
+    onPitchChanged: requestPaint()
     onColorChanged: requestPaint()
     onColonColorChanged: requestPaint()
     onDimColorChanged: requestPaint()

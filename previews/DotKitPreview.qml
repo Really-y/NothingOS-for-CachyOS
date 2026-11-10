@@ -8,7 +8,7 @@ Rectangle {
         x: 24; y: 24; spacing: 20
         Row {
             spacing: 32
-            DotTime { hours: "21"; minutes: "47"; size: 80; colonColor: Theme.red }
+            DotTime { hours: "21"; minutes: "47"; size: 80 }
             DotTime { hours: "09"; minutes: "05"; size: 50; stacked: true }
             DotString { text: "-3°"; size: 60 }
             DotString { text: "NO MEDIA"; size: 40 }

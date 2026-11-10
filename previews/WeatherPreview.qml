@@ -30,7 +30,7 @@ Rectangle {
             W.WeatherFace { width: 180; height: 180; temp: 3; hi: 5; lo: 0; code: 2; city: "BERLIN" }
             W.WeatherFace { width: 180; height: 180; temp: 19; hi: 21; lo: 15; code: 96; city: "TOKYO" }
             W.WeatherFace { width: 360; height: 180; temp: -2; hi: 0; lo: -6; code: 73; city: "MONTREAL" }
-            W.WeatherFace { width: 180; height: 180; temp: 11; code: 48; city: "LIMA" }
+            W.WeatherFace { width: 180; height: 180; temp: 11; code: 48; city: "LIMA" }  // partial data → placeholder
         }
     }
 }
