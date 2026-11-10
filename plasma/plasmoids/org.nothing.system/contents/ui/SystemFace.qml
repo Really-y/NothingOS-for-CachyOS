@@ -37,10 +37,28 @@ Card {
         id: g
         property var value: null
         property real maxPitch: 8          // largest house pitch to try
-        property real fixedPitch: 0        // > 0: always this pitch (shared by neighbours)
+        property real fixedPitch: 0        // > 0: always this pitch
         property real numberOffset: 0
         property bool mayWarn: true        // one red per widget: only the worst metric
+        // Largest house pitch whose digit+% group keeps ≥ 1 pitch clear of the
+        // ring's inner edge. Size changes go through pitch only (dot ratio fixed).
+        function fits(p) {
+            const w = num.widthAtPitch(p) + (pctSign.visible ? 3 + pctSign.width : 0);
+            const h = num.heightAtPitch(p);
+            const rIn = g.width / 2 - ring.dotSize * 1.5;
+            const y = h / 2 + Math.abs(g.numberOffset);
+            if (y >= rIn) return false;
+            return w / 2 <= Math.sqrt(rIn * rIn - y * y) - p;
+        }
+        readonly property real groupPitch: {
+            if (fixedPitch > 0) return fixedPitch;
+            const steps = Theme.dotPitches;
+            for (let i = steps.length - 1; i >= 0; i--)
+                if (steps[i] <= maxPitch + 0.001 && fits(steps[i])) return steps[i];
+            return steps[0];
+        }
         DotRing {
+            id: ring
             anchors.fill: parent
             value: root.ok(g.value) ? g.value : 0
             warn: 0.8                      // only dots past 80 % …
@@ -52,10 +70,12 @@ Card {
         DotString {
             id: num
             anchors.centerIn: parent
+            // digit + "%" centred as one group
             anchors.horizontalCenterOffset: pctSign.visible ? -(pctSign.width + 3) / 2 : 0
             anchors.verticalCenterOffset: g.numberOffset
             text: root.pct(g.value)
-            pitch: g.fixedPitch > 0 ? g.fixedPitch : fitPitch(g.width * 0.66, g.maxPitch)
+            pitch: g.groupPitch
+            dotRatio: Theme.dotRatio
             color: root.ok(g.value) ? Theme.fg : Theme.fg3
             width: implicitWidth; height: implicitHeight
         }
@@ -124,14 +144,14 @@ Card {
                 id: wg
                 width: wideRow.d; height: width
                 value: modelData.v
-                // shared pitch 8; both drop to 5 only while either reads "100"
-                fixedPitch: root.pct(root.cpu).length > 2 || root.pct(root.mem).length > 2 ? 5 : 8
+                // pitch 8; only a gauge that has to fit "100" steps down
+                maxPitch: 8
                 mayWarn: modelData.k === (root.ok(root.cpu) && root.ok(root.mem) && root.mem > root.cpu ? "RAM" : "CPU")
-                numberOffset: -Math.round(8 * root.u)
+                numberOffset: -Math.round(4 * root.u)
                 Row {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
-                    anchors.verticalCenterOffset: Math.round(34 * root.u)
+                    anchors.verticalCenterOffset: Math.round(38 * root.u)
                     spacing: Math.round(6 * root.u)
                     Caption { text: modelData.k; color: Theme.fg }
                     Caption {

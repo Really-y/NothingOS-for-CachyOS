@@ -152,16 +152,19 @@ Card {
         // idle: the black art tile with the vinyl inside, and IDLE in dots
         Rectangle {
             visible: !root.hasMedia
-            width: Math.round(sq.height - idleText.height - 12 * root.u); height: width
+            // tile as wide as the IDLE word (pitch 5 is the smallest house step)
+            width: idleText.width
+            height: Math.round(sq.height - idleText.height - 12 * root.u)
             radius: root.innerRadius
             color: Theme.bg
             DotGlyph {
                 anchors.centerIn: parent
-                width: parent.width * 0.66; height: width
+                width: Math.min(parent.width, parent.height) * 0.72; height: width
                 icon: "vinyl"
                 dimColor: "transparent"
                 litColor: Theme.fg2
                 halfColor: Theme.fg2
+                redColor: Theme.fg2              // no red while idle
             }
         }
         DotString {
@@ -190,6 +193,7 @@ Card {
                 width: parent.width * 0.62; height: width
                 visible: !artWide.ready
                 icon: root.hasMedia ? "note" : "vinyl"
+                redColor: Theme.fg2
                 litColor: Theme.fg2
                 halfColor: Theme.fg2
                 dimColor: "transparent"
@@ -247,16 +251,21 @@ Card {
                 SkipButton { anchors.verticalCenter: parent.verticalCenter; glyph: "next"; can: root.canNext; onClicked: root.next() }
             }
 
-            // idle: IDLE only
-            Column {
+            // idle: grey "NO MEDIA" where the status sits, IDLE where the title sits
+            Label {
+                id: idleStatus
                 visible: !root.hasMedia
-                anchors.left: parent.left; anchors.bottom: parent.bottom
-                spacing: Math.round(12 * root.u)
-                DotString {
-                    text: "IDLE"
-                    pitch: 5
-                    width: implicitWidth; height: implicitHeight
-                }
+                y: Math.round(2 * root.u)
+                size: Math.max(10, Math.round(10 * root.u))
+                color: Theme.fg2
+                text: "No media"
+            }
+            DotString {
+                visible: !root.hasMedia
+                anchors.top: idleStatus.bottom; anchors.topMargin: Math.round(14 * root.u)
+                text: "IDLE"
+                pitch: 5
+                width: implicitWidth; height: implicitHeight
             }
         }
     }
