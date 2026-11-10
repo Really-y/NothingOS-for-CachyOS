@@ -39,7 +39,7 @@ Card {
         }
         Label {
             size: Math.max(10, Math.round(10 * root.u))
-            color: root.playing ? Theme.red : Theme.fg2
+            color: Theme.fg2
             text: root.playing ? "Now playing" : "Paused"
         }
     }
@@ -54,7 +54,7 @@ Card {
         DotGlyph {
             anchors.centerIn: parent
             anchors.horizontalCenterOffset: root.playing ? 0 : 1
-            width: 16; height: 16
+            width: Math.min(16, Math.round(parent.diameter * 0.4)); height: width
             icon: root.playing ? "pause" : "play"
             dimColor: "transparent"
             litColor: Theme.bg
@@ -117,10 +117,12 @@ Card {
                 litColor: Theme.fg2
             }
         }
+        // small disk at transport scale, aligned to the tile's bottom edge
         PlayButton {
             visible: root.hasMedia
-            anchors.right: parent.right; anchors.top: parent.top
-            diameter: Math.round(38 * root.u)
+            anchors.right: parent.right
+            y: portrait.height - height
+            diameter: Math.round(30 * root.u)
         }
         Column {
             id: band
@@ -147,21 +149,27 @@ Card {
             }
         }
 
-        // idle: vinyl + IDLE, nothing else
-        DotGlyph {
+        // idle: the black art tile with the vinyl inside, and IDLE in dots
+        Rectangle {
             visible: !root.hasMedia
-            x: -pitch * 0.14; y: -pitch * 0.14
-            width: Math.round(72 * root.u); height: width
-            icon: "vinyl"
-            dimColor: "transparent"
-            litColor: Theme.fg2
-            halfColor: Theme.fg2
+            width: Math.round(sq.height - idleText.height - 12 * root.u); height: width
+            radius: root.innerRadius
+            color: Theme.bg
+            DotGlyph {
+                anchors.centerIn: parent
+                width: parent.width * 0.66; height: width
+                icon: "vinyl"
+                dimColor: "transparent"
+                litColor: Theme.fg2
+                halfColor: Theme.fg2
+            }
         }
         DotString {
+            id: idleText
             visible: !root.hasMedia
             anchors.left: parent.left; anchors.bottom: parent.bottom
             text: "IDLE"
-            size: Math.max(40, Math.round(48 * root.u))
+            pitch: 5
             width: implicitWidth; height: implicitHeight
         }
     }
@@ -239,17 +247,16 @@ Card {
                 SkipButton { anchors.verticalCenter: parent.verticalCenter; glyph: "next"; can: root.canNext; onClicked: root.next() }
             }
 
-            // idle: IDLE + one caption
+            // idle: IDLE only
             Column {
                 visible: !root.hasMedia
                 anchors.left: parent.left; anchors.bottom: parent.bottom
                 spacing: Math.round(12 * root.u)
                 DotString {
                     text: "IDLE"
-                    size: Math.max(40, Math.round(56 * root.u))
+                    pitch: 5
                     width: implicitWidth; height: implicitHeight
                 }
-                Label { size: Math.max(10, Math.round(10 * root.u)); color: Theme.fg3; text: "No media" }
             }
         }
     }

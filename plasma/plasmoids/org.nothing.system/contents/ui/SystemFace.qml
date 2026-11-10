@@ -39,10 +39,13 @@ Card {
         property real maxPitch: 8          // largest house pitch to try
         property real fixedPitch: 0        // > 0: always this pitch (shared by neighbours)
         property real numberOffset: 0
+        property bool mayWarn: true        // one red per widget: only the worst metric
         DotRing {
             anchors.fill: parent
             value: root.ok(g.value) ? g.value : 0
-            warn: 0.8                      // only dots past 80 % at the leading end turn red
+            warn: 0.8                      // only dots past 80 % …
+            warnTail: 3                    // … and only at the leading end of the fill
+            warnEnabled: g.mayWarn
             dots: 40
             dotSize: Math.max(3, 4 * root.u)
         }
@@ -121,7 +124,9 @@ Card {
                 id: wg
                 width: wideRow.d; height: width
                 value: modelData.v
-                fixedPitch: 5
+                // shared pitch 8; both drop to 5 only while either reads "100"
+                fixedPitch: root.pct(root.cpu).length > 2 || root.pct(root.mem).length > 2 ? 5 : 8
+                mayWarn: modelData.k === (root.ok(root.cpu) && root.ok(root.mem) && root.mem > root.cpu ? "RAM" : "CPU")
                 numberOffset: -Math.round(8 * root.u)
                 Row {
                     anchors.horizontalCenter: parent.horizontalCenter

@@ -41,13 +41,13 @@ Card {
     }
     function deg(v) { return (v === null || v === undefined || isNaN(v)) ? "--" : Math.round(v) + "°"; }
     readonly property string hiLo: "H" + deg(hi) + " L" + deg(lo)
-    // Short condition names (≤10 chars, fits beside H/L): never ellipsised.
+    // Short condition names (≤14 chars; the wide footer runs at 10px): never ellipsised.
     readonly property string condition: {
         if (!live) return "NO DATA";
         const c = code;
-        if (c === null || c === undefined) return (desc || "").toUpperCase().slice(0, 10);
+        if (c === null || c === undefined) return (desc || "").toUpperCase().slice(0, 14);
         if (c <= 1) return "CLEAR";
-        if (c === 2) return "SOME CLOUD";
+        if (c === 2) return "PARTLY CLOUDY";
         if (c === 3) return "CLOUDY";
         if (c === 45 || c === 48) return "FOG";
         if (c >= 51 && c <= 57) return "DRIZZLE";
@@ -56,7 +56,7 @@ Card {
         if ((c >= 71 && c <= 77) || c === 85 || c === 86) return "SNOW";
         if (c >= 80 && c <= 82) return "SHOWERS";
         if (c >= 95) return "STORM";
-        return (desc || "").toUpperCase().slice(0, 10);
+        return (desc || "").toUpperCase().slice(0, 14);
     }
 
     padding: Math.round(20 * u)
@@ -99,7 +99,6 @@ Card {
             icon: root.glyph + "_s"
             dotRatio: 0.67
             dimColor: "transparent"
-            trimTop: true; trimBottom: true
             litColor: root.live ? Theme.fg : Theme.fg3
             halfColor: root.live ? Theme.fg2 : Theme.fg3
         }
@@ -165,15 +164,19 @@ Card {
             }
             Caption {
                 anchors.left: parent.left; anchors.bottom: parent.bottom
-                width: parent.width - wHl.implicitWidth - 8
+                width: parent.width - wHl.implicitWidth - 6
                 clip: true
                 text: root.condition
                 color: Theme.fg
+                font.pixelSize: Math.max(10, Math.round(10 * root.u))
+                font.letterSpacing: 0.6
             }
             Caption {
                 id: wHl
                 anchors.right: parent.right; anchors.bottom: parent.bottom
                 text: root.hiLo
+                font.pixelSize: Math.max(10, Math.round(10 * root.u))
+                font.letterSpacing: 0.6
             }
         }
     }

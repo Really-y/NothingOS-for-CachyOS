@@ -1,7 +1,6 @@
 module nothing
 singleton Theme 1.0 Theme.qml
 Icon 1.0 Icon.qml
-DotText 1.0 DotText.qml
 Label 1.0 Label.qml
 Pressable 1.0 Pressable.qml
 Tile 1.0 Tile.qml

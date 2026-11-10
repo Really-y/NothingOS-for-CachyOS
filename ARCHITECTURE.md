@@ -18,7 +18,8 @@ small Rust daemon for data. No separate shell process.
 
 ## Shared UI kit
 `plasma/plasmoids/shared/` (QML, no Plasma deps, has `qmldir` with singleton `Theme`):
-Theme, Icon, DotText, Label, Pressable, Tile, NSlider, DotRing, Card.
+Theme, Icon, Label, Pressable, Tile, NSlider, DotRing, Card, DotString, DotTime, DotGlyph, ArtCanvas
+(dot type: DotString `pitch` in house steps 5/8/12/15 via `Theme.dotPitch()`, dots 0.65 × pitch).
 Every plasmoid gets a copy at `contents/ui/nothing/` at install time
 (`scripts/build-plasmoids.sh`) and uses `import "nothing"`.
 
