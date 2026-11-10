@@ -54,7 +54,7 @@ def frame_svg(r, fill, border, prefixes=("",)):
 
 FILES = {
     # path: (radius, fill, border, prefixes)
-    "dialogs/background.svg": (20, "#111111", "#2a2a2a", ("",)),
+    "dialogs/background.svg": (30, "#000000", "#2a2a2a", ("",)),
     "widgets/background.svg": (24, "#111111", "#1f1f1f", ("",)),
     "widgets/tooltip.svg": (12, "#1c1c1c", "#2a2a2a", ("",)),
     "widgets/panel-background.svg": (22, "#111111", "#2a2a2a", ("", "north", "south", "east", "west")),
