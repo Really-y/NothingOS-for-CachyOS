@@ -10,7 +10,7 @@ Canvas {
     id: root
     property string text: ""
     property real size: 60
-    property real dotRatio: 0.75             // dot diameter / pitch (Doto ≈ 0.75)
+    property real dotRatio: 0.65             // dot diameter / pitch (system-wide ≈ 0.65)
     property color color: "#ffffff"
     property color colonColor: color         // e.g. Theme.red for a red clock colon
     property color dimColor: "transparent"   // unlit dots inside each glyph cell

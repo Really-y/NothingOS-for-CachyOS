@@ -222,8 +222,9 @@ Item {
             id: clock
             visible: config.alwaysShowClock
             idle: !lockScreenRoot.uiVisible
-            // multiple of 10 → integer dot pitch, so the canvas never clips the last row
-            size: Math.max(60, Math.floor(Math.min(lockScreenRoot.height * 0.21, lockScreenRoot.width * 0.15, 230) / 10) * 10)
+            // dot pitch snapped to the system steps 5/8/12/15 px (size = 10 × pitch)
+            readonly property real fitPitch: Math.min(lockScreenRoot.height * 0.21, lockScreenRoot.width * 0.15) / 10
+            size: 10 * (fitPitch >= 15 ? 15 : fitPitch >= 12 ? 12 : fitPitch >= 8 ? 8 : 5)
             anchors.horizontalCenter: parent.horizontalCenter
             y: lockScreenRoot.uiVisible
                 ? lockScreenRoot.activeTop

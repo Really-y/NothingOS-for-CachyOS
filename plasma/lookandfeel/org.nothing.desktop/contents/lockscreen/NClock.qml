@@ -36,7 +36,7 @@ Column {
         size: clock.size
         // AOD: ~60% grey, thinner dots
         color: clock.idle ? "#9a9a9a" : Theme.fg
-        dotRatio: clock.idle ? 0.6 : 0.75
+        dotRatio: 0.65   // one dot renderer system-wide: dot:pitch ≈ 0.65
         width: implicitWidth
         height: implicitHeight
         Accessible.role: Accessible.StaticText

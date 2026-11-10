@@ -11,7 +11,7 @@ Item {
     property bool stacked: false
     property color color: "#ffffff"
     property color colonColor: color
-    property real dotRatio: 0.75
+    property real dotRatio: 0.65
     readonly property real pitch: size / 10
     // gap between stacked rows: two empty dot rows
     readonly property real rowGap: 2 * pitch + (pitch - pitch * dotRatio)

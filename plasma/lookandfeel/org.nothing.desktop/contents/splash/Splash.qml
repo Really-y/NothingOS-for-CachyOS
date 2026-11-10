@@ -34,10 +34,13 @@ Rectangle {
     readonly property var accelerate: [0.3, 0.0, 0.8, 0.15, 1, 1]
 
     // ── grid ────────────────────────────────────────────────────────────────
-    readonly property real pitch: Math.round(Math.max(6, Math.min(width, height) * 0.0145))
-    readonly property real dot: pitch * 0.75                 // wordmark dot
+    // Same round-dot renderer rules as the shared DotString (dot:pitch ≈ 0.65), pitch step 12.
+    readonly property real pitch: 12
+    readonly property real dot: 8                            // wordmark dot
     readonly property real bigDot: dot * 2                   // progress dot = 2× wordmark dot
-    readonly property real bigPitch: pitch * 4                // progress dots sit on wordmark columns 2 + 4·i
+    readonly property real bigPitch: pitch * 3               // 36 px: progress dots on every 3rd wordmark column
+    // first progress column, so the 7-dot row is centred under the wordmark's columns
+    readonly property int progressCol0: Math.round(((columns - 1) - (dotCount - 1) * 3) / 2)
 
     // Wordmark dot positions in grid units: [{c, r}], plus total columns.
     readonly property var cells: {
@@ -110,8 +113,8 @@ Rectangle {
                     Rectangle {
                         id: pdot
                         required property int index
-                        // centred under wordmark column 2 + 4·i, on grid row `progressRow`
-                        x: (2 + index * 4) * root.pitch + root.dot / 2 - root.bigDot / 2
+                        // centred under wordmark column progressCol0 + 3·i, on grid row `progressRow`
+                        x: (root.progressCol0 + index * 3) * root.pitch + root.dot / 2 - root.bigDot / 2
                         y: grid.progressRow * root.pitch + root.dot / 2 - root.bigDot / 2
                         readonly property bool isLast: index === root.dotCount - 1
                         readonly property bool isLit: isLast ? root.done : index < root.lit
@@ -139,10 +142,10 @@ Rectangle {
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 32
             text: "PLASMA  ·  CACHYOS"
-            color: root.fg3
+            color: "#5c5c5c"
             font.family: "Space Mono"
             font.pixelSize: 11
-            font.letterSpacing: 2.4
+            font.letterSpacing: 11 * 0.12
         }
     }
 

@@ -196,8 +196,10 @@ Rectangle {
                     anchors.horizontalCenter: parent.horizontalCenter
                     hours: root.use24h ? (h < 10 ? "0" : "") + h : String((h + 11) % 12 + 1)
                     minutes: Qt.formatTime(root.now, "mm")
-                    // multiple of 10 → integer dot pitch, so the canvas never clips the last row
-                    size: Math.max(60, Math.floor(Math.min(root.height * 0.19, root.width * 0.15, 230) / 10) * 10)
+                    // dot pitch snapped to the system steps 5/8/12/15 px (size = 10 × pitch)
+                    readonly property real fitPitch: Math.min(root.height * 0.19, root.width * 0.15) / 10
+                    size: 10 * (fitPitch >= 15 ? 15 : fitPitch >= 12 ? 12 : fitPitch >= 8 ? 8 : 5)
+                    dotRatio: 0.65
                     color: root.fg
                     width: implicitWidth
                     height: implicitHeight
