@@ -6,13 +6,19 @@ import "../plasma/plasmoids/org.nothing.drawer/contents/ui"
 Rectangle {
     color: "#060606"
     // mock of the theme scan in main.qml (names that really ship as -symbolic here)
-    readonly property var sym: ({ "firefox-symbolic": true, "system-file-manager-symbolic": true, "utilities-terminal-symbolic": true,
-        "accessories-calculator-symbolic": true, "kate-symbolic": true, "utilities-system-monitor-symbolic": true, "vlc-symbolic": true })
+    readonly property var sym: {
+        // mock of main.qml's theme scan: glyph names that ship in Papirus/Breeze here
+        const n = ["firefox", "system-file-manager", "utilities-terminal", "accessories-calculator", "kate", "utilities-system-monitor",
+                   "vlc", "audio-x-generic", "video-x-generic", "web-browser", "preferences-system", "image-x-generic",
+                   "package-x-generic", "applications-games", "applications-development", "system-software-install",
+                   "im-user", "x-office-document", "applications-internet", "help-browser"];
+        const o = {}; for (const k of n) o[k + "-symbolic"] = true; return o;
+    }
     ListModel {
         id: pinned
         ListElement { display: "Firefox"; decoration: "firefox" }
-        ListElement { display: "Dolphin"; decoration: "system-file-manager" }
-        ListElement { display: "Konsole"; decoration: "utilities-terminal" }
+        ListElement { display: "Dolphin"; decoration: "org.kde.dolphin" }
+        ListElement { display: "Konsole"; decoration: "org.kde.konsole" }
         ListElement { display: "Spotify"; decoration: "spotify-client" }
         ListElement { display: "Settings"; decoration: "systemsettings" }
     }
@@ -22,12 +28,12 @@ Rectangle {
         ListElement { display: "Ark"; decoration: "ark" }
         ListElement { display: "Calculator"; decoration: "accessories-calculator" }
         ListElement { display: "Discover"; decoration: "plasmadiscover" }
-        ListElement { display: "Dolphin"; decoration: "system-file-manager" }
+        ListElement { display: "Dolphin"; decoration: "org.kde.dolphin" }
         ListElement { display: "Firefox"; decoration: "firefox" }
         ListElement { display: "GIMP"; decoration: "gimp" }
         ListElement { display: "Gwenview"; decoration: "gwenview" }
         ListElement { display: "Kate"; decoration: "kate" }
-        ListElement { display: "Konsole"; decoration: "utilities-terminal" }
+        ListElement { display: "Konsole"; decoration: "org.kde.konsole" }
         ListElement { display: "Krita"; decoration: "krita" }
         ListElement { display: "Okular"; decoration: "okular" }
         ListElement { display: "Spectacle"; decoration: "spectacle" }
@@ -41,7 +47,7 @@ Rectangle {
         id: found
         ListElement { display: "Firefox"; decoration: "firefox" }
         ListElement { display: "FreeTube"; decoration: "freetube" }
-        ListElement { display: "Files"; decoration: "system-file-manager" }
+        ListElement { display: "Files"; decoration: "org.kde.dolphin" }
     }
     ListModel {
         id: other

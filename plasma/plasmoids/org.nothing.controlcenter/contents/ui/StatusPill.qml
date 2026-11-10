@@ -30,9 +30,7 @@ Item {
         width: root.implicitWidth
         height: Math.min(root.height, 26)
         radius: height / 2
-        color: root.open ? Theme.fg : (root.hovered ? Theme.card2 : Theme.card)
-        border.width: root.open ? 0 : 1
-        border.color: Theme.line
+        color: root.open ? Theme.fg : (root.hovered ? Theme.card3 : "#1a1a1a")
         Behavior on color { ColorAnimation { duration: Theme.normal; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.standard } }
     }
 

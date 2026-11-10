@@ -92,7 +92,8 @@ PlasmoidItem {
     P5Support.DataSource {
         id: iconScan
         engine: "executable"
-        readonly property string cmd: "find -L /usr/share/icons \"$HOME/.local/share/icons\" /var/lib/flatpak/exports/share/icons \"$HOME/.local/share/flatpak/exports/share/icons\" -name '*-symbolic.svg' -printf '%f\\n' 2>/dev/null | sort -u"
+        // only the active theme chain (Nothing → Papirus-Dark → breeze-dark → breeze → hicolor) + flatpak exports
+        readonly property string cmd: "find -L \"$HOME/.local/share/icons\" /usr/share/icons/Papirus-Dark /usr/share/icons/Papirus /usr/share/icons/breeze-dark /usr/share/icons/breeze /usr/share/icons/hicolor /var/lib/flatpak/exports/share/icons \"$HOME/.local/share/flatpak/exports/share/icons\" -name '*-symbolic.svg' -printf '%f\\n' 2>/dev/null | sort -u"
         connectedSources: [cmd]
         onNewData: (source, data) => {
             const set = {};

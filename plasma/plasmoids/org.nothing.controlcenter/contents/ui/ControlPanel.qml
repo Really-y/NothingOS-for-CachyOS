@@ -264,7 +264,7 @@ Item {
                         anchors.bottom: parent.bottom
                         text: rt.modelData.t
                         size: 9
-                        color: rt.on ? Theme.fg : Theme.fg3
+                        color: rt.on ? Theme.fg : (rt.avail ? Theme.fg2 : Theme.fg3)   // off ≠ unavailable
                     }
                 }
             }

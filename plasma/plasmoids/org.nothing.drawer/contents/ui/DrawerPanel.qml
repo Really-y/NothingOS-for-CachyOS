@@ -33,9 +33,10 @@ Item {
     property int zone: 0
     property int sel: 0
     property bool keyboardNav: false     // arrows/tab used since opening → show focus disc
-    property string iconFallback: "grey" // non-symbolic icons: "grey" (desaturated) or "mask" (flat silhouette)
     property var symbolicNames: ({})     // set of "<icon>-symbolic" names available in the icon theme
     readonly property color widgetFill: "#1a1a1a"
+    readonly property real viewY: flick.contentY
+    readonly property real viewHeight: flick.height
     readonly property bool pinnedShown: !searching && pinnedCount > 0
     readonly property bool resultsShown: searching && resultsCount > 0
     readonly property int cols: Math.max(1, Math.floor((width - pad * 2) / 112))
@@ -127,9 +128,8 @@ Item {
             Layout.fillWidth: true
             implicitHeight: 52
             radius: height / 2
-            color: Theme.card2
-            border.color: search.activeFocus ? Theme.fg3 : "transparent"; border.width: 1
-            Behavior on border.color { ColorAnimation { duration: Theme.fast } }
+            color: search.activeFocus ? "#222222" : Theme.card2
+            Behavior on color { ColorAnimation { duration: Theme.fast } }
             Icon { id: searchIcon; name: "search"; x: 18; anchors.verticalCenter: parent.verticalCenter; color: Theme.fg2 }
             TextInput {
                 id: search
@@ -160,7 +160,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                 }
             }
-            Label { id: escHint; text: "esc"; size: 10; color: Theme.fg3; anchors.right: parent.right; anchors.rightMargin: 20; anchors.verticalCenter: parent.verticalCenter }
+            Label { id: escHint; text: "esc"; size: 11; color: Theme.fg3; anchors.right: parent.right; anchors.rightMargin: 20; anchors.verticalCenter: parent.verticalCenter }
         }
 
         // ── scrolling content ────────────────────────────────────────────
@@ -225,6 +225,8 @@ Item {
                         readonly property bool selected: root.zone === 2 && root.sel === index && (root.keyboardNav || root.searching)
                         width: resultsList.width
                         height: 56
+                        readonly property real cut: resultsList.y + y + height - root.viewY - root.viewHeight
+                        opacity: Math.max(0, Math.min(1, 1 - cut / (height * 0.5)))
                         pressScale: 0.98
                         acceptedButtons: Qt.LeftButton | Qt.RightButton
                         onClicked: mouse => {
@@ -242,7 +244,8 @@ Item {
                             width: 40; height: 40; radius: 20
                             x: 8; anchors.verticalCenter: parent.verticalCenter
                             color: row.selected && root.keyboardNav ? Theme.fg : (row.selected ? Theme.card3 : root.widgetFill)
-                            MonoIcon { anchors.centerIn: parent; size: 18; source: row.model.decoration; symbolicNames: root.symbolicNames; fallback: root.iconFallback; dark: row.selected && root.keyboardNav }
+                            MonoIcon { anchors.centerIn: parent; size: 18; source: row.model.decoration; hint: "";   // results: match by icon name only (a file named "firefox…" is not a browser)
+                                 symbolicNames: root.symbolicNames; dark: row.selected && root.keyboardNav }
                         }
                         Column {
                             anchors.left: rdisc.right; anchors.leftMargin: 14
@@ -273,18 +276,7 @@ Item {
                         }
                     }
                 }
-                Item { width: 1; height: 48 }   // room to scroll the last row out of the fade
-            }
-            Rectangle {
-                // last 48px fade into the black card so rows never end in a hard cut
-                parent: flick
-                anchors.left: parent.left; anchors.right: parent.right; anchors.bottom: parent.bottom
-                height: 48
-                visible: flick.contentHeight > flick.height
-                gradient: Gradient {
-                    GradientStop { position: 0; color: "transparent" }
-                    GradientStop { position: 1; color: Theme.bg }
-                }
+                Item { width: 1; height: 8 }
             }
         }
     }
@@ -312,6 +304,11 @@ Item {
             required property var model
             readonly property bool selected: panel.zone === grid.zoneId && panel.sel === index && (panel.keyboardNav || panel.searching)
             width: grid.cellWidth; height: grid.cellHeight
+            // bottom of this cell in viewport coordinates; once its label is cut off the
+            // whole cell (icon + label) fades out, so there are no crisp icons over hidden labels
+            readonly property real cut: Math.max(grid.y + y + height - panel.viewY - panel.viewHeight,
+                                                 panel.viewY - (grid.y + y))
+            opacity: Math.max(0, Math.min(1, 1 - cut / (height * 0.4)))
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             onClicked: mouse => {
                 if (mouse.button === Qt.RightButton) panel.requestMenu(grid.zoneId, index, cell);
@@ -326,11 +323,10 @@ Item {
                 // white disc + black glyph only for keyboard focus; the Enter target while
                 // typing gets a quiet ring instead
                 readonly property bool focused: cell.selected && panel.keyboardNav
-                color: focused ? Theme.fg : (cell.containsMouse ? Theme.card3 : panel.widgetFill)
-                border.width: cell.selected && !focused && panel.searching ? 1 : 0
-                border.color: Theme.fg3
+                readonly property bool target: cell.selected && !focused        // Enter target while typing
+                color: focused ? Theme.fg : (target ? "#2a2a2a" : (cell.containsMouse ? Theme.card3 : panel.widgetFill))
                 Behavior on color { ColorAnimation { duration: Theme.fast } }
-                MonoIcon { anchors.centerIn: parent; size: 26; source: cell.model.decoration; symbolicNames: panel.symbolicNames; fallback: panel.iconFallback; dark: disc.focused }
+                MonoIcon { anchors.centerIn: parent; size: 26; source: cell.model.decoration; hint: (cell.model.display || "") + " " + (cell.model.description || ""); symbolicNames: panel.symbolicNames; dark: disc.focused }
             }
             Text {
                 anchors.top: disc.bottom; anchors.topMargin: 8
@@ -342,7 +338,7 @@ Item {
                 elide: Text.ElideRight          // last resort for very long names
                 lineHeight: 0.95
                 text: cell.model.display || ""
-                color: disc.focused || cell.containsMouse ? Theme.fg : Theme.fg2
+                color: disc.focused || disc.target || cell.containsMouse ? Theme.fg : Theme.fg2
                 font.family: Theme.sans; font.pixelSize: 12; font.weight: Font.Normal
             }
         }
