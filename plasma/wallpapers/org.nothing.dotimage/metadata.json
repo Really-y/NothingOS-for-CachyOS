@@ -1,0 +1,16 @@
+{
+    "KPackageStructure": "Plasma/Wallpaper",
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "X-KDE-ParentApp": "org.kde.plasmashell",
+    "KPlugin": {
+        "Id": "org.nothing.dotimage",
+        "Name": "Nothing Dot Image",
+        "Description": "Any picture (or a slideshow folder) redrawn as Nothing OS dot-matrix art on black",
+        "Icon": "preferences-desktop-wallpaper",
+        "Category": "",
+        "Authors": [{ "Name": "NothingOS for CachyOS" }],
+        "License": "GPL-3.0-or-later",
+        "Version": "1.0",
+        "Website": ""
+    }
+}

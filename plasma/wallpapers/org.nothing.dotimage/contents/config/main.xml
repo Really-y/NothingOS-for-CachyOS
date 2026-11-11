@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
+      http://www.kde.org/standards/kcfg/1.0/kcfg.xsd" >
+  <kcfgfile name=""/>
+  <group name="General">
+    <entry name="Image" type="String">
+      <label>Picture to render (file URL)</label>
+      <default></default>
+    </entry>
+    <entry name="RecentImages" type="StringList">
+      <label>Recently chosen pictures (newest first)</label>
+      <default></default>
+    </entry>
+    <entry name="SlideMode" type="Int">
+      <label>0 = single picture, 1 = slideshow folder</label>
+      <default>0</default>
+    </entry>
+    <entry name="SlideFolder" type="String">
+      <label>Slideshow folder (URL)</label>
+      <default></default>
+    </entry>
+    <entry name="SlideInterval" type="Int">
+      <label>Slideshow interval in minutes</label>
+      <default>10</default>
+    </entry>
+    <entry name="SlideShuffle" type="Bool">
+      <label>Slideshow in random order</label>
+      <default>false</default>
+    </entry>
+    <entry name="FillMode" type="Int">
+      <label>0 = Fill (cover), 1 = Fit (contain, black bars), 2 = Center (native size)</label>
+      <default>0</default>
+    </entry>
+    <entry name="DotPitch" type="Int">
+      <label>Grid pitch in px (5..16)</label>
+      <default>8</default>
+    </entry>
+    <entry name="Levels" type="Int">
+      <label>Number of dot sizes (3..6), 0 = continuous</label>
+      <default>5</default>
+    </entry>
+    <entry name="MinDotSize" type="Double">
+      <label>Smallest dot, fraction of the pitch</label>
+      <default>0.18</default>
+    </entry>
+    <entry name="Contrast" type="Double">
+      <label>Contrast (1 = neutral)</label>
+      <default>1.15</default>
+    </entry>
+    <entry name="Brightness" type="Double">
+      <label>Brightness / gamma (1 = neutral, higher = more and larger dots)</label>
+      <default>1.0</default>
+    </entry>
+    <entry name="AutoLevels" type="Bool">
+      <label>Stretch each picture's tones automatically (helps dark art)</label>
+      <default>true</default>
+    </entry>
+    <entry name="BlackPoint" type="Double">
+      <label>Manual black point 0..1 (Auto levels off)</label>
+      <default>0.0</default>
+    </entry>
+    <entry name="WhitePoint" type="Double">
+      <label>Manual white point 0..1 (Auto levels off)</label>
+      <default>1.0</default>
+    </entry>
+    <entry name="ColorMode" type="Int">
+      <label>0 = monochrome white, 1 = original colour, 2 = mono + Nothing red accent</label>
+      <default>0</default>
+    </entry>
+    <entry name="EdgeEmphasis" type="Bool">
+      <label>Boost dots along strong edges (line art)</label>
+      <default>false</default>
+    </entry>
+    <entry name="BackgroundGrid" type="Bool">
+      <label>Faint background dot grid where the picture is dark</label>
+      <default>true</default>
+    </entry>
+    <entry name="Animate" type="Bool">
+      <label>Animate: Glyph sweep every 8 s (off = static, no timer)</label>
+      <default>true</default>
+    </entry>
+    <entry name="Twinkle" type="Bool">
+      <label>Gentle twinkle between sweeps</label>
+      <default>true</default>
+    </entry>
+  </group>
+</kcfg>
