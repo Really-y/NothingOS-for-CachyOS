@@ -1,0 +1,16 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "X-Plasma-Provides": [ "org.kde.plasma.multitasking" ],
+    "KPlugin": {
+        "Id": "org.nothing.dock",
+        "Name": "Nothing Dock",
+        "Description": "Nothing OS dock: pinned and running apps as discs with dot indicators",
+        "Icon": "preferences-system-windows",
+        "Category": "Windows and Tasks",
+        "Version": "1.0",
+        "License": "GPL-3.0-or-later",
+        "Authors": [ { "Name": "NothingOS for CachyOS" } ],
+        "FormFactors": [ "desktop", "tablet" ]
+    }
+}

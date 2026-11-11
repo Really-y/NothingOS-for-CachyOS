@@ -62,9 +62,11 @@ FILES = {
     "dialogs/background.svg": (30, "#000000", "#2a2a2a", ("",)),
     "widgets/background.svg": (24, "#111111", "#1f1f1f", ("",)),
     "widgets/tooltip.svg": (12, "#1c1c1c", "#2a2a2a", ("",)),
-    # floating dock = card with hairline; docked top bar = pure black, no line
+    # docked top bar = pure black, no line. Bottom ("south") = the dock: the panel itself is
+    # invisible and org.nothing.dock draws its own pill; mask-south keeps the input/blur region.
     "widgets/panel-background.svg": (22, "#111111", "#2a2a2a",
-                                     ("", ("north", "#000000", "#000000"), "south", "east", "west")),
+                                     ("", ("north", "#000000", "#000000"), ("south", "none", "none"),
+                                      ("mask-south", "#000000", "#000000"), "east", "west")),
     "widgets/plasmoidheading.svg": (20, "#111111", "#111111", ("header", "footer")),
 }
 

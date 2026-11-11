@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0 http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+  <kcfgfile name=""/>
+  <group name="General">
+    <!-- same key/format as org.kde.plasma.icontasks, so pinned apps migrate 1:1 -->
+    <entry name="launchers" type="StringList">
+      <label>Pinned apps (launcher URLs, e.g. applications:org.kde.dolphin.desktop)</label>
+      <default></default>
+    </entry>
+    <entry name="showOnlyCurrentDesktop" type="Bool">
+      <default>true</default>
+    </entry>
+    <entry name="showOnlyCurrentActivity" type="Bool">
+      <default>true</default>
+    </entry>
+    <entry name="showOnlyCurrentScreen" type="Bool">
+      <default>false</default>
+    </entry>
+  </group>
+</kcfg>
