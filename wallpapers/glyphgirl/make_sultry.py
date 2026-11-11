@@ -15,14 +15,16 @@ import os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 HEAD = (294, 294, -8, 1.35)       # translate x, y, rotate deg, scale  (local head frame -> canvas)
-BEAD_LOCAL = (45, 44)
+BEAD_LOCAL = (44, 35)
+FRAME = (24, 0, 0.92)       # whole drawing: translate x, y, scale (keeps the hip flare in frame)
 
 
 def head_to_canvas(p):
     tx, ty, r, k = HEAD
     a = math.radians(r)
     x, y = p[0] * k, p[1] * k
-    return (tx + x * math.cos(a) - y * math.sin(a), ty + x * math.sin(a) + y * math.cos(a))
+    cx, cy = tx + x * math.cos(a) - y * math.sin(a), ty + x * math.sin(a) + y * math.cos(a)
+    return (FRAME[0] + FRAME[2] * cx, FRAME[1] + FRAME[2] * cy)
 
 
 frag = open(os.path.join(HERE, "sultry-body.svgfrag")).read().rstrip()
@@ -38,7 +40,7 @@ s = '''<?xml version="1.0" encoding="UTF-8"?>
     <filter id="soft" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="7"/></filter>
     <filter id="soft2" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="3"/></filter>
   </defs>
-''' + frag + "\n</svg>\n"
+''' + '  <g transform="translate(%g,%g) scale(%g)">\n' % FRAME + frag + "\n  </g>\n</svg>\n"
 open(os.path.join(HERE, "sultry.svg"), "w").write(s)
 bx, by = head_to_canvas(BEAD_LOCAL)
 print("ok sultry.svg  bead canvas (%.2f, %.2f)" % (bx, by))
