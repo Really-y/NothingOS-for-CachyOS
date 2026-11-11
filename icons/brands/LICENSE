@@ -5,3 +5,7 @@ https://creativecommons.org/publicdomain/zero/1.0/
 Downloaded from https://cdn.jsdelivr.net/npm/simple-icons@13.21.0/icons/<slug>.svg.
 Only the single <path d> of each file is used (recoloured white) by icons/appicons.py.
 The marks themselves remain trademarks of their respective owners.
+
+custom/ holds simplified filled variants drawn for this project (mpv, qBittorrent,
+Wireshark, a 22px Chrome) where the Simple Icons mark is a hairline at icon sizes.
+They are original drawings, CC0 like the rest.

@@ -17,7 +17,7 @@ Rectangle {
 
     Column {
         x: 24; y: 24; spacing: 22
-        Label { text: "Dock · 48px — brand marks (Simple Icons) + Material outline" }
+        Label { text: "Dock · 48px — brand marks + Material outline (wght 600, optical sizing)" }
         Rectangle {
             width: dockRow.width + 24; height: 64; radius: 32; color: "#000000"
             Row {
@@ -29,7 +29,7 @@ Rectangle {
                 }
             }
         }
-        Label { text: "Menus · 22px set (wght 600, opsz 20)" + (zoom > 1 ? " ×" + zoom : "") }
+        Label { text: "Menus · 22px set (wght 600, 700 for thin symbols, opsz 20)" + (zoom > 1 ? " ×" + zoom : "") }
         Row {
             spacing: 14
             Repeater {
@@ -37,14 +37,14 @@ Rectangle {
                 Image { required property string modelData; width: 22 * zoom; height: 22 * zoom; smooth: false; sourceSize: Qt.size(22, 22); source: dir22 + modelData + ".svg" }
             }
         }
-        Label { text: "Dot-letter fallback · 48px / 22px" }
+        Label { text: "Fallback · 48px dots (2px on 3px pitch) / 22px pixel letter" }
         Row {
             spacing: 8
             Repeater {
                 model: fallback.concat(fallback)
                 Image { required property string modelData; required property int index; readonly property int px: index < 3 ? 48 : 22
                         width: px * (index < 3 ? 1 : zoom); height: width; smooth: false; anchors.verticalCenter: parent.verticalCenter
-                        sourceSize: index < 3 ? Qt.size(96, 96) : Qt.size(22, 22)
+                        sourceSize: index < 3 ? Qt.size(48, 48) : Qt.size(22, 22)
                         source: dir + (index < 3 ? modelData : modelData.replace("dotletter-", "dotletter-small-")) + ".svg" }
             }
         }

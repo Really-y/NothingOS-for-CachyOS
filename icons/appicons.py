@@ -66,7 +66,7 @@ CURATED = {
     "org.gnome.meld": ["compare_arrows", "difference"], "designer": ["design_services"], "linguist": ["translate"],
     "assistant": ["menu_book"], "cmake-gui": ["build"], "qdbusviewer": ["hub"], "org.kde.iconexplorer": ["interests"],
     # media
-    "org.kde.spectacle": ["screenshot_region"], "mpv": ["brand:mpv"], "freetube": ["smart_display"],
+    "org.kde.spectacle": ["screenshot_region"], "mpv": ["brand:custom/mpv"], "freetube": ["smart_display"],
     "org.pulseaudio.pavucontrol": ["volume_up"], "qv4l2": ["videocam"], "qvidcap": ["video_camera_front"],
     "org.kde.plasma.bigscreen.uvcviewer": ["photo_camera"], "plasma-bigscreen-swap-session": ["tv"],
     "spotify": ["brand:spotify"], "com.spotify.client": ["brand:spotify"], "obs": ["brand:obsstudio"], "com.obsproject.studio": ["brand:obsstudio"], "vlc": ["brand:vlcmediaplayer"], "org.videolan.vlc": ["brand:vlcmediaplayer"], "thunderbird": ["brand:thunderbird"], "org.mozilla.thunderbird": ["brand:thunderbird"], "libreoffice-startcenter": ["brand:libreoffice"], "org.kde.elisa": ["headphones"], "org.kde.gwenview": ["image"],
@@ -74,11 +74,11 @@ CURATED = {
     # software
     "org.kde.discover": ["storefront"], "cachyos-pi": ["install_desktop"], "com.shellyorg.shelly": ["package_2"],
     # network / remote
-    "org.qbittorrent.qbittorrent": ["brand:qbittorrent"], "localsend": ["share"],
+    "org.qbittorrent.qbittorrent": ["brand:custom/qbittorrent"], "localsend": ["share"],
     "org.kde.kdeconnect.app": ["smartphone"], "org.kde.kdeconnect.nonplasma": ["smartphone"],
     "org.kde.kdeconnect.sms": ["smartphone"], "com.anydesk.anydesk": ["brand:anydesk"], "com.rustdesk.rustdesk": ["brand:rustdesk"],
     "com.parsecgaming.parsec": ["cast_connected"], "remote-viewer": ["connected_tv", "cast"],
-    "virt-manager": ["computer"], "qemu": ["dns"], "org.wireshark.wireshark": ["brand:wireshark"],
+    "virt-manager": ["computer"], "qemu": ["dns"], "org.wireshark.wireshark": ["brand:custom/wireshark"],
     "avahi-discover": ["travel_explore"], "bssh": ["vpn_key"], "bvnc": ["screen_share"],
     "nm-connection-editor": ["settings_ethernet"],
     # system
@@ -155,14 +155,18 @@ BRANDS = os.path.join(HERE, "brands")
 
 
 def brand_path(slug):
-    """The single <path d> of a Simple Icons mark (24×24 viewBox) — treated as data."""
+    """(d, fill-rule) of the single <path> of a Simple Icons mark or one of our filled variants in
+    brands/custom/ (24×24 viewBox) — treated as data."""
+    if not re.fullmatch(r"(custom/)?[a-z0-9]+", slug):
+        raise ValueError(f"bad brand slug {slug}")
     src = open(os.path.join(BRANDS, slug + ".svg"), encoding="utf-8").read()
     paths = re.findall(r'<path[^>]*\sd="([^"]+)"', src)
     if len(paths) != 1 or re.search(r"<(script|image|use|foreignObject|style)\b", src):
         raise ValueError(f"unexpected brand svg {slug}")
     if not re.fullmatch(r"[MmLlHhVvCcSsQqTtAaZz0-9.,\s+eE-]+", paths[0]):
         raise ValueError(f"unexpected path data in {slug}")
-    return paths[0]
+    rule = "evenodd" if 'fill-rule="evenodd"' in src else "nonzero"
+    return paths[0], rule
 
 
 def has_symbol(font, name):
@@ -200,11 +204,11 @@ def _shape(font, gname, bounds):
     return "round" if sum(corners) / max(1, len(corners)) < 60 else "square"
 
 
-def _ink_bbox(d, view=24.0):
+def _ink_bbox(d, rule="nonzero", view=24.0):
     """Ink bbox of a path in its own units (rasterised: Simple Icons paths use arcs)."""
     k = 40
     svgsrc = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{view * k:.0f}" height="{view * k:.0f}" '
-              f'viewBox="0 0 {view} {view}"><path d="{d}" fill="#fff"/></svg>')
+              f'viewBox="0 0 {view} {view}"><path d="{d}" fill="#fff" fill-rule="{rule}"/></svg>')
     with tempfile.TemporaryDirectory() as t:
         p, q = os.path.join(t, "b.svg"), os.path.join(t, "b.png")
         open(p, "w").write(svgsrc)
@@ -217,8 +221,8 @@ def _ink_bbox(d, view=24.0):
 def glyph_source(font, val):
     """(path d in y-down units, (xmin, ymin, xmax, ymax)) for 'brand:<slug>' or a Material symbol."""
     if val.startswith("brand:"):
-        d = brand_path(val[6:])
-        return d, _ink_bbox(d)
+        d, rule = brand_path(val[6:])
+        return d, _ink_bbox(d, rule), rule
     gname = ligature_glyph(font, val)
     gs = font.getGlyphSet()
     bp = BoundsPen(gs)
@@ -226,27 +230,60 @@ def glyph_source(font, val):
     x0, y0, x1, y1 = bp.bounds
     pen = SVGPathPen(gs)
     gs[gname].draw(TransformPen(pen, (1, 0, 0, -1, 0, 0)))      # flip to y-down
-    return pen.getCommands(), (x0, -y1, x1, -y0)
+    return pen.getCommands(), (x0, -y1, x1, -y0), "nonzero"
 
 
 # 22px set: symbols whose strokes render under 1.5px get a sturdier stand-in / weight
-SMALL_SWAP = {"folder_zip": "inventory_2"}
+SMALL_SWAP = {"folder_zip": "inventory_2", "brand:googlechrome": "brand:custom/chrome22"}
 SMALL_BOLD = {"smartphone", "computer", "phone_iphone", "desktop_windows", "connected_tv", "developer_board",
               "account_tree", "vpn_key", "keyboard", "interests", "hub", "translate"}
 
-GLYPH_FRACTION = 0.54          # ink bbox (longest side) : disc diameter — every glyph, every size
+def _ink_stats(d, bbox, rule):
+    """(fill ratio, corner fill) of the glyph inside its own ink bbox, rasterised at 48px."""
+    x0, y0, x1, y1 = bbox
+    w, h = x1 - x0, y1 - y0
+    W, H = (48, max(4, round(48 * h / w))) if w >= h else (max(4, round(48 * w / h)), 48)
+    svgsrc = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="{x0} {y0} {w} {h}" '
+              f'preserveAspectRatio="none"><path d="{d}" fill="#fff" fill-rule="{rule}"/></svg>')
+    with tempfile.TemporaryDirectory() as t:
+        p, q = os.path.join(t, "s.svg"), os.path.join(t, "s.png")
+        open(p, "w").write(svgsrc)
+        subprocess.run(["rsvg-convert", "-o", q, p], check=True)
+        fill = float(subprocess.run(["magick", q, "-alpha", "extract", "-format", "%[fx:mean]", "info:"],
+                                    capture_output=True, text=True).stdout or 0)
+        cw, ch = max(2, W // 6), max(2, H // 6)
+        corners = []
+        for gx, gy in ((0, 0), (W - cw, 0), (0, H - ch), (W - cw, H - ch)):
+            v = subprocess.run(["magick", q, "-alpha", "extract", "-crop", f"{cw}x{ch}+{gx}+{gy}", "+repage",
+                                "-format", "%[fx:mean]", "info:"], capture_output=True, text=True).stdout
+            corners.append(float(v or 0))
+    return fill, sum(corners) / 4
+
+
+def optical_fraction(d, bbox, rule):
+    """Longest ink side : disc diameter, by shape class (ink-bbox aspect + fill):
+    tall narrow (phone) 0.58, round / narrow 0.54, squares and wide rectangles 0.48."""
+    x0, y0, x1, y1 = bbox
+    aspect = (x1 - x0) / (y1 - y0)
+    if aspect < 0.72:
+        return 0.58
+    _fill, corner = _ink_stats(d, bbox, rule)
+    if corner < 0.12 or aspect < 0.85:
+        return 0.54
+    return 0.48
 
 
 def glyph_markup(font, val, c=64, disc_d=60, snap=False):
-    d, (x0, y0, x1, y1) = glyph_source(font, val)
+    d, (x0, y0, x1, y1), rule = glyph_source(font, val)
     w, h = x1 - x0, y1 - y0
-    s = GLYPH_FRACTION * disc_d / max(w, h)
+    s = optical_fraction(d, (x0, y0, x1, y1), rule) * disc_d / max(w, h)
     tx = c / 2 - (x0 + w / 2) * s
     ty = c / 2 - (y0 + h / 2) * s
     if snap:                                         # bbox on whole pixels
         tx += round(x0 * s + tx) - (x0 * s + tx)
         ty += round(y0 * s + ty) - (y0 * s + ty)
-    return f'<path transform="translate({tx:.3f} {ty:.3f}) scale({s:.5f})" d="{d}" fill="#ffffff"/>'
+    return (f'<path transform="translate({tx:.3f} {ty:.3f}) scale({s:.5f})" d="{d}" '
+            f'fill="#ffffff" fill-rule="{rule}"/>')
 
 
 # ── dot-matrix letter fallback (shared/dotfont.js) ──────────────────────────
@@ -257,13 +294,21 @@ def load_dotfont():
 
 
 def dot_letter_markup(dots, ch):
+    """5×7 letter for the scalable set: round dots on an integer 4-unit pitch at integer centres."""
     rows = dots.get(ch.upper()) or dots.get("?")
-    pitch = 34 / 7                                     # 7 rows ≈ a tall glyph; dots stay legible at 22px
-    r = pitch * 0.75 / 2                               # fuller dots than UI text so the letter survives 22px
-    cols = len(rows[0])
-    x0 = 32 - (cols - 1) * pitch / 2
-    y0 = 32 - (len(rows) - 1) * pitch / 2
-    return "".join(f'<circle cx="{x0 + c * pitch:.2f}" cy="{y0 + y * pitch:.2f}" r="{r:.2f}" fill="#ffffff"/>'
+    pitch, r = 4, 1.5
+    x0 = 32 - (len(rows[0]) - 1) * pitch // 2
+    y0 = 32 - (len(rows) - 1) * pitch // 2
+    return "".join(f'<circle cx="{x0 + c * pitch}" cy="{y0 + y * pitch}" r="{r}" fill="#ffffff"/>'
+                   for y, row in enumerate(rows) for c, v in enumerate(row) if v == "#")
+
+
+def dot_letter_48(dots, ch):
+    """5×7 letter for the 48px set: 2×2px dots on a 3px pitch at integer offsets — crisp, no AA smears."""
+    rows = dots.get(ch.upper()) or dots.get("?")
+    x0 = 24 - (len(rows[0]) * 3 - 1) // 2
+    y0 = 24 - (len(rows) * 3 - 1) // 2
+    return "".join(f'<rect x="{x0 + c * 3}" y="{y0 + y * 3}" width="2" height="2" fill="#ffffff"/>'
                    for y, row in enumerate(rows) for c, v in enumerate(row) if v == "#")
 
 
@@ -366,7 +411,7 @@ def svg(inner, c=64):
 
 
 def build(theme_dir):
-    font = load_font()
+    font = load_font(600, 24)          # ≥25px: weight 600 so outlines match the filled brand marks
     font_s = load_font(600, 20)        # small sizes: heavier, low optical size
     font_b = load_font(700, 20)        # thin-stroked symbols that would drop under 1.5px at 22px
     dots = load_dotfont()
@@ -376,6 +421,8 @@ def build(theme_dir):
     skip_names = non_app_icon_names()
     d = os.path.join(theme_dir, "scalable", "apps")
     d22 = os.path.join(theme_dir, "22", "apps")       # ≤24px: menus, tray-size lists, task switcher rows
+    d48 = os.path.join(theme_dir, "48", "apps")       # dot-letter fallbacks only: pixel-exact at 48px
+    os.makedirs(d48, exist_ok=True)
     os.makedirs(d, exist_ok=True)
     os.makedirs(d22, exist_ok=True)
     markup_cache, gmap = {}, {}
@@ -408,6 +455,8 @@ def build(theme_dir):
                 small = glyph_markup(font_b if v22 in SMALL_BOLD else font_s, v22, c=22, disc_d=21, snap=True)
             else:
                 small = dot_letter_small(dots_s, val)
+                with open(os.path.join(d48, icon + ".svg"), "w") as f:
+                    f.write(svg(f'<circle cx="24" cy="24" r="22.5" fill="{DISC}"/>{dot_letter_48(dots, val)}', 48))
             with open(os.path.join(d22, icon + ".svg"), "w") as f:
                 f.write(svg(f'<circle cx="11" cy="11" r="10.5" fill="{DISC}"/>{small}', 22))
             # glyph-only twin by icon name, for drawer items that only know the icon (window/runner results)
