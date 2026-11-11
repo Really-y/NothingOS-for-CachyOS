@@ -1,0 +1,34 @@
+{
+  "_note": "Single source of truth for every terminal. Pure black, white text, greys, ONE red (#d71921). green/yellow/blue/magenta/cyan are desaturated greys with a slight tint: calm, but ls/git diff/htop stay readable.",
+  "background": "#000000",
+  "foreground": "#ffffff",
+  "dim": "#5e5e5e",
+  "secondary": "#8e8e8e",
+  "hairline": "#2a2a2a",
+  "surface": "#1a1a1a",
+  "cursor": "#ffffff",
+  "cursor_text": "#000000",
+  "selection_bg": "#ffffff",
+  "selection_fg": "#000000",
+  "accent": "#d71921",
+  "normal": {
+    "black":   "#1a1a1a",
+    "red":     "#d71921",
+    "green":   "#8fb59a",
+    "yellow":  "#c9b98a",
+    "blue":    "#8a9bb5",
+    "magenta": "#a994b5",
+    "cyan":    "#86aeb0",
+    "white":   "#c8c8c8"
+  },
+  "bright": {
+    "black":   "#5e5e5e",
+    "red":     "#ff3b44",
+    "green":   "#b4d4bb",
+    "yellow":  "#e0d3a8",
+    "blue":    "#aebbd1",
+    "magenta": "#c6b6d1",
+    "cyan":    "#aacdcf",
+    "white":   "#ffffff"
+  }
+}

@@ -27,6 +27,8 @@ for f in "$SRC"/*; do
   rm -rf "$HOME/.config/$name"
   cp -a "$f" "$HOME/.config/$name"
 done
+# terminals (Konsole/Alacritty/Ghostty/Kitty/WezTerm/Starship/fastfetch) from ~/.local/share/nothingos-backup/terminal
+python3 "$ROOT/terminal/gen_terminal.py" --restore 2>/dev/null || true
 plasma-apply-colorscheme BreezeDark >/dev/null 2>&1 || true
 qdbus6 org.kde.KWin /KWin reconfigure 2>/dev/null || true
 systemctl --user restart plasma-plasmashell.service 2>/dev/null || (plasmashell --replace >/dev/null 2>&1 & disown)

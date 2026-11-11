@@ -64,7 +64,7 @@ else "$ROOT/scripts/build-wallpaper.sh" >/dev/null || true; fi
 
 echo "· icons";        python3 "$ROOT/icons/gen_icons.py" >/dev/null; mkdir -p "$D/icons"; rm -rf "$D/icons/Nothing"; cp -r "$ROOT/icons/Nothing" "$D/icons/"; /usr/lib/plasma-changeicons Nothing >/dev/null 2>&1 || true
 
-echo "· konsole";      mkdir -p "$D/konsole"; cp "$ROOT/terminal/Nothing.colorscheme" "$D/konsole/"
+echo "· terminal";     python3 "$ROOT/terminal/gen_terminal.py" --install >/dev/null   # Konsole/Alacritty/Ghostty/Kitty/WezTerm/Starship/fastfetch; originals -> $D/nothingos-backup/terminal
 
 echo "· nothingd (Rust)"; "$ROOT/daemon/install.sh" >/dev/null
 echo "· plasmoids";    "$ROOT/scripts/build-plasmoids.sh" >/dev/null
