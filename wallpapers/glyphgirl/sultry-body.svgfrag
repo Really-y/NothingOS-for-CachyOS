@@ -36,7 +36,7 @@
     <path fill="#cdcdcd" d="M 276,336 C 298,318 320,292 338,276 C 352,290 362,302 370,308
       C 372,334 376,354 388,372 L 266,370 C 272,358 274,348 276,336 Z"/>
     <!-- sternocleidomastoid shadow toward the hidden throat -->
-    <path fill="none" stroke="#9a9a9a" stroke-width="6" stroke-linecap="round" d="M 330,290 C 316,322 306,346 298,366"/>
+    <path fill="none" stroke="#a6a6a6" stroke-width="7" stroke-linecap="round" filter="url(#soft2)" d="M 330,290 C 316,322 306,346 298,366"/>
   </g>
 
   <g id="body">
@@ -66,6 +66,11 @@
     <path fill="#3a3a3a" d="M 160,476 C 196,548 270,616 338,628 C 392,620 432,556 466,440
       C 456,500 444,560 432,602 C 438,640 452,690 470,800 L 160,800 C 172,740 200,670 205,612
       C 196,566 182,520 160,476 Z"/>
+    <!-- satin sheen: broad soft highlights following the waist -> hip curve on both sides -->
+    <path fill="none" stroke="#6a6a6a" stroke-width="18" stroke-linecap="round" filter="url(#soft2)"
+          d="M 222,636 C 214,680 204,730 196,800"/>
+    <path fill="none" stroke="#5e5e5e" stroke-width="16" stroke-linecap="round" filter="url(#soft2)"
+          d="M 420,622 C 428,670 440,720 452,790"/>
     <!-- light binding along the back edge -->
     <path fill="none" stroke="#8c8c8c" stroke-width="5" stroke-linecap="round"
           d="M 164,482 C 200,552 272,618 338,626 C 392,618 430,556 462,448"/>
@@ -112,6 +117,9 @@
   <g id="hand">
     <!-- back of her right hand; four fingers fan up-left through the hair (hair-dark gaps
          >= 2 dots between them so they read at 6 px), slim wrist from the forearm -->
+    <!-- shadow the fingers cast into the hair: keeps the gaps between them dark -->
+    <path fill="#1c1c1c" d="M 362,124 C 380,130 398,140 412,146 L 412,192 C 396,196 378,194 360,192
+      C 350,186 348,170 350,156 C 352,142 354,130 362,124 Z"/>
     <path fill="#c8c8c8" d="M 428,152 C 416,146 402,146 392,150 C 386,160 386,176 392,188
       C 404,192 418,188 428,182 Z"/>
     <g fill="none" stroke="#c8c8c8" stroke-width="9" stroke-linecap="round">
