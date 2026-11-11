@@ -22,6 +22,7 @@ rm -f "$HOME/.config/autostart/nothingos-shell.desktop"
 rm -f "$HOME/.local/share/dbus-1/services/org.knopwob.dunst.service" "$HOME/.local/share/dbus-1/services/org.kde.plasma.Notifications.service"
 rm -f "$HOME"/.local/share/applications/nothingos-*.desktop
 "$ROOT/scripts/dolphin.sh" --revert 2>/dev/null || true
+"$ROOT/scripts/defaults.sh" --revert 2>/dev/null || true
 for f in "$SRC"/*; do
   name=$(basename "$f")
   rm -rf "$HOME/.config/$name"

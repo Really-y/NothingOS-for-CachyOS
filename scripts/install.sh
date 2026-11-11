@@ -23,6 +23,7 @@ kw --file "$HOME/.config/Kvantum/kvantum.kvconfig" --group General --key theme N
 kw --file "$HOME/.config/Kvantum/kvantum.kvconfig" --group Applications --key NothingFiles dolphin
 kw --file kdeglobals --group KDE --key widgetStyle kvantum
 echo "· dolphin";      "$ROOT/scripts/dolphin.sh"
+echo "· defaults";     "$ROOT/scripts/defaults.sh"
 # Flatpak Dolphin only sees Kvantum through the org.kde.KStyle.Kvantum extension (downloads from Flathub; opt-in)
 if flatpak info org.kde.dolphin >/dev/null 2>&1; then
   RT=$(flatpak info -m org.kde.dolphin | sed -n 's|^runtime=org.kde.Platform/[^/]*/||p' | head -1)
