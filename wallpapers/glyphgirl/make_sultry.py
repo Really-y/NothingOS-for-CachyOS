@@ -14,7 +14,7 @@ import math
 import os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-HEAD = (294, 286, -8, 1.35)       # translate x, y, rotate deg, scale  (local head frame -> canvas)
+HEAD = (294, 294, -8, 1.35)       # translate x, y, rotate deg, scale  (local head frame -> canvas)
 BEAD_LOCAL = (45, 44)
 
 
