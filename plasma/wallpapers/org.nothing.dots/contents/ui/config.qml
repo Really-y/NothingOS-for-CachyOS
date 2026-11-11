@@ -6,6 +6,8 @@ Kirigami.FormLayout {
     id: root
     twinFormLayouts: parentLayout
     property alias formLayout: root
+    property var configDialog            // set by Plasma's wallpaper settings page
+    property var wallpaperConfiguration  // idem
 
     property int cfg_DotPitch: 24
     property int cfg_DotPitchDefault: 24
