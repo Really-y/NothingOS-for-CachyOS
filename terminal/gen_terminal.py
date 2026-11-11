@@ -373,7 +373,7 @@ def logo_text():
         for x in range(9):
             d = math.hypot(x - 4, y - 4)
             if x == 4 and y == 4: cells.append("$3●")
-            elif 3.0 <= d <= 4.3 and not (x > 4 and y == 4): cells.append("$1●")
+            elif 3.0 <= d <= 4.3: cells.append("$1●")
             else: cells.append("$2·")
         rows.append(" ".join(cells))
     return "\n".join(rows) + "\n"
@@ -384,7 +384,7 @@ def fastfetch():
     def col(h):
         r, g, b = rgb(h)
         return f"38;2;{r};{g};{b}"
-    dots = " ".join(f"{tc(c)}●\x1b[0m" for c in (P["foreground"], P["secondary"], P["accent"]))
+    dots = " ".join(f"{tc(c)}●\x1b[0m" for c in (P["foreground"], P["secondary"]))
     def m(t, k, **kw):
         d = {"type": t, "key": k}; d.update(kw); return d
     cfg = {
