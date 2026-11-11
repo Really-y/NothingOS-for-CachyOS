@@ -104,14 +104,14 @@ def trash_svg(font, symbol):
 
 INDEX = """[Icon Theme]
 Name=Nothing
-Comment=Monochrome Nothing places and app icons on top of Papirus-Dark
+Comment=Monochrome Nothing places, devices, mimetypes and app icons on top of Papirus-Dark
 Inherits=Papirus-Dark,breeze-dark,hicolor
 Example=folder
-Directories=scalable/places,48/apps,scalable/apps,22/apps
+Directories=scalable/places,48/apps,scalable/apps,22/apps,{DIRS}
 
 [scalable/places]
 Size=64
-MinSize=16
+MinSize=25
 MaxSize=512
 Type=Scalable
 Context=Places
@@ -148,8 +148,9 @@ if __name__ == "__main__":
             svg = trash_svg(font, sym) if n.startswith("user-trash") else folder_svg(font, sym, sym == "__open__")
             with open(os.path.join(d, n + ".svg"), "w") as f:
                 f.write(svg)
+    import mimeicons
     with open(os.path.join(OUT, "index.theme"), "w") as f:
-        f.write(INDEX)
+        f.write(INDEX.replace("{DIRS}", mimeicons.DIRS) + mimeicons.INDEX_DIRS)
     print("wrote", len(os.listdir(d)), "place icons to", OUT)
     import appicons
     rep = appicons.build(OUT)
@@ -158,3 +159,6 @@ if __name__ == "__main__":
           f"{rep['dock_icons']} dock icons; not themed in the dock: {', '.join(rep['dock_skipped'])}")
     for line in rep["dot"]:
         print("  dot:", line)
+    mr = mimeicons.build(OUT, PLACES)
+    print(f"mimetypes: {mr['mimetypes']}, devices: {mr['devices']}, small places: {mr['places_small']}; "
+          f"symbols: {mr['by_symbol']}")
