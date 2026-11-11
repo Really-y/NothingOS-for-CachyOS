@@ -14,8 +14,8 @@ function M.apply(config)
     selection_fg = "#000000",
     scrollbar_thumb = "#2a2a2a",
     split = "#2a2a2a",
-    ansi = { "#1a1a1a", "#d71921", "#8fb59a", "#c9b98a", "#8a9bb5", "#a994b5", "#86aeb0", "#c8c8c8" },
-    brights = { "#5e5e5e", "#ff3b44", "#b4d4bb", "#e0d3a8", "#aebbd1", "#c6b6d1", "#aacdcf", "#ffffff" },
+    ansi = { "#1a1a1a", "#d71921", "#9eaea2", "#b8b19c", "#9aa3b2", "#aaa1b0", "#9aaeae", "#c8c8c8" },
+    brights = { "#5e5e5e", "#d71921", "#c6d2c8", "#d9d3c1", "#c4cad6", "#cfc7d5", "#c4d3d3", "#ffffff" },
     tab_bar = {
       background = "#000000",
       active_tab = { bg_color = "#ffffff", fg_color = "#000000" },

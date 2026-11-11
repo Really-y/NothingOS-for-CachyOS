@@ -2,7 +2,7 @@
 """Render terminal previews (previews/terminal-*.png) from palette.json with PIL: a tiny ANSI
 emulator (SGR, cursor forward/column) so starship / fastfetch / ls / git-diff output is shown
 exactly as a Nothing terminal would draw it. Needs gen_terminal.py to have run first."""
-import json, os, re, subprocess, sys
+import json, os, re, shutil, subprocess, sys
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
@@ -123,22 +123,22 @@ def sample():
     t.append("".join(f"\x1b[{40 + i if i < 8 else 100 + i - 8}m  {R}" for i in range(16)) + "   " + "".join(f"{sgr(i)}●{R} " for i in range(16)))
     t.append("")
     t.append(f"{tc(P['dim'])}$ ls --color -l{R}")
-    t.append(f"drwxr-xr-x baron baron 4.0K Nov 11 {sgr(12)}\x1b[1mTerminal{R}")
-    t.append(f"drwxr-xr-x baron baron 4.0K Nov 11 {sgr(12)}\x1b[1mwallpapers{R}")
-    t.append(f"-rwxr-xr-x baron baron 1.8K Nov 11 {sgr(10)}\x1b[1minstall.sh{R}*")
-    t.append(f"lrwxrwxrwx baron baron   12 Nov 11 {sgr(14)}\x1b[1mlatest{R} -> 2026-11-11")
-    t.append(f"-rw-r--r-- baron baron  72K Nov 11 {sgr(9)}\x1b[1mbackup.tar.gz{R}")
-    t.append(f"-rw-r--r-- baron baron 3.2K Nov 11 {sgr(13)}banner.png{R}")
-    t.append(f"-rw-r--r-- baron baron 2.4K Nov 11 {sgr(11)}\x1b[1mNOTES.md{R}")
-    t.append(f"-rw-r--r-- baron baron 2.4K Nov 11 ARCHITECTURE.md")
+    fx = HERE / "out/_fx"; shutil.rmtree(fx, ignore_errors=True); (fx / "Terminal").mkdir(parents=True); (fx / "wallpapers").mkdir()
+    for n, m in (("install.sh", 0o755), ("backup.tar.gz", 0o644), ("banner.png", 0o644), ("NOTES.md", 0o644)): (fx / n).write_text("x" * 1800); (fx / n).chmod(m)
+    os.symlink("wallpapers", fx / "latest"); os.symlink("gone", fx / "broken"); os.mkfifo(fx / "pipe")
+    lsc = subprocess.run(["dircolors", "-b", str(OUT / "nothing/dircolors")], capture_output=True, text=True).stdout
+    lsc = re.search(r"LS_COLORS='([^']*)'", lsc).group(1)
+    ls = subprocess.run(["ls", "-l", "--color=always", "--time-style=+%b %d", str(fx)], capture_output=True, text=True, env=dict(os.environ, LS_COLORS=lsc)).stdout
+    t += [l.replace("baron baron", "baron baron") for l in ls.splitlines()[1:]]
+    shutil.rmtree(fx)
     t.append("")
     t.append(f"{tc(P['dim'])}$ git diff{R}")
-    t.append(f"\x1b[1mdiff --git a/terminal/palette.json b/terminal/palette.json{R}")
-    t.append(f"{sgr(6)}@@ -4,7 +4,7 @@{R} {tc(P['dim'])}def palette():{R}")
-    t.append(f" \"background\": \"#000000\",")
-    t.append(f"{sgr(1)}-  \"red\": \"#ff0000\",{R}")
-    t.append(f"{sgr(2)}+  \"red\": \"#d71921\",{R}")
-    t.append(f" \"foreground\": \"#ffffff\",")
+    t.append(f"{tc('#ffffff')}\x1b[1mdiff --git a/terminal/palette.json b/terminal/palette.json{R}")
+    t.append(f"{tc('#8e8e8e')}@@ -4,7 +4,7 @@{R} {tc('#5e5e5e')}def palette():{R}")
+    t.append(f"{tc('#8e8e8e')} \"background\": \"#000000\",{R}")
+    t.append(f"{tc('#d71921')}-  \"red\": \"#ff0000\",{R}")
+    t.append(f"{tc('#ffffff')}+  \"red\": \"#d71921\",{R}")
+    t.append(f"{tc('#8e8e8e')} \"foreground\": \"#ffffff\",{R}")
     t.append("")
     t.append(f"{tc(P['dim'])}$ htop{R}")
     bar = lambda lab, n, col: f"{tc(P['secondary'])}{lab}{R} [{sgr(col)}{'|' * n}{tc(P['dim'])}{'|' * (30 - n)}{R}] {n * 3}%"

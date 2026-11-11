@@ -1,5 +1,5 @@
 {
-  "_note": "Single source of truth for every terminal. Pure black, white text, greys, ONE red (#d71921). green/yellow/blue/magenta/cyan are desaturated greys with a slight tint: calm, but ls/git diff/htop stay readable.",
+  "_note": "Single source of truth for every terminal. Pure black, white text, greys, ONE red (#d71921, used for both red slots). green/yellow/blue/magenta/cyan are near-grey with a faint tint: calm, but ls/git diff/htop stay readable.",
   "background": "#000000",
   "foreground": "#ffffff",
   "dim": "#5e5e5e",
@@ -12,23 +12,23 @@
   "selection_fg": "#000000",
   "accent": "#d71921",
   "normal": {
-    "black":   "#1a1a1a",
-    "red":     "#d71921",
-    "green":   "#8fb59a",
-    "yellow":  "#c9b98a",
-    "blue":    "#8a9bb5",
-    "magenta": "#a994b5",
-    "cyan":    "#86aeb0",
-    "white":   "#c8c8c8"
+    "black": "#1a1a1a",
+    "red": "#d71921",
+    "green": "#9eaea2",
+    "yellow": "#b8b19c",
+    "blue": "#9aa3b2",
+    "magenta": "#aaa1b0",
+    "cyan": "#9aaeae",
+    "white": "#c8c8c8"
   },
   "bright": {
-    "black":   "#5e5e5e",
-    "red":     "#ff3b44",
-    "green":   "#b4d4bb",
-    "yellow":  "#e0d3a8",
-    "blue":    "#aebbd1",
-    "magenta": "#c6b6d1",
-    "cyan":    "#aacdcf",
-    "white":   "#ffffff"
+    "black": "#5e5e5e",
+    "red": "#d71921",
+    "green": "#c6d2c8",
+    "yellow": "#d9d3c1",
+    "blue": "#c4cad6",
+    "magenta": "#cfc7d5",
+    "cyan": "#c4d3d3",
+    "white": "#ffffff"
   }
 }
