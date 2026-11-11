@@ -7,12 +7,14 @@ kw() { kwriteconfig6 "$@"; }
 
 [ -e "$D/nothingos-backup/latest" ] || "$ROOT/scripts/backup.sh"
 
-echo "· fonts";        mkdir -p "$D/fonts/nothingos"; cp "$ROOT"/fonts/*.ttf "$D/fonts/nothingos/"; fc-cache -f >/dev/null
+echo "· fonts";        mkdir -p "$D/fonts/nothingos"; cp "$ROOT"/fonts/*.ttf "$ROOT"/fonts/inter/*.ttf "$D/fonts/nothingos/"; rm -f "$D/fonts/nothingos/Inter.ttf"; mkdir -p "$HOME/.config/fontconfig"; cp "$ROOT/fonts/fonts.conf" "$HOME/.config/fontconfig/fonts.conf"; fc-cache -f >/dev/null
 echo "· colours";      mkdir -p "$D/color-schemes"; cp "$ROOT/plasma/colors/Nothing.colors" "$D/color-schemes/"; plasma-apply-colorscheme Nothing >/dev/null || true
 for k in "font:Inter,10,-1,5,400,0,0,0,0,0" "menuFont:Inter,10,-1,5,400,0,0,0,0,0" \
          "toolBarFont:Inter,9,-1,5,400,0,0,0,0,0" "smallestReadableFont:Space Mono,8,-1,5,400,0,0,0,0,0" \
          "fixed:Space Mono,10,-1,5,400,0,0,0,0,0"; do kw --file kdeglobals --group General --key "${k%%:*}" "${k#*:}"; done
 kw --file kdeglobals --group WM --key activeFont "Inter,10,-1,5,500,0,0,0,0,0"
+for g in gtk-3.0 gtk-4.0; do mkdir -p "$HOME/.config/$g"; kw --file "$HOME/.config/$g/settings.ini" --group Settings --key gtk-font-name "Inter 10"; done
+gsettings set org.gnome.desktop.interface font-name "Inter 10" 2>/dev/null || true
 echo "· kvantum";      mkdir -p "$HOME/.config/Kvantum"; cp -r "$ROOT/kvantum/NothingDark" "$HOME/.config/Kvantum/"
 kw --file "$HOME/.config/Kvantum/kvantum.kvconfig" --group General --key theme NothingDark
 kw --file kdeglobals --group KDE --key widgetStyle Breeze

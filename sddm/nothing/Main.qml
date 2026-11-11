@@ -74,8 +74,10 @@ Rectangle {
     FontLoader {
         id: sansFont
 
-        source: "fonts/Inter.ttf"
+        source: "fonts/Inter-Regular.ttf"
     }
+    // second weight of the same family (avatar initials use Medium)
+    FontLoader { source: "fonts/Inter-Medium.ttf" }
 
     FontLoader {
         id: monoFont
