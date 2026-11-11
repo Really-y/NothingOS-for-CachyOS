@@ -30,9 +30,9 @@ Rectangle {
     }
     Grid {
         x: 8; y: 4; columns: 2; spacing: 8
-        Frame { label: "MONO · 8 PX · 5 SIZES"; field.pitch: 8 }
+        Frame { label: "MONO · 5 PX · DEFAULTS"; field.pitch: 5 }
         Frame { label: "ORIGINAL COLOUR · 8 PX"; field.pitch: 8; field.colorMode: 1 }
         Frame { label: "MONO + RED ACCENT · 12 PX · GLYPH SWEEP"; field.pitch: 12; field.colorMode: 2; field.animated: true; field.time: 1.25 }
-        Frame { label: "FIT · 6 PX · EDGES · SMOOTH"; field.pitch: 6; field.fillMode: 1; field.edges: true; field.levels: 0 }
+        Frame { label: "FIT · PORTRAIT · 6 PX · SMOOTH"; field.pitch: 6; field.fillMode: 1; field.levels: 0; field.source: Qt.resolvedUrl("assets/dotimage-portrait.png") }
     }
 }

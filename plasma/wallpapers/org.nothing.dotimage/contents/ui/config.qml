@@ -25,15 +25,17 @@ Kirigami.FormLayout {
     property alias cfg_SlideShuffle: shuffle.checked
     property bool cfg_SlideShuffleDefault: false
     property int cfg_FillMode: 0
+    property real cfg_FocusY: 0.3
+    property real cfg_FocusYDefault: 0.3
     property int cfg_FillModeDefault: 0
     property alias cfg_DotPitch: pitch.value
-    property int cfg_DotPitchDefault: 8
-    property int cfg_Levels: 5
-    property int cfg_LevelsDefault: 5
+    property int cfg_DotPitchDefault: 5
+    property int cfg_Levels: 6
+    property int cfg_LevelsDefault: 6
     property alias cfg_MinDotSize: minDot.value
     property real cfg_MinDotSizeDefault: 0.18
     property alias cfg_Contrast: contrast.value
-    property real cfg_ContrastDefault: 1.15
+    property real cfg_ContrastDefault: 1.2
     property alias cfg_Brightness: brightness.value
     property real cfg_BrightnessDefault: 1.0
     property alias cfg_AutoLevels: autoLevels.checked
@@ -45,7 +47,7 @@ Kirigami.FormLayout {
     property int cfg_ColorMode: 0
     property int cfg_ColorModeDefault: 0
     property alias cfg_EdgeEmphasis: edges.checked
-    property bool cfg_EdgeEmphasisDefault: false
+    property bool cfg_EdgeEmphasisDefault: true
     property alias cfg_BackgroundGrid: bgGrid.checked
     property bool cfg_BackgroundGridDefault: true
     property alias cfg_Animate: animate.checked
@@ -90,12 +92,24 @@ Kirigami.FormLayout {
         radius: Kirigami.Units.cornerRadius
         border.width: drop.containsDrag ? 2 : 1
         border.color: drop.containsDrag ? Kirigami.Theme.highlightColor : Qt.rgba(1, 1, 1, 0.15)
-        Image {
+        Item {   // same framing as the wallpaper (Fill keeps the vertical focus; Fit = bars)
+            id: thumbFrame
             anchors.fill: parent; anchors.margins: 1
-            source: root.toUrl(root.cfg_Image)
-            sourceSize: Qt.size(width * 2, height * 2)
-            fillMode: [Image.PreserveAspectCrop, Image.PreserveAspectFit, Image.Pad][Math.max(0, Math.min(2, root.cfg_FillMode))]
-            asynchronous: true; clip: true
+            clip: true
+            Image {
+                id: thumb
+                source: root.toUrl(root.cfg_Image)
+                sourceSize: Qt.size(512, 512)
+                asynchronous: true
+                readonly property real nw: Math.max(1, implicitWidth)
+                readonly property real nh: Math.max(1, implicitHeight)
+                readonly property real s: root.cfg_FillMode === 0 ? Math.max(thumbFrame.width / nw, thumbFrame.height / nh)
+                                        : root.cfg_FillMode === 1 ? Math.min(thumbFrame.width / nw, thumbFrame.height / nh)
+                                        : Math.min(thumbFrame.width / nw, thumbFrame.height / nh)   // Center: approximated as Fit
+                width: nw * s; height: nh * s
+                x: (thumbFrame.width - width) / 2
+                y: (thumbFrame.height - height) * (root.cfg_FillMode === 0 && height > thumbFrame.height ? root.cfg_FocusY : 0.5)
+            }
         }
         QQC2.Label {
             anchors.centerIn: parent
@@ -169,9 +183,22 @@ Kirigami.FormLayout {
 
     QQC2.ComboBox {
         Kirigami.FormData.label: "Positioning:"
-        model: ["Fill (crop to screen)", "Fit (whole picture, black bars)", "Center (native size)"]
+        model: ["Fill: cover the whole screen (crops)", "Fit: whole picture, dot grid at the sides", "Center: native size"]
         currentIndex: Math.max(0, Math.min(2, root.cfg_FillMode))
         onActivated: index => root.cfg_FillMode = index
+    }
+    QQC2.ComboBox {
+        Kirigami.FormData.label: "Keep in view:"
+        visible: root.cfg_FillMode === 0
+        model: ["Top", "Upper third (faces)", "Center", "Bottom"]
+        readonly property var values: [0.0, 0.3, 0.5, 1.0]
+        currentIndex: {
+            let best = 0
+            for (let i = 1; i < values.length; i++)
+                if (Math.abs(values[i] - root.cfg_FocusY) < Math.abs(values[best] - root.cfg_FocusY)) best = i
+            return best
+        }
+        onActivated: index => root.cfg_FocusY = values[index]
     }
 
     Item { Kirigami.FormData.isSection: true }
@@ -180,13 +207,13 @@ Kirigami.FormLayout {
     QQC2.SpinBox {
         id: pitch
         Kirigami.FormData.label: "Dot pitch:"
-        from: 5; to: 16
+        from: 3; to: 16
         textFromValue: v => v + " px"
         valueFromText: t => parseInt(t)
     }
     QQC2.ComboBox {
         Kirigami.FormData.label: "Dot sizes:"
-        model: ["Smooth (continuous)", "3", "4", "5 (Nothing look)", "6"]
+        model: ["Smooth (continuous)", "3", "4", "5", "6 (default)"]
         readonly property var values: [0, 3, 4, 5, 6]
         currentIndex: Math.max(0, values.indexOf(root.cfg_Levels))
         onActivated: index => root.cfg_Levels = values[index]
@@ -230,7 +257,7 @@ Kirigami.FormLayout {
         QQC2.Slider { id: contrast; from: 0.5; to: 2.0; stepSize: 0.05 }
         QQC2.Label { text: contrast.value.toFixed(2); opacity: 0.7 }
     }
-    QQC2.CheckBox { id: edges; Kirigami.FormData.label: "Detail:"; text: "Edge emphasis (line art)" }
+    QQC2.CheckBox { id: edges; Kirigami.FormData.label: "Detail:"; text: "Sharpen edges (line art)" }
     QQC2.CheckBox { id: bgGrid; text: "Faint background dot grid" }
 
     Item { Kirigami.FormData.isSection: true }

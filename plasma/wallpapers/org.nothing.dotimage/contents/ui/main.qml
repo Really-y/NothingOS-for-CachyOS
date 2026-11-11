@@ -52,9 +52,10 @@ WallpaperItem {
         anchors.fill: parent
         source: root.slideshow ? root.slideUrl : root.toUrl(root.cfg.Image)
         fillMode: Math.max(0, Math.min(2, root.cfg.FillMode))
-        pitch: Math.max(5, Math.min(16, root.cfg.DotPitch))
+        focusY: Math.max(0, Math.min(1, root.cfg.FocusY))
+        pitch: Math.max(3, Math.min(16, root.cfg.DotPitch))
         minDot: Math.max(0, Math.min(0.6, root.cfg.MinDotSize))
-        levels: [0, 3, 4, 5, 6].includes(root.cfg.Levels) ? root.cfg.Levels : 5
+        levels: [0, 3, 4, 5, 6].includes(root.cfg.Levels) ? root.cfg.Levels : 6
         contrast: Math.max(0.5, Math.min(2.5, root.cfg.Contrast))
         brightness: Math.max(0.4, Math.min(2.5, root.cfg.Brightness))
         autoLevels: root.cfg.AutoLevels

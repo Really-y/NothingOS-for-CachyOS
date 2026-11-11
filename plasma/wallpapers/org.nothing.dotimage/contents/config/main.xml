@@ -33,13 +33,17 @@
       <label>0 = Fill (cover), 1 = Fit (contain, black bars), 2 = Center (native size)</label>
       <default>0</default>
     </entry>
+    <entry name="FocusY" type="Double">
+      <label>Fill only: which part of a taller picture stays on screen (0 top, 0.5 centre, 1 bottom)</label>
+      <default>0.3</default>
+    </entry>
     <entry name="DotPitch" type="Int">
-      <label>Grid pitch in px (5..16)</label>
-      <default>8</default>
+      <label>Grid pitch in px (3..16)</label>
+      <default>5</default>
     </entry>
     <entry name="Levels" type="Int">
       <label>Number of dot sizes (3..6), 0 = continuous</label>
-      <default>5</default>
+      <default>6</default>
     </entry>
     <entry name="MinDotSize" type="Double">
       <label>Smallest dot, fraction of the pitch</label>
@@ -47,7 +51,7 @@
     </entry>
     <entry name="Contrast" type="Double">
       <label>Contrast (1 = neutral)</label>
-      <default>1.15</default>
+      <default>1.2</default>
     </entry>
     <entry name="Brightness" type="Double">
       <label>Brightness / gamma (1 = neutral, higher = more and larger dots)</label>
@@ -70,8 +74,8 @@
       <default>0</default>
     </entry>
     <entry name="EdgeEmphasis" type="Bool">
-      <label>Boost dots along strong edges (line art)</label>
-      <default>false</default>
+      <label>Detail: subtle sharpening and edge boost (line art)</label>
+      <default>true</default>
     </entry>
     <entry name="BackgroundGrid" type="Bool">
       <label>Faint background dot grid where the picture is dark</label>

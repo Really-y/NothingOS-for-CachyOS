@@ -28,7 +28,7 @@ layout(std140, binding = 0) uniform buf {
     vec3 lvB;          // picture B: idem
     float fade;        // 0 = A, 1 = B
     float colorMode;   // 0 mono white, 1 original colour, 2 mono + red accent
-    float edge;        // edge emphasis 0..1
+    float edge;        // detail (sharpening + edge boost) 0..1
     float bgOn;        // 1 = faint background grid
     float bgLum;       // background dot luminance
     float sweep;       // band position 0..1 along the diagonal, <0 = off
@@ -65,12 +65,15 @@ vec4 cellDot(sampler2D s, vec2 c, vec3 lv)
     vec4 a = pick(s, uv);
     if (a.a < 0.5) return vec4(0.0);                       // outside the picture (Fit bars)
     float t = tone(luma(a.rgb), lv);
-    if (edge > 0.0) {                                      // luminance gradient over the 4 neighbours
+    if (edge > 0.0) {   // detail: unsharp mask over the 4 neighbour cells + a light edge boost
         vec2 d = vec2(pitch) / res;
-        float gx = tone(luma(pick(s, uv + vec2(d.x, 0.0)).rgb), lv) - tone(luma(pick(s, uv - vec2(d.x, 0.0)).rgb), lv);
-        float gy = tone(luma(pick(s, uv + vec2(0.0, d.y)).rgb), lv) - tone(luma(pick(s, uv - vec2(0.0, d.y)).rgb), lv);
-        float g = smoothstep(0.10, 0.45, length(vec2(gx, gy)));
-        t = max(t, edge * g * 0.85);
+        float l = tone(luma(pick(s, uv - vec2(d.x, 0.0)).rgb), lv);
+        float r = tone(luma(pick(s, uv + vec2(d.x, 0.0)).rgb), lv);
+        float u = tone(luma(pick(s, uv - vec2(0.0, d.y)).rgb), lv);
+        float b = tone(luma(pick(s, uv + vec2(0.0, d.y)).rgb), lv);
+        float g = smoothstep(0.12, 0.50, length(vec2(r - l, b - u)));
+        t = clamp(t + edge * 0.6 * (t - 0.25 * (l + r + u + b)), 0.0, 1.0);
+        t = max(t, edge * g * 0.55);
     }
     float q = t;
     // rounding is biased down (+0.3, not +0.5) so the darkest ~15 % become missing dots

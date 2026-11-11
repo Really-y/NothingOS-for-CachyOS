@@ -2,9 +2,8 @@
 import QtQuick
 import "../plasma/wallpapers/org.nothing.dotimage/contents/ui" as Dot
 
-// org.nothing.dotimage at 1:1 (no scaling): 1920x1080 screens, cropped. Top row: the
-// synthetic test card's face at two pitches. Bottom row: a KDE-shipped photo wallpaper
-// (Coast, CC-BY-SA-4.0, read from /usr/share/wallpapers, not copied into the repo).
+// org.nothing.dotimage at 1:1 (no scaling): 1920x1080 screens, cropped, default settings
+// unless labelled. Synthetic cards only (tools/dotimage_testcard.py --all).
 //   tools/render.sh previews/DotImageDetail.qml previews/dotimage-detail.png 1600 900
 Rectangle {
     color: "#000000"
@@ -21,17 +20,19 @@ Rectangle {
             transitionMs: 0; animated: false
         }
         Rectangle { anchors.fill: parent; color: "transparent"; border.color: "#2a2a2a"; border.width: 1 }
+        Rectangle { x: 8; y: 8; width: lbl.width + 12; height: lbl.height + 6; color: "#000000" }
         Text {
-            x: 14; y: 12; text: cr.label; color: "#8e8e8e"
+            id: lbl; x: 14; y: 11; text: cr.label; color: "#8e8e8e"
             font.family: "Space Mono"; font.pixelSize: 11; font.letterSpacing: 1.2
         }
     }
-    readonly property url photo: "file:///usr/share/wallpapers/Coast/contents/images/5120x2880.png"
+    readonly property url square: Qt.resolvedUrl("assets/dotimage-square.png")
+    readonly property url lineart: Qt.resolvedUrl("assets/dotimage-lineart.png")
     Grid {
         x: 8; y: 4; columns: 2; spacing: 8
-        Crop { label: "1:1 · MONO · 6 PX"; at: Qt.point(1272, 560); field.pitch: 6 }
-        Crop { label: "1:1 · MONO + RED · 10 PX"; at: Qt.point(1272, 520); field.pitch: 10; field.colorMode: 2 }
-        Crop { label: "1:1 · PHOTO · MONO · 8 PX"; at: Qt.point(960, 540); field.pitch: 8; field.source: parent.parent.photo }
-        Crop { label: "1:1 · PHOTO · COLOUR · 8 PX"; at: Qt.point(960, 540); field.pitch: 8; field.colorMode: 1; field.source: parent.parent.photo }
+        Crop { label: "SQUARE · FILL · 5 PX (DEFAULT)"; at: Qt.point(960, 300); field.source: parent.parent.square }
+        Crop { label: "SQUARE · MONO + RED · 3 PX"; at: Qt.point(1010, 230); field.source: parent.parent.square; field.pitch: 3; field.colorMode: 2 }
+        Crop { label: "LINE ART · 5 PX · DETAIL ON (DEFAULT)"; at: Qt.point(1340, 560); field.source: parent.parent.lineart }
+        Crop { label: "LINE ART · 5 PX · DETAIL OFF"; at: Qt.point(1340, 560); field.source: parent.parent.lineart; field.edges: false }
     }
 }

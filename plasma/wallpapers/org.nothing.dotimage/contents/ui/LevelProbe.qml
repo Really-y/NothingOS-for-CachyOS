@@ -3,7 +3,7 @@ import QtQuick
 // One-shot luminance histogram of a picture -> auto levels for the shader.
 // Draws the image at 64x64 into a tiny software canvas once per source, reads the pixels
 // back and returns vector3d(black point, white point, gamma):
-//   black / white = 2nd / 99th luminance percentile (so dark anime art is stretched),
+//   black / white = 2nd (max 0.15) / 99th luminance percentile (dark art is stretched),
 //   gamma pulls the stretched median towards ~0.30 (clamped 0.75..1.35); dark backgrounds
 //   stay dark (missing dots) instead of turning into a sheet of small dots.
 // `done` flips true when levels are known (or the probe failed -> neutral levels).
@@ -43,7 +43,8 @@ Canvas {
         }
         if (n < 16) { levels = Qt.vector3d(0, 1, 1); done = true; return }
         const pct = f => { let acc = 0; for (let v = 0; v < 256; v++) { acc += hist[v]; if (acc >= f * n) return v / 255 } return 1 }
-        let lo = pct(0.02), hi = pct(0.99)
+        // black point capped at 0.15: a flat mid-grey backdrop stays faint dots, not nothing
+        let lo = Math.min(0.15, pct(0.02)), hi = Math.max(lo + 0.15, pct(0.99))
         if (hi - lo < 0.15) { const m = (hi + lo) / 2; lo = Math.max(0, m - 0.25); hi = Math.min(1, m + 0.25) }
         const med = Math.min(0.95, Math.max(0.03, (pct(0.5) - lo) / (hi - lo)))
         const g = Math.min(1.35, Math.max(0.75, Math.log(0.30) / Math.log(med)))

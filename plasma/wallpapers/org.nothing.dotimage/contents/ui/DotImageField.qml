@@ -18,17 +18,18 @@ Item {
 
     property url source
     property int fillMode: 0              // 0 Fill (cover), 1 Fit (contain), 2 Center
-    property int pitch: 8
+    property real focusY: 0.3            // Fill only: 0 top … 0.5 centre … 1 bottom
+    property int pitch: 5
     property real maxRatio: 0.84
     property real minDot: 0.18
-    property int levels: 5                // 0 = continuous
+    property int levels: 6                // 0 = continuous
     property real contrast: 1.0
     property real brightness: 1.0
     property bool autoLevels: true
     property real blackPoint: 0.0
     property real whitePoint: 1.0
     property int colorMode: 0             // 0 mono, 1 colour, 2 mono + red accent
-    property bool edges: false
+    property bool edges: true             // subtle sharpening + edge boost
     property bool backgroundGrid: true
     property bool animated: true
     property bool twinkle: true
@@ -93,24 +94,39 @@ Item {
         width: field.width; height: field.height
         onReadyChanged: if (ready) field._tryFlip()
 
-        Image {
-            id: img
-            anchors.fill: parent
-            asynchronous: true
-            autoTransform: true
-            cache: false
-            smooth: true
-            mipmap: true                    // trilinear shrink into the 2-texel-per-cell texture
-            fillMode: field.fillMode === 1 ? Image.PreserveAspectFit
-                    : field.fillMode === 2 ? Image.Pad : Image.PreserveAspectCrop
-            // decode near screen size (Center keeps native pixels)
-            sourceSize: field.fillMode === 2 ? undefined
-                : Qt.size(Math.max(1, slot.width * Screen.devicePixelRatio), Math.max(1, slot.height * Screen.devicePixelRatio))
-            onStatusChanged: if (status === Image.Error) console.warn("org.nothing.dotimage: cannot load", source)
+        // the screen-sized frame the shader sees; the picture is placed in it by hand so
+        // Fill can keep a chosen vertical focus (faces) instead of always cropping the centre
+        Item {
+            id: frame
+            width: slot.width; height: slot.height
+            clip: true
+            Image {
+                id: img
+                asynchronous: true
+                autoTransform: true
+                cache: false
+                smooth: true
+                mipmap: true                // trilinear shrink into the 2-texel-per-cell texture
+                fillMode: Image.Stretch     // geometry below keeps the aspect ratio
+                // decode at most ~1.5x the screen's long side (Center keeps native pixels)
+                sourceSize: field.fillMode === 2 ? undefined
+                    : Qt.size(slot.cap, slot.cap)
+                readonly property real nw: Math.max(1, implicitWidth)
+                readonly property real nh: Math.max(1, implicitHeight)
+                readonly property real s: field.fillMode === 0 ? Math.max(slot.width / nw, slot.height / nh)
+                                        : field.fillMode === 1 ? Math.min(slot.width / nw, slot.height / nh)
+                                        : 1 / Screen.devicePixelRatio
+                width: Math.round(nw * s); height: Math.round(nh * s)
+                x: Math.round((slot.width - width) / 2)
+                // Fill: focus 0 = keep the top, 0.5 = centre, 1 = keep the bottom
+                y: Math.round((slot.height - height) * (field.fillMode === 0 && height > slot.height ? field.focusY : 0.5))
+                onStatusChanged: if (status === Image.Error) console.warn("org.nothing.dotimage: cannot load", source)
+            }
         }
+        readonly property int cap: Math.max(16, Math.round(1.5 * Math.max(width, height) * Screen.devicePixelRatio))
         ShaderEffectSource {
             id: tex
-            sourceItem: img
+            sourceItem: frame
             hideSource: true
             visible: false
             smooth: true
