@@ -107,7 +107,7 @@ Name=Nothing
 Comment=Monochrome Nothing places and app icons on top of Papirus-Dark
 Inherits=Papirus-Dark,breeze-dark,hicolor
 Example=folder
-Directories=scalable/places,scalable/apps
+Directories=scalable/places,scalable/apps,22/apps
 
 [scalable/places]
 Size=64
@@ -118,8 +118,15 @@ Context=Places
 
 [scalable/apps]
 Size=64
-MinSize=16
+MinSize=25
 MaxSize=512
+Type=Scalable
+Context=Applications
+
+[22/apps]
+Size=22
+MinSize=16
+MaxSize=24
 Type=Scalable
 Context=Applications
 """

@@ -1,6 +1,7 @@
 import QtQuick
 import org.kde.kirigami as Kirigami
 import "iconmap.js" as IconMap
+import "dot3x5.js" as Dot3x5
 import "nothing"
 
 // App icon as one flat monochrome glyph (white, or black when `dark`).
@@ -29,6 +30,7 @@ Item {
     property string label: ""               // app name: first letter is the dot-matrix fallback
     // nothing fits: house dot-matrix letter instead of any silhouette of the colour icon
     readonly property bool dotLetter: themeGlyph === "" && glyph === ""
+    readonly property string letter: (String(label).match(/[A-Za-z0-9]/) || ["?"])[0].toUpperCase()
     property var glyphMap: ({})              // distinct per-app glyphs from IconMap.assign()
     property string key: ""
     readonly property string glyph: IconMap.resolve(source, hint, symbolicNames, glyphMap, key)
@@ -39,13 +41,30 @@ Item {
     width: themeGlyph !== "" ? discSize : size
     height: width
 
+    // ≥ 24px: 5×7 house dot font; smaller (result rows): 3×5 grid with fuller dots (dot3x5.js,
+    // the same table the 22px theme icons use)
     DotString {
-        visible: root.dotLetter
+        visible: root.dotLetter && root.size > 24
         anchors.centerIn: parent
-        text: (String(root.label).match(/[A-Za-z0-9]/) || ["?"])[0].toUpperCase()
+        text: root.letter
         size: root.size * 10 / 7 * 0.8
         dotRatio: 0.65
         color: root.ink
+    }
+    Grid {
+        visible: root.dotLetter && root.size <= 24
+        anchors.centerIn: parent
+        columns: 3
+        readonly property real pitch: root.size * 0.2
+        spacing: pitch * 0.25
+        Repeater {
+            model: root.dotLetter && root.size <= 24 ? Dot3x5.glyph(root.letter).join("").split("") : []
+            Rectangle {
+                required property string modelData
+                width: parent.pitch * 0.75; height: width; radius: width / 2
+                color: modelData === "#" ? root.ink : "transparent"
+            }
+        }
     }
 
     Kirigami.Icon {

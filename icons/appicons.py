@@ -45,15 +45,15 @@ DISC = "#1a1a1a"
 # desktop id or icon name (lower case) → Material Symbols, best first
 CURATED = {
     # browsers
-    "firefox": ["public"], "com.google.chrome": ["language"], "com.brave.browser": ["shield"],
+    "firefox": ["explore", "travel_explore"], "com.google.chrome": ["adjust"], "com.brave.browser": ["shield"],
     "chromium": ["travel_explore"], "org.kde.falkon": ["explore"],
     # files
-    "org.kde.dolphin": ["folder_open"], "thunar": ["folder"], "org.gnome.nautilus": ["folder_copy"],
+    "org.kde.dolphin": ["folder_open"], "thunar": ["folder_special"], "org.gnome.nautilus": ["folder"],
     "thunar-bulk-rename": ["drive_file_rename_outline"], "thunar-settings": ["folder_special"],
-    "thunar-volman-settings": ["usb"], "xarchiver": ["inventory_2"], "org.kde.ark": ["inventory_2"],
+    "thunar-volman-settings": ["usb"], "xarchiver": ["folder_zip"], "org.kde.ark": ["inventory_2"],
     # terminals
-    "alacritty": ["terminal"], "alacritty-terminal": ["terminal"], "org.kde.konsole": ["terminal"],
-    "xterm": ["code_blocks"], "uxterm": ["code_blocks"], "kitty": ["keyboard_command_key"],
+    "alacritty-terminal": ["terminal"], "org.kde.konsole": ["terminal"], "alacritty": ["chevron_right"],
+    "xterm": ["code_blocks"], "uxterm": ["code_blocks"], "kitty": ["chevron_right", "code_blocks"],
     # chat
     "discord": ["forum"], "vesktop": ["chat"], "com.rtosta.zapzap": ["chat_bubble"],
     "com.rtosta.zapzap.nogpu": ["chat_bubble"], "org.telegram.desktop": ["send"],
@@ -63,7 +63,7 @@ CURATED = {
     # code / text
     "vscodium": ["code"], "vscodium-wayland": ["code"], "code": ["code"], "antigravity-ide": ["deployed_code"],
     "micro": ["edit_note"], "vim": ["edit"], "org.kde.kate": ["edit_note"], "org.kde.kwrite": ["description"],
-    "org.gnome.meld": ["compare"], "designer": ["design_services"], "linguist": ["translate"],
+    "org.gnome.meld": ["compare_arrows", "difference"], "designer": ["design_services"], "linguist": ["translate"],
     "assistant": ["menu_book"], "cmake-gui": ["build"], "qdbusviewer": ["hub"], "org.kde.iconexplorer": ["interests"],
     # media
     "org.kde.spectacle": ["screenshot_region"], "mpv": ["play_circle"], "freetube": ["smart_display"],
@@ -76,14 +76,14 @@ CURATED = {
     # network / remote
     "org.qbittorrent.qbittorrent": ["download"], "localsend": ["share"],
     "org.kde.kdeconnect.app": ["smartphone"], "org.kde.kdeconnect.nonplasma": ["smartphone"],
-    "org.kde.kdeconnect.sms": ["smartphone"], "com.anydesk.anydesk": ["cast"], "com.rustdesk.rustdesk": ["screen_share"],
-    "com.parsecgaming.parsec": ["cast_connected"], "remote-viewer": ["desktop_windows"],
+    "org.kde.kdeconnect.sms": ["smartphone"], "com.anydesk.anydesk": ["desktop_windows"], "com.rustdesk.rustdesk": ["screen_share"],
+    "com.parsecgaming.parsec": ["cast_connected"], "remote-viewer": ["connected_tv", "cast"],
     "virt-manager": ["computer"], "qemu": ["dns"], "org.wireshark.wireshark": ["lan"],
     "avahi-discover": ["router"], "bssh": ["network_check"], "bvnc": ["devices"],
     "nm-connection-editor": ["settings_ethernet"],
     # system
     "org.kde.plasma-systemmonitor": ["monitoring"], "org.gnome.systemmonitor": ["speed"],
-    "gnome-system-monitor-kde": ["equalizer"], "org.kde.kinfocenter": ["info"], "lstopo": ["account_tree"],
+    "gnome-system-monitor-kde": ["equalizer"], "org.kde.kinfocenter": ["info"], "lstopo": ["developer_board"],
     "org.cachyos.kernelmanager": ["memory"], "org.cachyos.scx-manager": ["tune"],
     "cachyos-hello": ["waving_hand"], "org.kde.plasma-welcome": ["celebration"], "xfce4-about": ["help"],
     "org.kde.drkonqi.coredump.gui": ["bug_report"], "org.kde.kmenuedit": ["menu_open"],
@@ -99,8 +99,8 @@ CURATED = {
 # generic rules for apps not in CURATED (matched on id + icon + Name/GenericName/Categories/Keywords)
 RULES = [(re.compile(p), c) for p, c in [
     (r"steam_icon_|\bgames?\b|lutris|heroic|bottles|minecraft", ["stadia_controller", "joystick", "videogame_asset", "casino", "sports_score", "toys"]),
-    (r"browser|webbrowser", ["travel_explore", "explore", "public", "language"]),
-    (r"termin|console", ["terminal", "code_blocks", "keyboard_command_key"]),
+    (r"browser|webbrowser", ["explore", "travel_explore", "captive_portal"]),
+    (r"termin|console", ["terminal", "chevron_right", "code_blocks"]),
     (r"file ?manager|files", ["folder", "folder_open", "folder_copy"]),
     (r"chat|messag|instantmessaging|irc", ["chat", "forum", "chat_bubble"]),
     (r"\bmail\b|email", ["mail"]),
@@ -128,9 +128,9 @@ RULES = [(re.compile(p), c) for p, c in [
 
 
 # ── Material Symbols ────────────────────────────────────────────────────────
-def load_font():
+def load_font(wght=400, opsz=24):
     f = TTFont(FONT)
-    return instancer.instantiateVariableFont(f, {"wght": 400, "FILL": 0, "GRAD": 0, "opsz": 24})
+    return instancer.instantiateVariableFont(f, {"wght": wght, "FILL": 0, "GRAD": 0, "opsz": opsz})
 
 
 def ligature_glyph(font, name):
@@ -146,7 +146,14 @@ def ligature_glyph(font, name):
     raise KeyError(name)
 
 
+# symbols with large solid areas at FILL 0 (measured: survive a 4px erosion at 128px);
+# they read heavier than the outline set, so they are never picked
+HEAVY = {"public", "compare", "radio_button_checked", "language", "circle"}
+
+
 def has_symbol(font, name):
+    if name in HEAVY:
+        return False
     try:
         ligature_glyph(font, name)
         return True
@@ -177,8 +184,9 @@ def _shape(font, gname, bounds):
     return "round" if sum(corners) / max(1, len(corners)) < 60 else "square"
 
 
-def symbol_markup(font, name):
-    """Solid white path of a symbol, optically sized and centred on its bbox in a 64 canvas."""
+def symbol_markup(font, name, c=64, sizes=(26, 24, 30, 26), cap=36, snap=False):
+    """Solid white path of a symbol, optically sized and centred on its bbox in a c×c canvas.
+    sizes = (round, square, wide-by-width, tall-by-height) glyph extents; cap = max em size."""
     gname = ligature_glyph(font, name)
     gs = font.getGlyphSet()
     bp = BoundsPen(gs)
@@ -186,14 +194,22 @@ def symbol_markup(font, name):
     xmin, ymin, xmax, ymax = bp.bounds
     w, h = xmax - xmin, ymax - ymin
     aspect = w / h
+    r_, sq_, wide_, tall_ = sizes
     if aspect > 1.25:
-        s = 30 / w                                   # wide
+        s = wide_ / w                                # wide
     elif aspect < 0.8:
-        s = 26 / h                                   # tall
+        s = tall_ / h                                # tall
     else:
-        s = (26 if _shape(font, gname, bp.bounds) == "round" else 24) / max(w, h)
-    tx = 32 - (xmin + w / 2) * s
-    ty = 32 + (ymin + h / 2) * s
+        s = (r_ if _shape(font, gname, bp.bounds) == "round" else sq_) / max(w, h)
+    # never blow a small glyph (chevron, dot) up past the em scale: strokes would get thicker
+    # than everyone else's — uniform outline weight beats uniform size
+    s = min(s, cap / font["head"].unitsPerEm)
+    tx = c / 2 - (xmin + w / 2) * s
+    ty = c / 2 + (ymin + h / 2) * s
+    if snap:                                         # align the bbox to whole pixels
+        left, top = xmin * s + tx, ty - ymax * s
+        tx += round(left) - left
+        ty += round(top) - top
     pen = SVGPathPen(gs)
     gs[gname].draw(TransformPen(pen, (s, 0, 0, -s, tx, ty)))
     return f'<path d="{pen.getCommands()}" fill="#ffffff"/>'
@@ -215,6 +231,24 @@ def dot_letter_markup(dots, ch):
     y0 = 32 - (len(rows) - 1) * pitch / 2
     return "".join(f'<circle cx="{x0 + c * pitch:.2f}" cy="{y0 + y * pitch:.2f}" r="{r:.2f}" fill="#ffffff"/>'
                    for y, row in enumerate(rows) for c, v in enumerate(row) if v == "#")
+
+
+DOT3X5 = os.path.join(HERE, "..", "plasma", "plasmoids", "org.nothing.drawer", "contents", "ui", "dot3x5.js")
+
+
+def load_dot3x5():
+    src = open(DOT3X5, encoding="utf-8").read()
+    return {m.group(1): json.loads(m.group(2)) for m in re.finditer(r'"(.)"\s*:\s*(\[[^\]]*\])', src)}
+
+
+def dot_letter_small(dots, ch, c=22):
+    """3×5 letter with ~2px dots for ≤24px icons (the 5×7 font would go sub-pixel)."""
+    rows = dots.get(ch.upper()) or dots.get("?")
+    pitch, r = 2.75, 1.0
+    x0 = c / 2 - (len(rows[0]) - 1) * pitch / 2
+    y0 = c / 2 - (len(rows) - 1) * pitch / 2
+    return "".join(f'<circle cx="{x0 + i * pitch:.2f}" cy="{y0 + y * pitch:.2f}" r="{r}" fill="#ffffff"/>'
+                   for y, row in enumerate(rows) for i, v in enumerate(row) if v == "#")
 
 
 # ── desktop entries ─────────────────────────────────────────────────────────
@@ -292,18 +326,22 @@ def assign(font, entries):
     return out
 
 
-def svg(inner):
-    return f'<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">{inner}</svg>'
+def svg(inner, c=64):
+    return f'<svg xmlns="http://www.w3.org/2000/svg" width="{c}" height="{c}" viewBox="0 0 {c} {c}">{inner}</svg>'
 
 
 def build(theme_dir):
     font = load_font()
+    font_s = load_font(600, 20)        # small sizes: heavier, low optical size
     dots = load_dotfont()
+    dots_s = load_dot3x5()
     entries = desktop_entries()
     glyphs = assign(font, entries)
     skip_names = non_app_icon_names()
     d = os.path.join(theme_dir, "scalable", "apps")
+    d22 = os.path.join(theme_dir, "22", "apps")       # ≤24px: menus, tray-size lists, task switcher rows
     os.makedirs(d, exist_ok=True)
+    os.makedirs(d22, exist_ok=True)
     markup_cache, gmap = {}, {}
     report = {"symbol": [], "dot": [], "dock_icons": 0, "dock_skipped": set()}
     dock = {}                                   # icon name → glyph of its first (primary) entry
@@ -329,6 +367,10 @@ def build(theme_dir):
             dock[icon] = inner
             with open(os.path.join(d, icon + ".svg"), "w") as f:
                 f.write(svg(f'<circle cx="32" cy="32" r="30" fill="{DISC}"/>{inner}'))
+            small = (symbol_markup(font_s, val, c=22, sizes=(13, 12, 14, 13), cap=16, snap=True)
+                     if kind == "sym" else dot_letter_small(dots_s, val))
+            with open(os.path.join(d22, icon + ".svg"), "w") as f:
+                f.write(svg(f'<circle cx="11" cy="11" r="10.5" fill="{DISC}"/>{small}', 22))
             # glyph-only twin by icon name, for drawer items that only know the icon (window/runner results)
             with open(os.path.join(d, f"nothing-glyph-icon-{icon}.svg"), "w") as f:
                 f.write(svg(inner))
