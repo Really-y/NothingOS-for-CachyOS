@@ -11,7 +11,7 @@
   </defs>
   <g transform="translate(24,0) scale(0.92)">
   <!-- ===== Sultry: three-quarter BACK view (make_sultry.py wraps this into sultry.svg) =====
-       Body in canvas coordinates; head groups in the local head frame (translate(294,294) rotate(-8) scale(1.35)): origin = head
+       Body in canvas coordinates; head groups in the local head frame (translate(294,282) rotate(-8) scale(1.35)): origin = head
        centre, three-quarter profile facing viewer-left, chin at (-46,66), ear at (48,4).
        Light from the left (the desktop): rim group. Values: face 0.85 (brightest skin, cheek
        0.9), back 0.78 -> 0.42 into the shadow side and toward the small of the back,
@@ -41,7 +41,7 @@
 
   <g id="hair-back">
     <!-- skull hair, kept close to the head (sleek, swept up) -->
-    <g transform="translate(294,294) rotate(-8) scale(1.35)">
+    <g transform="translate(294,282) rotate(-8) scale(1.35)">
       <path fill="#474747" d="M -50,-74 C -40,-100 -6,-112 24,-106 C 56,-100 78,-76 80,-44
         C 82,-20 74,2 62,14 L 44,14 L 44,-74 Z"/>
       <path fill="none" stroke="#8c8c8c" stroke-width="4" stroke-linecap="round" d="M -20,-100 C 10,-108 50,-96 68,-64"/>
@@ -59,84 +59,70 @@
   </g>
 
   <g id="neck">
-    <!-- slim neck rising from the nape; tendon from behind the ear toward the collarbone -->
-    <path fill="#c4c4c4" d="M 290,376 C 302,364 316,356 330,350 C 340,338 348,326 356,314
-      C 362,308 368,304 372,300 C 376,328 380,352 394,378 Z"/>
-    <path fill="none" stroke="#6e6e6e" stroke-width="6" stroke-linecap="round" d="M 352,322 C 336,342 318,358 300,374"/>
-    <path fill="none" stroke="#d4d4d4" stroke-width="5" stroke-linecap="round" d="M 376,308 C 380,332 386,354 393,372"/>
+    <!-- side neck twisting into the turn, nape lit under the updo, tendon ear -> collarbone -->
+    <path fill="#c4c4c4" d="M 286,380 C 296,360 308,346 322,336 C 334,326 346,312 356,298
+      C 362,292 368,288 374,286 C 378,320 382,350 390,380 Z"/>
+    <path fill="none" stroke="#6e6e6e" stroke-width="5" stroke-linecap="round" d="M 352,306 C 336,330 318,352 300,376"/>
+    <path fill="none" stroke="#d4d4d4" stroke-width="5" stroke-linecap="round" d="M 378,294 C 381,322 385,350 389,374"/>
   </g>
 
-  <g id="body">
-    <!-- bare back: narrow, three-quarter away; the far shoulder drops behind -->
+  <g id="body" transform="translate(325,0) scale(0.85,1) translate(-325,0)">
+    <!-- (the whole torso group is narrowed 15 % about the spine, x = 325) -->
+    <!-- bare back: three-quarter away; the far shoulder drops behind -->
     <use xlink:href="#backShape" fill="url(#skinBack)"/>
     <g clip-path="url(#backClip)">
-      <!-- spine: a soft groove, graded, fading out before the scoop -->
-      <path fill="none" stroke="#6a6a6a" stroke-width="11" stroke-linecap="round" filter="url(#soft2)" d="M 338,380 C 328,416 324,446 326,476"/>
-      <path fill="none" stroke="#8c8c8c" stroke-width="9" stroke-linecap="round" filter="url(#soft2)" d="M 326,480 C 328,505 332,524 330,545"/>
-      <!-- one soft shadow plane on the turned-away side, a light catch on the lit shoulder blade -->
-      <ellipse cx="398" cy="470" rx="40" ry="80" fill="#5e5e5e" filter="url(#soft)"/>
-      <ellipse cx="232" cy="440" rx="40" ry="26" fill="#c8c8c8" filter="url(#soft)"/>
-      <!-- near-shoulder soft light; the chin's shadow on the shoulder -->
-      <ellipse cx="214" cy="418" rx="44" ry="20" fill="#b4b4b4" filter="url(#soft)"/>
-      <ellipse cx="258" cy="398" rx="24" ry="8" fill="#7a7a7a" filter="url(#soft)"/>
-      <!-- fall-off toward the small of the back -->
+      <!-- spine: a faint, short groove below the nape only; a soft plane on the turned side -->
+      <path fill="none" stroke="#8e8e8e" stroke-width="9" stroke-linecap="round" filter="url(#soft2)" d="M 338,384 C 332,404 330,426 331,448"/>
+      <ellipse cx="402" cy="460" rx="34" ry="70" fill="#7a7a7a" filter="url(#soft)"/>
       <rect x="150" y="440" width="300" height="230" fill="url(#backFall)"/>
     </g>
-    <!-- near arm (her left): upper arm ~45 px, elbow at y 615 bent slightly away from the waist -->
+    <!-- near arm (her left): deltoid, slim upper arm, elbow crease, forearm to the hip; the hand
+         is tucked behind the hip (the gown is painted over the wrist) -->
     <path fill="url(#skinArm)" d="M 138,418 C 120,430 112,452 114,480 C 114,530 112,580 112,612
-      C 118,656 146,694 178,716 C 184,720 190,718 192,712 C 193,704 191,698 186,694
-      C 170,680 158,654 150,616
+      C 118,656 150,694 186,716 C 194,720 204,722 210,718 C 212,708 208,700 202,694
+      C 176,680 158,654 150,616
       C 150,566 152,512 154,480 C 156,462 158,446 156,436 C 152,428 146,422 138,418 Z"/>
     <path fill="none" stroke="#7a7a7a" stroke-width="3.5" stroke-linecap="round" d="M 122,612 C 128,618 136,620 144,618"/>
-    <!-- raised far arm (her right): deltoid, upper arm to the elbow, tapered forearm, thin wrist -->
-    <path fill="url(#skinArmR)" d="M 392,378 C 420,330 458,252 484,192 C 490,176 498,160 510,154
-      C 526,150 536,164 532,182 C 524,216 506,272 490,320 C 484,340 474,352 470,368
+    <!-- raised far arm (her right): deltoid, upper arm, rounded elbow, forearm tapering to the wrist -->
+    <path fill="url(#skinArmR)" d="M 392,378 C 420,330 458,252 484,192 C 490,176 498,158 512,152
+      C 528,148 538,162 534,180 C 524,216 506,272 490,320 C 484,340 474,352 470,368
       C 462,396 456,420 448,446 C 440,428 428,408 414,394 C 406,386 398,380 392,378 Z"/>
-    <path fill="#b0b0b0" d="M 506,150 C 480,152 452,158 428,163 L 429,184 C 452,184 480,183 514,180
-      C 532,174 530,150 506,150 Z"/>
+    <path fill="#b0b0b0" d="M 508,146 C 482,150 454,160 430,167 L 430,181 C 454,182 482,186 514,184
+      C 536,176 534,146 508,146 Z"/>
     <path fill="none" stroke="#5a5a5a" stroke-width="4" stroke-linecap="round" d="M 470,372 C 482,336 494,300 506,266"/>
-    <!-- backless gown: side panels from the armpits, a clean U scooped to the small of the back -->
-    <path fill="#1c1c1c" d="M 172,470 C 196,548 258,594 325,596 C 378,594 414,560 434,462
-      C 424,520 414,562 406,596 C 424,646 452,700 458,760 L 456,800 L 186,800 C 188,740 204,668 220,598
-      C 210,560 190,520 172,470 Z"/>
-    <!-- satin: near-black, only sparse highlight dots along two folds -->
+    <!-- backless gown: covers the sides from the armpits; a soft scoop to mid-back -->
+    <path fill="#404040" d="M 160,452 L 196,456 C 226,502 276,534 322,538 C 364,534 396,502 416,452 L 440,446
+      C 430,500 416,560 406,596 C 424,646 452,700 458,760 L 462,880 L 182,880 L 186,800 C 188,740 204,668 220,598
+      C 210,560 190,520 172,474 Z"/>
+    <!-- satin: long fold highlights and shadows following the waist -> hip -->
     <g fill="none" stroke-linecap="round">
-      <path stroke="#6a6a6a" stroke-width="6" d="M 236,650 C 226,700 214,750 208,800"/>
-      <path stroke="#4e4e4e" stroke-width="6" d="M 380,640 C 394,690 406,744 414,800"/>
+      <path stroke="#262626" stroke-width="10" d="M 276,584 C 276,660 270,740 266,800 M 352,572 C 362,650 368,730 372,800"/>
+      <path stroke="#8c8c8c" stroke-width="9" filter="url(#soft2)" d="M 240,600 C 230,680 216,740 208,800"/>
+      <path stroke="#8c8c8c" stroke-width="8" filter="url(#soft2)" d="M 312,566 C 318,640 322,720 322,800"/>
+      <path stroke="#7a7a7a" stroke-width="8" filter="url(#soft2)" d="M 388,580 C 400,660 410,730 418,800"/>
     </g>
-    <!-- the scoop: a 2.5-dot bright satin edge, the U centred on the spine -->
-    <path fill="none" stroke="#d6d6d6" stroke-width="10" stroke-linecap="round" d="M 176,480 C 200,556 260,600 325,602 C 380,600 416,564 434,470"/>
-    <!-- slender fingers resting on the hip, over the gown with a 1-dot dark gap -->
-    <g fill="none" stroke-linecap="round">
-      <path stroke="#101010" stroke-width="10" d="M 188,708 C 198,716 206,726 210,740 M 190,704 C 202,708 212,716 218,728"/>
-      <path stroke="#b4b4b4" stroke-width="5" d="M 188,708 C 198,716 206,726 210,740 M 190,704 C 202,708 212,716 218,728"/>
-    </g>
-    <!-- straps over both shoulders, ~2 dots, running all the way into the scoop edge -->
-    <!-- (black satin strap, 2 dots, with a bright 1-dot piping on its lit edge: reads on skin) -->
-    <path fill="none" stroke="#141414" stroke-width="10" stroke-linecap="round" d="M 218,386 C 202,416 188,446 180,480"/>
-    <path fill="none" stroke="#d6d6d6" stroke-width="4" stroke-linecap="round" d="M 210,388 C 194,416 181,446 173,476"/>
-    <path fill="none" stroke="#141414" stroke-width="12" stroke-linecap="round" d="M 405,380 C 416,404 428,432 434,468"/>
-    <path fill="none" stroke="#d0d0d0" stroke-width="4.5" stroke-linecap="round" d="M 397,382 C 408,404 420,432 426,466"/>
+    <!-- bright continuous binding along the whole opening -->
+    <path fill="none" stroke="#e2e2e2" stroke-width="9" stroke-linecap="round" d="M 196,456 C 226,502 276,534 322,538 C 364,534 396,502 416,452"/>
+    <!-- straps shoulder -> opening: black satin, 2 dots, bright piping on the lit edge -->
+    <path fill="none" stroke="#141414" stroke-width="11" stroke-linecap="round" d="M 222,386 C 212,410 204,432 198,456"/>
+    <path fill="none" stroke="#e0e0e0" stroke-width="4.5" stroke-linecap="round" d="M 214,388 C 204,410 196,432 190,454"/>
+    <path fill="none" stroke="#141414" stroke-width="11" stroke-linecap="round" d="M 404,380 C 410,402 414,426 416,452"/>
+    <path fill="none" stroke="#d0d0d0" stroke-width="4.5" stroke-linecap="round" d="M 396,382 C 402,404 406,428 408,452"/>
   </g>
 
-  <g id="rim">
-    <!-- soft core shadow inside the lit edges so the rim reads as light -->
-    <path fill="none" stroke="#9a9a9a" stroke-width="10" stroke-linecap="round" filter="url(#soft2)" clip-path="url(#backClip)"
-          d="M 182,498 C 198,540 210,576 216,614"/>
+  <g id="rim" transform="translate(325,0) scale(0.85,1) translate(-325,0)">
+    <!-- light from the left (the lit side only): near shoulder, arm, waist -> hip, raised arm -->
     <path fill="none" stroke="#a4a4a4" stroke-width="10" stroke-linecap="round" filter="url(#soft2)"
           d="M 124,470 C 118,540 118,600 120,660"/>
     <g fill="none" stroke="#e0e0e0" stroke-width="5" stroke-linecap="round">
-      <!-- near shoulder top -> deltoid -> arm outer edge to the frame bottom -->
       <path d="M 286,375 C 248,380 184,394 154,412 C 136,424 118,440 117,476 C 116,520 115,570 115,612
-        C 120,654 146,692 178,714"/>
-      <!-- near waist -> hip contour, skin then gown, to the frame bottom -->
-      <path d="M 174,476 C 192,522 210,560 218,600 C 212,630 206,660 202,690 M 230,746 C 222,766 214,784 212,800"/>
-      <!-- raised arm: top edge, elbow, forearm top -->
-      <path d="M 396,376 C 424,326 460,250 486,192 C 492,176 500,160 512,156 M 506,153 C 480,155 452,161 430,166"/>
+        C 122,654 152,692 188,716"/>
+      <path d="M 174,476 C 192,522 210,560 218,600 C 210,650 198,720 190,800 L 186,880"/>
+      <path d="M 396,376 C 424,326 460,250 486,192 C 492,176 500,158 514,152 M 508,149 C 482,153 454,162 432,168"/>
     </g>
   </g>
 
-  <g id="hair-curtain">
+  <g id="hair-curtain" transform="translate(325,0) scale(0.85,1) translate(-325,0)">
     <!-- a lock falls from her hand over the far shoulder and hangs beside the waist -->
     <path fill="#474747" stroke="#0c0c0c" stroke-width="8" paint-order="stroke" d="M 418,194 C 408,236 410,272 422,304 C 432,334 420,370 426,410
       C 432,448 450,474 444,512 C 440,536 446,556 458,574 C 468,552 476,532 474,504
@@ -153,30 +139,30 @@
     <path fill="none" stroke="#5a5a5a" stroke-width="3.5" stroke-linecap="round" d="M 386,302 C 386,322 394,338 390,356"/>
   </g>
 
-  <g id="hand">
-    <!-- slender back of her right hand; four relaxed fingers threaded up-left into the hair,
-         hair-dark gaps >= 1 dot between them; lit knuckle edge -->
-    <path fill="#1c1c1c" d="M 366,126 C 384,132 400,140 414,146 L 414,194 C 398,198 380,196 362,194
-      C 352,186 350,170 352,156 C 354,142 358,130 366,126 Z"/>
-    <path fill="#c2c2c2" d="M 430,160 C 420,152 408,150 398,154 C 392,164 392,178 398,190
-      C 408,192 420,188 430,184 Z"/>
-    <g fill="none" stroke="#c2c2c2" stroke-width="5.5" stroke-linecap="round">
-      <path d="M 400,156 C 390,148 380,140 370,134"/>
-      <path d="M 398,166 C 386,162 374,156 362,152"/>
-      <path d="M 398,176 C 386,175 374,172 362,170"/>
-      <path d="M 400,186 C 390,188 380,188 372,188"/>
+  <g id="hand" transform="translate(325,0) scale(0.85,1) translate(-325,0)">
+    <!-- back of her right hand from a slim wrist; four long slim fingers curling up-left into the
+         hair (dark gaps between them), thumb wrapped under the ponytail, lit knuckle edge -->
+    <g fill="none" stroke-linecap="round" stroke="#0e0e0e" stroke-width="11">
+      <path d="M 404,158 C 392,150 380,142 370,134 C 366,131 361,131 358,135"/>
+      <path d="M 402,166 C 388,162 374,156 360,152 C 355,151 350,153 350,158"/>
+      <path d="M 402,174 C 388,174 374,172 362,172 C 357,172 353,175 354,180"/>
+      <path d="M 404,182 C 394,186 384,188 374,190"/>
+      <path d="M 424,180 C 418,190 408,196 398,198"/>
     </g>
-    <path fill="none" stroke="#e0e0e0" stroke-width="3.5" stroke-linecap="round" d="M 372,132 C 384,140 398,148 430,158"/>
+    <path fill="#c2c2c2" d="M 432,166 C 424,158 414,154 404,156 C 398,164 398,176 402,186 C 412,186 422,184 432,180 Z"/>
+    <g fill="none" stroke-linecap="round" stroke="#c2c2c2" stroke-width="5.5">
+      <path d="M 404,158 C 392,150 380,142 370,134 C 366,131 361,131 358,135"/>
+      <path d="M 402,166 C 388,162 374,156 360,152 C 355,151 350,153 350,158"/>
+      <path d="M 402,174 C 388,174 374,172 362,172 C 357,172 353,175 354,180"/>
+      <path d="M 404,182 C 394,186 384,188 374,190"/>
+      <path d="M 424,180 C 418,190 408,196 398,198"/>
+    </g>
+    <path fill="none" stroke="#e0e0e0" stroke-width="3.5" stroke-linecap="round" d="M 372,132 C 386,142 404,152 432,164"/>
   </g>
 
-  <g id="face" transform="translate(294,294) rotate(-8) scale(1.35)">
+  <g id="face" transform="translate(294,282) rotate(-8) scale(1.35)">
     <use xlink:href="#faceShape" fill="#d9d9d9"/>
-    <g clip-path="url(#faceClip)">
-      <!-- near cheekbone catches the light (brightest skin); soft shade toward the ear and jaw -->
-      <ellipse cx="-28" cy="8" rx="14" ry="9" fill="#e6e6e6" filter="url(#soft)"/>
-      <path fill="#b2b2b2" filter="url(#soft2)" d="M 20,-10 C 34,4 40,24 34,40 C 24,50 10,56 0,58 L 46,64 L 46,-10 Z"/>
-      <path fill="#a8a8a8" filter="url(#soft2)" d="M -60,-74 L 30,-74 L 30,-58 C 0,-56 -30,-50 -60,-40 Z"/>
-    </g>
+    <path fill="none" stroke="#000000" stroke-width="2.6" stroke-linecap="round" d="M -57,46 C -55,52 -51,56 -45,57 C -28,57 -2,50 20,40"/>
     <!-- ear with the lobe free for the earring -->
     <path fill="#bababa" d="M 42,-12 C 50,-18 58,-8 57,4 C 56,16 50,24 43,25 C 41,12 41,0 42,-12 Z"/>
     <path fill="none" stroke="#6a6a6a" stroke-width="2.4" stroke-linecap="round" d="M 46,-6 C 52,-2 52,10 47,16"/>
@@ -187,14 +173,14 @@
     <path fill="none" stroke="#7a7a7a" stroke-width="2.6" stroke-linecap="round" d="M -63,24.5 L -57,25.5"/>
 <g transform="translate(1,-6)">
     <!-- lips: fuller upper lip, short dark parting, glossy lower lip -->
-    <path fill="#5a5a5a" d="M -61,41 C -57,36 -52,35 -48,37 C -45,35 -40,34 -34,37 L -35,41 L -60,42.5 Z"/>
+    <path fill="#4a4a4a" d="M -61,41 C -57,36 -52,35 -48,37 C -45,35 -40,34 -34,37 L -35,41 L -60,42.5 Z"/>
     <path fill="#000000" d="M -60,42.5 C -52,44.5 -44,44 -35,40.5 C -44,45.5 -52,46 -60,42.5 Z"/>
     <path fill="#8a8a8a" d="M -58,45 C -54,52 -42,53 -37,44 C -44,47 -52,47 -58,45 Z"/>
     <ellipse cx="-48" cy="48.5" rx="2.8" ry="1.6" fill="#b8b8b8"/>
     </g>
   </g>
 
-  <g id="eyes-open" transform="translate(294,294) rotate(-8) scale(1.35)">
+  <g id="eyes-open" transform="translate(294,282) rotate(-8) scale(1.35)">
     <!-- near eye: half-lidded almond, iris in the corner nearest the viewer (viewer-right) -->
     <clipPath id="nearEye"><path d="M -36,-6 C -28,-16 -10,-18 -2,-10 C -8,-2 -20,0 -28,-1 C -32,-2 -35,-4 -36,-6 Z"/></clipPath>
     <path fill="#d4d4d4" d="M -36,-6 C -28,-16 -10,-18 -2,-10 C -8,-2 -20,0 -28,-1 C -32,-2 -35,-4 -36,-6 Z"/>
@@ -208,12 +194,12 @@
     <path fill="none" stroke="#000000" stroke-width="1.8" stroke-linecap="round" d="M -4,-15 L 0,-20 M -10,-17 L -8,-22 M -16,-18 L -15,-23"/>
   </g>
 
-  <g id="eyes-closed" display="none" transform="translate(294,294) rotate(-8) scale(1.35)">
+  <g id="eyes-closed" display="none" transform="translate(294,282) rotate(-8) scale(1.35)">
     <path fill="none" stroke="#000000" stroke-width="3.4" stroke-linecap="round" d="M -36,-5 C -26,0 -10,0 -1,-8"/>
     <path fill="none" stroke="#000000" stroke-width="3" stroke-linecap="round" d="M -1,-8 L 5,-13"/>
   </g>
 
-  <g id="hair-side" transform="translate(294,294) rotate(-8) scale(1.35)">
+  <g id="hair-side" transform="translate(294,282) rotate(-8) scale(1.35)">
     <!-- temple hair: hairline in front of the ear, swept back over its top -->
     <path fill="#474747" d="M -14,-82 C 12,-74 26,-56 24,-36 C 22,-24 26,-14 36,-12
       C 42,-16 50,-16 58,-12 C 62,-24 60,-50 50,-66 C 36,-80 16,-86 -14,-82 Z"/>
@@ -223,7 +209,7 @@
     <path fill="none" stroke="#7a7a7a" stroke-width="2.4" stroke-linecap="round" d="M 54,14 C 52,30 52,48 53,66"/>
   </g>
 
-  <g id="bangs" transform="translate(294,294) rotate(-8) scale(1.35)">
+  <g id="bangs" transform="translate(294,282) rotate(-8) scale(1.35)">
     <!-- short side-swept fringe at the hairline, off the near eye -->
     <path fill="#474747" d="M -6,-100 C -40,-98 -62,-80 -66,-56 C -68,-44 -66,-34 -62,-28
       C -56,-40 -46,-52 -30,-60 C -18,-66 -6,-72 4,-76 Z"/>
@@ -232,10 +218,10 @@
     <path fill="none" stroke="#8c8c8c" stroke-width="2.2" stroke-linecap="round" d="M -26,-74 C -40,-58 -46,-44 -46,-30"/>
   </g>
 
-  <g id="clip" transform="translate(294,294) rotate(-8) scale(1.35)">
+  <g id="clip" transform="translate(294,282) rotate(-8) scale(1.35)">
     <!-- earring chain from the lobe; the red bead under it is drawn by the shader (clipUV) -->
     <circle cx="43" cy="24" r="2.2" fill="#e0e0e0"/>
-    <path d="M 43,26 L 43.8,30" stroke="#b0b0b0" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M 43,26 L 48,32" stroke="#b0b0b0" stroke-width="2.4" stroke-linecap="round"/>
   </g>
   </g>
 </svg>

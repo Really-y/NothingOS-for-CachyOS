@@ -32,6 +32,9 @@ GROUPS = ["hair-back", "neck", "body", "rim", "hair-curtain", "hand", "face", "e
           "hair-side", "bangs", "ahoge", "clip"]
 # hair-curtain sway starts higher where the hair is lifted (sultry: from her hand, nape tendrils)
 CURTAIN_RAMP = {"sultry": (200, 560)}
+# Nothing-style posterise: snap luminance to a few discrete dot sizes (0 = missing dot and
+# >= 0.97 forced highlights are kept as they are)
+QUANT = {"sultry": (0.28, 0.5, 0.68, 0.85)}
 
 
 def variant(show):
@@ -111,6 +114,12 @@ def bake(style):
     lum_open = lum_open * (1 - contour) + 0.45 * contour
     lum_closed = lum_closed * (1 - contour) + 0.45 * contour
     face_mask = small(np.clip(face_region + visible("neck"), 0, 1))
+    if style in QUANT:
+        lv = np.array(QUANT[style], np.float32)
+        def quant(l):
+            q = lv[np.abs(l[..., None] - lv).argmin(-1)]
+            return np.where(l < 0.03, 0.0, np.where(l >= 0.97, l, q)).astype(np.float32)
+        lum_open, lum_closed = quant(lum_open), quant(lum_closed)
 
     S = small(sil)
     fig = np.dstack([small(lum_open), small(lum_closed), S])
