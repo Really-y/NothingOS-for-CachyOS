@@ -157,6 +157,7 @@ if __name__ == "__main__":
     nb = sum("brand:" in l for l in rep["symbol"])
     print(f"apps: {nb} brand marks, {len(rep['symbol']) - nb} Material symbols, {len(rep['dot'])} dot-letter fallbacks, "
           f"{rep['dock_icons']} dock icons; not themed in the dock: {', '.join(rep['dock_skipped'])}")
+    print(f"generic coverage (KCM/NoDisplay/runner/category names): {len(rep['generic'])}")
     for line in rep["dot"]:
         print("  dot:", line)
     mr = mimeicons.build(OUT, PLACES)

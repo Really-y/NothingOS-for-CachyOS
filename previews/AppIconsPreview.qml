@@ -13,6 +13,12 @@ Rectangle {
         "com.rtosta.zapzap", "steam", "vscodium", "mpv", "org.qbittorrent.qBittorrent", "org.wireshark.Wireshark",
         "com.anydesk.Anydesk", "com.rustdesk.RustDesk", "org.kde.dolphin", "org.gnome.Nautilus", "utilities-terminal",
         "Alacritty", "spectacle", "freetube", "plasmadiscover", "xarchiver", "kdeconnect", "virt-manager", "localsend"]
+    readonly property var generic: ["filelight", "preferences-security-firewall", "internet-web-browser", "kfind",
+        "preferences-desktop-font", "krunner", "preferences-web-browser-shortcuts", "preferences-desktop-display",
+        "preferences-desktop-sound", "preferences-desktop-keyboard", "preferences-desktop-mouse",
+        "preferences-desktop-notification", "preferences-system-bluetooth", "preferences-desktop-wallpaper",
+        "preferences-desktop-color", "preferences-system-power-management", "preferences-desktop-user",
+        "preferences-desktop-locale", "applications-graphics", "accessories-calculator"]
     readonly property var fallback: ["../../../../previews/assets/dotletter-L", "../../../../previews/assets/dotletter-S", "../../../../previews/assets/dotletter-R"]
 
     Column {
@@ -35,6 +41,21 @@ Rectangle {
             Repeater {
                 model: dock
                 Image { required property string modelData; width: 22 * zoom; height: 22 * zoom; smooth: false; sourceSize: Qt.size(22, 22); source: dir22 + modelData + ".svg" }
+            }
+        }
+        Label { text: "KRunner / System Settings modules / categories · 48px + 22px" }
+        Row {
+            spacing: 8
+            Repeater {
+                model: generic
+                Image { required property string modelData; width: 48; height: 48; sourceSize: Qt.size(48, 48); source: dir + modelData + ".svg" }
+            }
+        }
+        Row {
+            spacing: 14
+            Repeater {
+                model: generic
+                Image { required property string modelData; width: 22; height: 22; sourceSize: Qt.size(22, 22); source: dir22 + modelData + ".svg" }
             }
         }
         Label { text: "Fallback · 48px dots (2px on 3px pitch) / 22px pixel letter" }

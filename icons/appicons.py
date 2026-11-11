@@ -370,6 +370,103 @@ def non_app_icon_names():
     return {n for n, c in ctx.items() if "apps" not in c}
 
 
+# ── generic coverage: KCMs, NoDisplay entries, KRunner runners, category names ─────────────
+RUNNER_ICONS = ["internet-web-browser", "system-search", "plasma-search", "krunner", "applications-internet",
+                "preferences-desktop-font", "kfind", "filelight", "preferences-web-browser-shortcuts",
+                "accessories-dictionary", "accessories-calculator", "utilities-terminal", "system-run",
+                "preferences-system-windows", "preferences-desktop-locale", "kdeconnect", "org.kde.kfind",
+                "org.kde.filelight", "help-browser", "system-file-manager", "preferences-kde-plasma",
+                "accessories-character-map", "applications-all", "utilities-system-monitor"]
+GENERIC_PREFIXES = ("applications-", "accessories-", "utilities-", "system-", "preferences-")
+GENERIC_OK_CONTEXTS = {"apps", "categories", "preferences"}
+
+# name/hint regex → Material symbol (generic names may share)
+GENERIC = [(re.compile(p), g) for p, g in [
+    (r"font", "text_fields"), (r"firewall|security|privacy|kwallet|password|encrypt", "shield"),
+    (r"web-?browser|internet|webshortcut|web-shortcut|browser", "travel_explore"),
+    (r"search|krunner|kfind|find|baloo", "search"), (r"filelight|disk-?usage|pie", "pie_chart"),
+    (r"bluetooth", "bluetooth"), (r"network|wifi|wireless|proxy|connection|vpn", "lan"),
+    (r"display|monitor|screen|randr|kscreen|kwin-?scale|night", "monitor"),
+    (r"sound|audio|speaker|pulseaudio|volume|phonon|multimedia", "volume_up"),
+    (r"keyboard|shortcut|keys|input-method", "keyboard"), (r"mouse|cursor|pointer", "mouse"),
+    (r"touchpad|touchscreen|touch", "touch_app"), (r"tablet|stylus|wacom|pen", "stylus"),
+    (r"color|colour|palette", "palette"), (r"theme|style|look|decoration|plasma-theme|icons|splash|effects", "style"),
+    (r"wallpaper|background", "wallpaper"), (r"notification|bell", "notifications"),
+    (r"power|energy|battery|session|shutdown|logout", "power_settings_new"),
+    (r"user|account|people|password", "person"), (r"locale|language|region|translate|spell", "translate"),
+    (r"clock|date|time", "schedule"), (r"print", "print"), (r"virtual|desktops|pager|activities", "view_quilt"),
+    (r"window|task-?switch|tabbox|kwin", "web_asset"), (r"accessib", "accessibility"),
+    (r"gaming|game|joystick|controller", "sports_esports"), (r"thunderbolt|usb|device", "bolt"),
+    (r"online-accounts|cloud", "cloud"), (r"login|sddm|startup|autostart|boot", "login"),
+    (r"backup|sync", "backup"), (r"calendar|kontact|pim", "calendar_month"), (r"mail", "mail"),
+    (r"dictionary|book|help|documentation|manual", "menu_book"), (r"calculat", "calculate"),
+    (r"character|emoji|emoticon", "emoji_emotions"), (r"terminal|konsole|run|command", "terminal"),
+    (r"file-?manager|files|folder", "folder"), (r"monitor|system-monitor|ksysguard", "monitoring"),
+    (r"graphics|image|photo|camera", "image"), (r"development|code|ide|debug", "code"),
+    (r"office|document|text", "article"), (r"education|science|math", "school"),
+    (r"games", "sports_esports"), (r"utilities|accessories|tools", "build"),
+    (r"software|package|install|update|discover", "storefront"), (r"plasma|desktop|kde", "widgets"),
+    (r"system|preferences|settings|configure|kcm", "settings"), (r"applications|apps", "apps"),
+]]
+
+
+def icon_contexts():
+    ctx = {}
+    for theme in THEMES:
+        for root, _d, files in os.walk(theme, followlinks=True):
+            parts = set(os.path.relpath(root, theme).split(os.sep))
+            c = parts & (NON_APP_CONTEXTS | {"apps"})
+            if not c:
+                continue
+            for f in files:
+                if f.endswith((".svg", ".png")):
+                    ctx.setdefault(f[:-4], set()).update(c)
+    return ctx
+
+
+def generic_icon_names():
+    """{icon: hint} for KCM / NoDisplay / runner / category icon names (never status/action/places)."""
+    names = {}
+    for d in APP_DIRS:
+        for path in glob.glob(os.path.join(d, "*.desktop")):
+            cp = configparser.RawConfigParser(strict=False, interpolation=None)
+            try:
+                cp.read(path, encoding="utf-8")
+                e = cp["Desktop Entry"]
+            except Exception:
+                continue
+            icon = e.get("Icon", "").strip()
+            if icon and "/" not in icon:
+                hint = " ".join(e.get(k, "") for k in ("Name", "GenericName", "Comment", "Categories", "Keywords"))
+                names[icon] = names.get(icon, "") + " " + os.path.basename(path) + " " + hint.replace(";", " ")
+    for n in RUNNER_ICONS:
+        names.setdefault(n, "")
+    ctx = icon_contexts()
+    for n, c in ctx.items():
+        if n.startswith(GENERIC_PREFIXES) and c & GENERIC_OK_CONTEXTS and not n.endswith("-symbolic"):
+            names.setdefault(n, "")
+    out = {}
+    for n, hint in names.items():
+        c = ctx.get(n, set())
+        if c - GENERIC_OK_CONTEXTS and "apps" not in c:
+            continue                       # a status/action/device/place/mimetype name: leave it alone
+        if n.endswith(("-symbolic", "-tray", "-panel", "-indicator", "-status")) or n.startswith(("start-here", "folder", "user-")):
+            continue
+        out[n] = hint
+    return out
+
+
+def generic_symbol(font, name, hint):
+    text = f"{name} {hint}".lower()
+    for rx, g in GENERIC:
+        if rx.search(name.lower()) and has_symbol(font, g):
+            return g
+    for rx, g in GENERIC:
+        if rx.search(text) and has_symbol(font, g):
+            return g
+    return "apps"
+
+
 def same_family(a, b):
     a, b = a.lower(), b.lower()
     return a in b or b in a or a.split()[0] == b.split()[0]
@@ -462,6 +559,28 @@ def build(theme_dir):
             # glyph-only twin by icon name, for drawer items that only know the icon (window/runner results)
             with open(os.path.join(d, f"nothing-glyph-icon-{icon}.svg"), "w") as f:
                 f.write(svg(inner))
+    # generic coverage (KCMs, NoDisplay entries, runners, categories): may share glyphs
+    report["generic"] = []
+    for icon, hint in sorted(generic_icon_names().items()):
+        if icon in dock:
+            continue
+        g = generic_symbol(font, icon, hint)
+        key = ("sym", g)
+        if key not in markup_cache:
+            markup_cache[key] = glyph_markup(font, g)
+        inner = markup_cache[key]
+        with open(os.path.join(d, icon + ".svg"), "w") as f:
+            f.write(svg(f'<circle cx="32" cy="32" r="30" fill="{DISC}"/>{inner}'))
+        v22 = SMALL_SWAP.get(g, g)
+        k22 = ("s22", v22)
+        if k22 not in markup_cache:
+            markup_cache[k22] = glyph_markup(font_b if v22 in SMALL_BOLD else font_s, v22, c=22, disc_d=21, snap=True)
+        with open(os.path.join(d22, icon + ".svg"), "w") as f:
+            f.write(svg(f'<circle cx="11" cy="11" r="10.5" fill="{DISC}"/>{markup_cache[k22]}', 22))
+        with open(os.path.join(d, f"nothing-glyph-icon-{icon}.svg"), "w") as f:
+            f.write(svg(inner))
+        report["generic"].append(f"{icon}→{g}")
+        dock[icon] = inner
     report["dock_icons"] = len(dock)
     report["dock_skipped"] = sorted(report["dock_skipped"])
     with open(os.path.join(theme_dir, "glyphmap.json"), "w") as f:
