@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# DISABLED — DO NOT RUN. Registering/unregistering kglobalaccel components at runtime via DBus
+# left KWin (which hosts kglobalaccel) with a dangling Component and crashed kwin_wayland on keypress.
 # Nothing quick search: Alt+Space / Alt+F2 / Search open the Nothing drawer in search mode
 # instead of KRunner, and KRunner itself (still installed: `krunner`, Alt+Shift+F2) is tuned.
 #

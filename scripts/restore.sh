@@ -14,7 +14,7 @@ systemctl --user unmask dunst.service 2>/dev/null || true
   cp "$HOME/.local/share/nothingos-backup/dunst/org.freedesktop.Notifications.service" "$HOME/.local/share/dbus-1/services/"
 "$ROOT/plasma/lookandfeel/install.sh" --revert 2>/dev/null || true
 # KRunner gets Alt+Space / Alt+F2 / Search back (live, via kglobalaccel) and its original krunnerrc
-"$ROOT/scripts/quicksearch.sh" revert >/dev/null 2>&1 || true
+# quick search shortcut removed: changing kglobalaccel components at runtime crashed KWin (see scripts/quicksearch.sh header)
 rm -f "$HOME/.config/autostart/nothingos-shell.desktop"
 rm -f "$HOME/.local/share/dbus-1/services/org.knopwob.dunst.service" "$HOME/.local/share/dbus-1/services/org.kde.plasma.Notifications.service"
 rm -f "$HOME"/.local/share/applications/nothingos-*.desktop
