@@ -44,6 +44,67 @@ QIcon.setThemeSearchPaths([os.path.expanduser("~/.local/share/icons"), "/usr/sha
 QIcon.setThemeName("Nothing")
 OUT = os.path.join(ROOT, "previews")
 
+# ── KIconEngine stand-in ─────────────────────────────────────────────────
+# KDE apps load icons through KIconEngine, which recolours ".ColorScheme-Text" SVGs from the
+# palette (Normal -> Text, Selected -> HighlightedText).  Kvantum asks for QIcon::Selected on
+# white pills, so in real Dolphin the glyph turns black.  Plain PyQt has no KIconEngine, so
+# emulate it here; otherwise the preview would show light-grey glyphs that KDE never draws.
+from PyQt6.QtCore import QByteArray, QRectF  # noqa: E402
+from PyQt6.QtGui import QIconEngine, QPalette  # noqa: E402
+from PyQt6.QtSvg import QSvgRenderer  # noqa: E402
+import re  # noqa: E402
+
+_THEMES = [os.path.expanduser("~/.local/share/icons/Nothing"), "/usr/share/icons/Papirus-Dark",
+           "/usr/share/icons/Papirus", "/usr/share/icons/breeze-dark", "/usr/share/icons/hicolor"]
+_SIZES = ["22", "22x22", "24", "24x24", "scalable", "48", "48x48", "64x64", "32x32", "16x16"]
+
+
+def _find_svg(name):
+    for root in _THEMES:
+        for sz in _SIZES:
+            d = os.path.join(root, sz)
+            if not os.path.isdir(d):
+                continue
+            for ctx in sorted(os.listdir(d)):
+                f = os.path.join(d, ctx, name + ".svg")
+                if os.path.exists(f):
+                    return os.path.realpath(f)
+    return None
+
+
+class KdeLikeEngine(QIconEngine):
+    def __init__(self, path):
+        super().__init__()
+        self.path = path
+        with open(path, "rb") as fh:
+            self.src = fh.read().decode("utf-8", "replace")
+
+    def clone(self):
+        return KdeLikeEngine(self.path)
+
+    def paint(self, painter, rect, mode, state):
+        pal = QApplication.palette()
+        col = pal.color(QPalette.ColorRole.HighlightedText if mode == QIcon.Mode.Selected
+                        else QPalette.ColorRole.Text).name()
+        svg = re.sub(r"\.ColorScheme-Text\s*\{\s*color:\s*#[0-9a-fA-F]+", ".ColorScheme-Text { color:" + col, self.src)
+        r = QSvgRenderer(QByteArray(svg.encode()))
+        if mode == QIcon.Mode.Disabled:
+            painter.setOpacity(0.4)
+        r.render(painter, QRectF(rect))
+
+    def pixmap(self, size, mode, state):
+        pm = QPixmap(size)
+        pm.fill(Qt.GlobalColor.transparent)
+        p = QPainter(pm)
+        self.paint(p, pm.rect(), mode, state)
+        p.end()
+        return pm
+
+
+def kicon(name):
+    path = _find_svg(name)
+    return QIcon(KdeLikeEngine(path)) if path else QIcon.fromTheme(name)
+
 
 def hover(w):
     w.setAttribute(Qt.WidgetAttribute.WA_UnderMouse, True)
@@ -52,7 +113,7 @@ def hover(w):
 
 def tbtn(icon, checkable=False, checked=False, text=None):
     b = QToolButton()
-    b.setIcon(QIcon.fromTheme(icon))
+    b.setIcon(kicon(icon))
     b.setIconSize(QSize(22, 22))
     b.setAutoRaise(True)
     if text:
@@ -128,7 +189,7 @@ def dolphin():
     tb.addWidget(spacer)
     search = QLineEdit()
     search.setPlaceholderText("Search…")
-    search.addAction(QIcon.fromTheme("edit-find"), QLineEdit.ActionPosition.LeadingPosition)
+    search.addAction(kicon("edit-find"), QLineEdit.ActionPosition.LeadingPosition)
     search.setMinimumWidth(220)
     tb.addWidget(search)
     tb.addWidget(hover(tbtn("split")))
@@ -155,7 +216,7 @@ def dolphin():
         h.setForeground(QColor("#8e8e8e"))
         places.addItem(h)
         for ic, name in items:
-            it = QListWidgetItem(QIcon.fromTheme(ic), name)
+            it = QListWidgetItem(kicon(ic), name)
             places.addItem(it)
             if name == "Home":
                 sel = it
@@ -179,7 +240,7 @@ def dolphin():
              ("text-x-generic", "notes.txt"), ("image-png", "wallpaper.png"),
              ("application-pdf", "invoice.pdf")]
     for ic, name in files:
-        it = QListWidgetItem(QIcon.fromTheme(ic), name)
+        it = QListWidgetItem(kicon(ic), name)
         it.setTextAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop)
         grid.addItem(it)
     grid.item(8).setSelected(True)
@@ -189,9 +250,9 @@ def dolphin():
     tabs.setDocumentMode(True)
     tabs.setTabsClosable(True)
     tabs.setExpanding(False)
-    tabs.addTab(QIcon.fromTheme("user-home"), "Home")
-    tabs.addTab(QIcon.fromTheme("folder"), "Projects")
-    tabs.addTab(QIcon.fromTheme("folder-download"), "Downloads")
+    tabs.addTab(kicon("user-home"), "Home")
+    tabs.addTab(kicon("folder"), "Projects")
+    tabs.addTab(kicon("folder-download"), "Downloads")
     tabs.setCurrentIndex(1)
 
     right = QWidget()
@@ -225,23 +286,23 @@ def dolphin():
     settle()
 
     menu = QMenu(win)
-    menu.addAction(QIcon.fromTheme("document-open"), "Open")
-    menu.addAction(QIcon.fromTheme("tab-new"), "Open in New Tab")
+    menu.addAction(kicon("document-open"), "Open")
+    menu.addAction(kicon("tab-new"), "Open in New Tab")
     menu.addSeparator()
-    menu.addAction(QIcon.fromTheme("edit-cut"), "Cut")
-    act = menu.addAction(QIcon.fromTheme("edit-copy"), "Copy")
-    menu.addAction(QIcon.fromTheme("edit-rename"), "Rename…")
-    menu.addAction(QIcon.fromTheme("edit-delete"), "Move to Trash")
+    menu.addAction(kicon("edit-cut"), "Cut")
+    act = menu.addAction(kicon("edit-copy"), "Copy")
+    menu.addAction(kicon("edit-rename"), "Rename…")
+    menu.addAction(kicon("edit-delete"), "Move to Trash")
     menu.addSeparator()
-    sub = menu.addMenu(QIcon.fromTheme("document-share"), "Share")
+    sub = menu.addMenu(kicon("document-share"), "Share")
     sub.addAction("Bluetooth")
     c = menu.addAction("Show Hidden Files")
     c.setCheckable(True)
     c.setChecked(True)
-    menu.addAction(QIcon.fromTheme("document-properties"), "Properties")
+    menu.addAction(kicon("document-properties"), "Properties")
     menu.popup(QPoint(0, 0))
     app.processEvents()
-    menu.setActiveAction(act)
+    menu.setActiveAction(sub.menuAction())
     settle()
     pm = composite(win, menu, QPoint(640, 300))
     menu.close()
@@ -281,7 +342,7 @@ def gallery():
     t.setCheckable(True)
     t.setChecked(True)
     row.addWidget(t)
-    row.addWidget(QPushButton(QIcon.fromTheme("document-save"), "Save"))
+    row.addWidget(QPushButton(kicon("document-save"), "Save"))
     row.addWidget(tbtn("go-previous"))
     row.addWidget(hover(tbtn("go-next")))
     row.addWidget(tbtn("view-list-icons", True, True))
@@ -364,10 +425,10 @@ def gallery():
     tree.setRootIsDecorated(True)
     for n, sz in (("Documents", "12 items"), ("Pictures", "340 items"), ("Music", "88 items")):
         it = QTreeWidgetItem([n, sz, "Today"])
-        it.setIcon(0, QIcon.fromTheme("folder"))
+        it.setIcon(0, kicon("folder"))
         for k in range(3):
             ch = QTreeWidgetItem([f"file-{k}.txt", "4 KiB", "Yesterday"])
-            ch.setIcon(0, QIcon.fromTheme("text-x-generic"))
+            ch.setIcon(0, kicon("text-x-generic"))
             it.addChild(ch)
         tree.addTopLevelItem(it)
     tree.expandItem(tree.topLevelItem(1))

@@ -45,7 +45,12 @@ def _place(w, h):
 
 
 def _fill(c):
-    return 'fill="#000" fill-opacity="0"' if c is None else f'fill="{c}"'
+    if c is None:
+        return 'fill="#000" fill-opacity="0"'
+    if ";" in c:  # "colour;opacity"
+        col, op = c.split(";")
+        return f'fill="{col}" fill-opacity="{op}"'
+    return f'fill="{c}"'
 
 
 def box(name, state, fill, u=10):
@@ -112,10 +117,11 @@ def chevron(d, c, w=2.2):
 # push buttons: grey pill, hover lighter, pressed / checked = white
 boxes("button", {"normal": S2, "focused": S3, "pressed": WHITE, "toggled": WHITE,
                  "disabled": "#0d0d0d"})
-# default button: white ring (Kvantum cannot recolour the label, so no white fill)
-ring("button", "default", WHITE, 1.3)
+# default button (drawn OVER every state; Kvantum cannot recolour its label):
+# a 7% white veil (#1a1a1a -> ~#2a2a2a, white stays white) + bold label + a small dot
+boxes("button", {"default": "#ffffff;0.07"})
 # tool buttons (toolbars, Dolphin navigator): invisible until hovered
-boxes("tbutton", {"normal": NONE, "focused": S2, "pressed": S3, "toggled": S4,
+boxes("tbutton", {"normal": NONE, "focused": S2, "pressed": S3, "toggled": WHITE,
                   "disabled": NONE})
 # line edits / editable combos: flat round field, focus = lighter fill
 boxes("lineedit", {"normal": S2, "focused": S4, "pressed": S4, "toggled": S4,
@@ -141,7 +147,7 @@ boxes("scrollbargroove", {"normal": NONE})
 boxes("slider", {"normal": S4, "focused": S4, "pressed": S4, "toggled": WHITE, "disabled": S2})
 # menus / popups
 boxes("menu", {"normal": S1})
-boxes("menuitem", {"normal": NONE, "focused": S3, "pressed": S3, "toggled": S3})
+boxes("menuitem", {"normal": NONE, "focused": WHITE, "pressed": WHITE2, "toggled": WHITE})
 boxes("menubar", {"normal": NONE})
 boxes("menubaritem", {"normal": NONE, "focused": S2, "pressed": S3, "toggled": S3})
 boxes("tooltip", {"normal": S2})
@@ -163,11 +169,12 @@ for eid, c in (("progress-normal", S4), ("progress-pattern-normal", WHITE),
     ox, oy = _place(12, 12)
     svg.append(f'<g id="{eid}" transform="translate({ox},{oy})">'
                f'<rect width="12" height="12" fill="#000" fill-opacity="0"/>'
-               f'<circle cx="6" cy="6" r="3.6" fill="{c}"/></g>')
+               f'<circle cx="3" cy="6" r="3" fill="{c}"/></g>')  # 6px dot at the tile's left, 6px gap
 # progress bar groove rendered via frame=false / interior = dot pattern; see kvconfig
 
 # ── indicators ───────────────────────────────────────────────────────────
-ARROW = {"normal": WHITE, "focused": WHITE, "pressed": BLACK, "toggled": BLACK, "disabled": DIM}
+# focused (hover) arrows are grey: they must read on #262626 buttons AND on the white menu hover pill
+ARROW = {"normal": WHITE, "focused": GREY, "pressed": BLACK, "toggled": BLACK, "disabled": DIM}
 for d in ("down", "up", "left", "right"):
     for st, c in ARROW.items():
         icon(f"arrow-{d}-{st}", chevron(d, c))
@@ -204,11 +211,16 @@ for st, off, on in (("normal", S4, WHITE), ("focused", S5, WHITE), ("pressed", G
     dot = lambda c: f'<circle cx="12" cy="12" r="10" fill="{c}"/>'
     icon(f"radio-{st}", dot(off))
     icon(f"radio-checked-{st}", dot(on) + '<circle cx="12" cy="12" r="4" fill="#000"/>')
-    # menu check/radio (on #111 popups)
-    icon(f"menu-checkbox-{st}", sq(off))
-    icon(f"menu-checkbox-checked-{st}", sq(on) + TICK)
-    icon(f"menu-radio-{st}", dot(off))
-    icon(f"menu-radio-checked-{st}", dot(on) + '<circle cx="12" cy="12" r="4" fill="#000"/>')
+    # menu check/radio: on #111 popups, inverted on the white hover pill
+    if st in ("focused", "pressed"):
+        mo, mon, mk = "#d0d0d0", BLACK, WHITE
+    else:
+        mo, mon, mk = off, on, BLACK
+    mtick = TICK.replace('stroke="#000"', f'stroke="{mk}"')
+    icon(f"menu-checkbox-{st}", sq(mo))
+    icon(f"menu-checkbox-checked-{st}", sq(mon) + mtick)
+    icon(f"menu-radio-{st}", dot(mo))
+    icon(f"menu-radio-checked-{st}", dot(mon) + f'<circle cx="12" cy="12" r="4" fill="{mk}"/>')
 
 # slider handle: white disc (black core ring keeps it legible over the white fill)
 for st, c in (("normal", WHITE), ("focused", WHITE), ("pressed", WHITE2), ("disabled", DIM)):
@@ -225,7 +237,8 @@ icon("toolbar-handle", f'<circle cx="12" cy="6" r="1.6" fill="{DIM}"/><circle cx
 icon("resize-grip-normal", "".join(f'<circle cx="{x}" cy="{y}" r="1.5" fill="{DIM}"/>'
                                     for x, y in ((18, 18), (12, 18), (18, 12))))
 icon("flat-button-default-indicator", "", 4)
-icon("button-default-indicator", "", 4)
+# default-button dot: Kvantum aligns this box bottom-right; the dot sits in its upper half
+icon("button-default-indicator", f'<circle cx="8" cy="7" r="2.6" fill="{WHITE}"/>', 14)
 
 # ── kvconfig ─────────────────────────────────────────────────────────────
 KV = f"""[%General]
@@ -391,7 +404,7 @@ frame.element=tbutton
 interior.element=tbutton
 indicator.element=tarrow
 text.press.color={WHITE}
-text.toggle.color={WHITE}
+text.toggle.color={BLACK}
 text.margin.left=6
 text.margin.right=6
 min_width=0
@@ -737,9 +750,9 @@ frame.left=6
 frame.right=6
 frame.expansion=0
 text.normal.color={WHITE}
-text.focus.color={WHITE}
-text.press.color={WHITE}
-text.toggle.color={WHITE}
+text.focus.color={BLACK}
+text.press.color={BLACK}
+text.toggle.color={BLACK}
 text.margin.top=2
 text.margin.bottom=2
 text.margin.left=6
