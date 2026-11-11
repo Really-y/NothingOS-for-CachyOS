@@ -1,0 +1,41 @@
+{
+  "manifest_version": 3,
+  "name": "Nothing",
+  "version": "1.0",
+  "description": "Nothing OS for Chrome — black, white, one red. Colours only: no scripts, no images, zero performance cost.",
+  "theme": {
+    "colors": {
+      "frame": [0, 0, 0],
+      "frame_inactive": [0, 0, 0],
+      "frame_incognito": [0, 0, 0],
+      "frame_incognito_inactive": [0, 0, 0],
+      "background_tab": [0, 0, 0],
+      "background_tab_inactive": [0, 0, 0],
+      "background_tab_incognito": [0, 0, 0],
+      "toolbar": [26, 26, 26],
+      "toolbar_text": [255, 255, 255],
+      "toolbar_button_icon": [255, 255, 255],
+      "toolbar_field": [0, 0, 0],
+      "toolbar_field_text": [255, 255, 255],
+      "omnibox_background": [0, 0, 0],
+      "omnibox_text": [255, 255, 255],
+      "tab_text": [255, 255, 255],
+      "tab_background_text": [142, 142, 142],
+      "tab_background_text_inactive": [94, 94, 94],
+      "tab_background_text_incognito": [142, 142, 142],
+      "bookmark_text": [255, 255, 255],
+      "button_background": [26, 26, 26],
+      "ntp_background": [0, 0, 0],
+      "ntp_text": [255, 255, 255],
+      "ntp_link": [215, 25, 33],
+      "ntp_header": [26, 26, 26]
+    },
+    "tints": {
+      "buttons": [0, 0, 1],
+      "frame_inactive": [-1, -1, 0.9]
+    },
+    "properties": {
+      "ntp_logo_alternate": 1
+    }
+  }
+}
