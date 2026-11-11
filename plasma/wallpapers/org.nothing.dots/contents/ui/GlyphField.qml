@@ -26,10 +26,11 @@ Item {
 
     // the character
     property bool showFigure: true
-    property string figureStyle: "glam"   // "glam" (adult, stylish) | "cute" — wallpapers/glyphgirl/*.svg
+    property string figureStyle: "casual" // "casual" (waist-up, relaxed) | "glam" (portrait) | "cute" — wallpapers/glyphgirl/*.svg
     property real figureX: 0.75           // horizontal centre, fraction of width
     property real figureScale: 1.15       // height, fraction of screen height
-    property int figurePitch: 5          // house pitch (5/8/12/15); fine enough for her eyes
+    // fine grid per style; 8 and 6 divide the 24 px field and share its origin (no moire)
+    readonly property int figurePitch: _style === "glam" ? 8 : _style === "casual" ? 6 : 5
     readonly property rect figRect: {
         const h = Math.round(figureScale * height), w = Math.round(h * 0.75)
         // bottom-aligned; when taller than the screen, keep the ahoge ~2 % below the top edge
@@ -98,15 +99,16 @@ Item {
 
     // ---- the one red dot: her hair-clip bead, else bottom-right ----
     // red bead per style, in canvas uv after the head tilt (see the svg sources)
-    readonly property point clipUV: figureStyle === "cute" ? Qt.point(228.0 / 600, 214.4 / 800)   // hair-clip end
-                                                           : Qt.point(403.7 / 600, 402.7 / 800)   // earring
+    readonly property point clipUV: _style === "cute" ? Qt.point(228.0 / 600, 214.4 / 800)     // hair-clip end
+                                  : _style === "glam" ? Qt.point(399.67 / 600, 403.02 / 800)   // earring
+                                  : Qt.point(371.76 / 600, 301.37 / 800)                       // earring (casual)
     readonly property point redPos: showFigure
         ? Qt.point(figRect.x + (0.5 + (clipUV.x - 0.5) * (1 + breathe)) * figRect.width,
                    figRect.y + (1 + (clipUV.y - 1) * (1 + breathe)) * figRect.height)
         : Qt.point((Math.floor((width - 216) / pitch) + 0.5) * pitch,
                    (Math.floor((height - 168) / pitch) + 0.5) * pitch)
     readonly property real redR: showFigure ? Math.max(4.5, figRect.height / 800 * 5.5) : 0.5 * dotRatio * pitch
-    readonly property string _style: figureStyle === "cute" ? "cute" : "glam"
+    readonly property string _style: ["cute", "glam", "casual"].includes(figureStyle) ? figureStyle : "casual"
 
     readonly property bool useShader: GraphicsInfo.api !== GraphicsInfo.Software
                                       && shader.status !== ShaderEffect.Error
