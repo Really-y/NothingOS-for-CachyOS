@@ -63,8 +63,8 @@ for (const d of desktops()) {
     if (d.screen !== 0) continue;
     const have = d.widgets().map(w => w.type);
     const add = (id, x, y, w, h) => { if (have.indexOf(id) < 0) d.addWidget(id, x, y, w, h); };
-    add("org.nothing.clock", 40, 40, 352, 168);
-    add("org.nothing.weather", 40, 218, 168, 168);
-    add("org.nothing.system", 224, 218, 168, 168);
-    add("org.nothing.media", 40, 396, 352, 168);
+    add("org.nothing.clock", 32, 32, 400, 192);
+    add("org.nothing.weather", 32, 240, 192, 192);
+    add("org.nothing.system", 240, 240, 192, 192);
+    add("org.nothing.media", 32, 448, 400, 192);
 }
