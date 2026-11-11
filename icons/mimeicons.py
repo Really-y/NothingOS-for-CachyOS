@@ -134,6 +134,12 @@ def build(theme_dir, places):
         with open(os.path.join(d, name + ".svg"), "w") as fh:
             fh.write(appicons.svg(inner, c))
 
+    def recolourable(markup):
+        """Bare glyph (no disc/page behind it): use KDE's ColorScheme-Text convention so the icon
+        loader recolours it (white normally, dark on a selected/highlighted row)."""
+        return ('<defs><style id="current-color-scheme" type="text/css">.ColorScheme-Text { color:#ffffff; }</style></defs>'
+                + markup.replace('fill="#ffffff"', 'class="ColorScheme-Text" style="fill:currentColor"'))
+
     report = {"mimetypes": 0, "devices": 0, "places_small": 0, "by_symbol": {}}
     # mimetypes: page + glyph (glyph box = page width-ish so 48–58% of it is the ink)
     for n in mime_names():
@@ -149,15 +155,15 @@ def build(theme_dir, places):
     # devices: disc + glyph large, bare glyph small
     for n, sym in DEVICES.items():
         write("scalable/devices", n, f'<circle cx="32" cy="32" r="30" fill="{appicons.DISC}"/>' + glyph(sym, 64, 60, False), 64)
-        write("22/devices", n, glyph(sym, 22, 30, True), 22)
-        write("16/devices", n, glyph(sym, 16, 24, True), 16)
+        write("22/devices", n, recolourable(glyph(sym, 22, 30, True)), 22)
+        write("16/devices", n, recolourable(glyph(sym, 16, 24, True)), 16)
         report["devices"] += 1
     # places: bare glyph at 16/22 (the folder body + tiny glyph is unreadable there)
     for names, sym in places.items():
         sym = "folder" if sym is None else ("folder_open" if sym == "__open__" else sym)
         for n in names:
-            write("22/places", n, glyph(sym, 22, 30, True), 22)
-            write("16/places", n, glyph(sym, 16, 24, True), 16)
+            write("22/places", n, recolourable(glyph(sym, 22, 30, True)), 22)
+            write("16/places", n, recolourable(glyph(sym, 16, 24, True)), 16)
             report["places_small"] += 1
     return report
 
