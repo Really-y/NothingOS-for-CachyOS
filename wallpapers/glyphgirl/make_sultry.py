@@ -7,13 +7,13 @@ shoulder; irises shifted toward viewer-right (a side glance back at the viewer),
 slightly parted glossy lips. glam's hair-back / neck / body / hair-curtain are replaced by the
 fragment (hair-back, neck, body, rim, hair-curtain, hand groups). Non-explicit by design.
 
-The earring bead (red, drawn by the shader) hangs at canvas (330,302) -> see GlyphField.clipUV.
+The earring bead (red, drawn by the shader) hangs at canvas (370,332) -> see GlyphField.clipUV.
 """
 import os
 import re
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-HEAD = 'translate(74,28) scale(0.66) rotate(-12 300 480)'
+HEAD = 'translate(114,58) scale(0.66) rotate(-12 300 480)'
 GLANCE = 7          # iris shift toward viewer-right, eye-template units
 
 s = open(os.path.join(HERE, "glam.svg")).read()
@@ -31,30 +31,46 @@ s = s[:i] + glance(GLANCE, "eyeOpenR") + "\n" + glance(-GLANCE, "eyeOpenL") + s[
 s = s.replace('<use xlink:href="#eyeOpen" transform="translate(356,338) scale(1.25)"/>',
               '<use xlink:href="#eyeOpenR" transform="translate(356,338) scale(1.25)"/>')
 s = s.replace('<use xlink:href="#eyeOpen" transform="translate(244,338) scale(-1.25,1.25)"/>',
-              '<use xlink:href="#eyeOpenL" transform="translate(244,338) scale(-1.25,1.25)"/>')
+              '<use xlink:href="#eyeOpenL" transform="translate(262,340) scale(-0.72,0.95)"/>')
+s = s.replace('<use xlink:href="#eyeClosed" transform="translate(244,340) scale(-1.2,1.2)"/>',
+              '<use xlink:href="#eyeClosed" transform="translate(262,342) scale(-0.7,0.9)"/>')
 # catchlights follow the irises (viewer-right, a touch lower under the heavier lid)
-s = s.replace('<circle cx="242" cy="336" r="5.5" fill="#ffffff"/>', '<circle cx="250" cy="339" r="5.5" fill="#ffffff"/>')
+s = s.replace('<circle cx="242" cy="336" r="5.5" fill="#ffffff"/>', '<circle cx="266" cy="341" r="4" fill="#ffffff"/>')
 s = s.replace('<circle cx="347" cy="336" r="5.5" fill="#ffffff"/>', '<circle cx="358" cy="339" r="5.5" fill="#ffffff"/>')
 
 s = s.replace('<stop offset="1" stop-color="#8c8c8c"/>\n    </linearGradient>\n    <linearGradient id="shoulders"',
               '<stop offset="1" stop-color="#a6a6a6"/>\n    </linearGradient>\n    <linearGradient id="shoulders"', 1)
-# lips: slightly parted (dark gap instead of a line), deeper tone, fuller glossy lower lip, forced lower-lip highlight
-s = s.replace('<path fill="#595959" d="M 276,446', '<path fill="#3c3c3c" d="M 276,446')
-s = s.replace('<path d="M 276,446 Q 300,451 330,434" fill="none" stroke="#000000" stroke-width="4" stroke-linecap="round"/>',
-              '<path fill="#000000" d="M 276,446 Q 300,449 330,434 Q 302,457 276,446 Z"/>')
-s = s.replace('<path fill="#a6a6a6" d="M 282,449 C 292,462 316,460 324,442 C 312,452 292,452 282,449 Z"/>',
-              '<path fill="#7a7a7a" d="M 280,450 C 290,466 318,464 326,443 C 312,455 292,455 280,450 Z"/>')
-s = s.replace('<ellipse cx="306" cy="454" rx="5" ry="2.5" fill="#ffffff"/>',
-              '<ellipse cx="306" cy="458" rx="6" ry="3" fill="#ffffff"/>')
+# true three-quarter face: far (viewer-left) cheek turns away, the nose tip breaks its contour
+i = s.index('    <path id="faceShape"'); j = s.index('/>', i) + 2
+s = s[:i] + """    <path id="faceShape" d="M 236,286 C 240,236 268,212 316,212 C 366,212 402,236 402,290
+      L 402,352 C 402,402 378,440 340,470 C 324,482 308,490 294,490 C 280,490 270,482 266,472
+      C 260,458 262,444 268,428 C 262,424 254,418 252,410 C 250,402 254,396 262,392
+      C 252,384 240,378 234,368 C 230,352 236,340 232,326 C 228,312 232,298 236,286 Z\"/>""".replace('\\"', '"') + s[j:]
+# far brow foreshortened; nose bridge + nostril toward the far side
+s = s.replace('<use xlink:href="#brow" fill="#141414"/>',
+              '<use xlink:href="#brow" fill="#141414" transform="translate(280,0) scale(0.72,1) translate(-280,0)"/>')
+i = s.index('    <!-- nose: side shadow + tip -->'); j = s.index('    <!-- lips:')
+s = s[:i] + """    <!-- nose: bridge shadow toward the far side, tip on the contour, nostril -->
+    <path d="M 296,330 C 290,356 276,378 262,392" fill="none" stroke="#a6a6a6" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 266,412 L 276,414" stroke="#5a5a5a" stroke-width="4" stroke-linecap="round"/>
+""" + s[j:]
+# mouth: symmetric, softly parted; fuller lower lip with one highlight; no side tick
+i = s.index('    <!-- lips:'); j = s.index('\n', s.index('M 333,430 L 336,438')) + 1
+s = s[:i] + """    <!-- lips: softly parted, symmetric bow, fuller glossy lower lip -->
+    <path fill="#3c3c3c" d="M 282,444 C 290,438 298,435 304,439 C 310,435 318,438 326,444 C 314,447 294,447 282,444 Z"/>
+    <path fill="#000000" d="M 283,445 Q 304,449 325,445 Q 304,453 283,445 Z"/>
+    <path fill="#7a7a7a" d="M 286,450 C 292,464 316,464 322,450 C 312,454 296,454 286,450 Z"/>
+    <ellipse cx="304" cy="457" rx="5" ry="2.5" fill="#ffffff"/>
+""" + s[j:]
 
 # head groups: over-the-shoulder placement
 s = s.replace('transform="rotate(-5 300 480)"', 'transform="%s"' % HEAD)
 
 # earring: the chain hangs plumb from the lobe (canvas coords), clear of the tilted jaw;
-# the red bead below it is drawn by the shader at (330, 302) -> GlyphField.clipUV
+# the red bead below it is drawn by the shader at (370, 332) -> GlyphField.clipUV
 i = s.index('  <g id="clip"'); j = s.index('</g>', i) + 4
 s = s[:i] + '''  <g id="clip">
-    <path d="M 327,276 L 329,295" stroke="#a6a6a6" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M 367,306 L 369,325" stroke="#a6a6a6" stroke-width="3.5" stroke-linecap="round"/>
   </g>''' + s[j:]
 
 # replace hair-back .. hair-curtain (glam's front body) with the back-view fragment

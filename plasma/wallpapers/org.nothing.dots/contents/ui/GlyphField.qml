@@ -102,7 +102,7 @@ Item {
     readonly property point clipUV: _style === "cute" ? Qt.point(228.0 / 600, 214.4 / 800)     // hair-clip end
                                   : _style === "glam" ? Qt.point(399.67 / 600, 403.02 / 800)   // earring
                                   : _style === "casual" ? Qt.point(371.76 / 600, 301.37 / 800) // earring (casual)
-                                  : Qt.point(330.0 / 600, 302.0 / 800)                       // earring (sultry, over-the-shoulder head)
+                                  : Qt.point(370.0 / 600, 332.0 / 800)                       // earring (sultry, over-the-shoulder head)
     readonly property point redPos: showFigure
         ? Qt.point(figRect.x + (0.5 + (clipUV.x - 0.5) * (1 + breathe)) * figRect.width,
                    figRect.y + (1 + (clipUV.y - 1) * (1 + breathe)) * figRect.height)
