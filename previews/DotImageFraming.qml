@@ -2,7 +2,7 @@
 import QtQuick
 import "../plasma/wallpapers/org.nothing.dotimage/contents/ui" as Dot
 
-// org.nothing.dotimage framing on synthetic cards (tools/dotimage_testcard.py --all): each
+// org.nothing.dotimage framing (halftone look) on synthetic cards (tools/dotimage_testcard.py --all): each
 // frame is a full 1920x1080 screen scaled down. White border = picture edge, bars = TOP / BOTTOM.
 //   tools/render.sh previews/DotImageFraming.qml previews/dotimage-framing.png 1600 690
 Rectangle {
@@ -15,7 +15,7 @@ Rectangle {
         Item {
             width: 1920; height: 1080; scale: parent.width / 1920; transformOrigin: Item.TopLeft
             layer.enabled: true; layer.smooth: true; layer.mipmap: true
-            Dot.DotImageField { id: f; anchors.fill: parent; transitionMs: 0; animated: false; pitch: 6 }
+            Dot.DotImageField { id: f; anchors.fill: parent; transitionMs: 0; animated: false; pitch: 6; look: 1 }
         }
         Rectangle { anchors.fill: parent; color: "transparent"; border.color: "#2a2a2a"; border.width: 1 }
         Rectangle { x: 8; y: 8; width: lbl.width + 12; height: lbl.height + 6; color: "#000000" }

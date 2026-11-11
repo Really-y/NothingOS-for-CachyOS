@@ -37,8 +37,16 @@
       <label>Fill only: which part of a taller picture stays on screen (0 top, 0.5 centre, 1 bottom)</label>
       <default>0.3</default>
     </entry>
+    <entry name="Look" type="Int">
+      <label>0 = Glyph field (dim 24 px field + fine picture dots), 1 = Halftone (one grid)</label>
+      <default>0</default>
+    </entry>
+    <entry name="FinePitch" type="Int">
+      <label>Glyph field look: picture dot pitch in px (3, 4, 6 or 8), 0 = auto from the picture size</label>
+      <default>0</default>
+    </entry>
     <entry name="DotPitch" type="Int">
-      <label>Grid pitch in px (3..16)</label>
+      <label>Halftone look: grid pitch in px (3..16)</label>
       <default>5</default>
     </entry>
     <entry name="Levels" type="Int">

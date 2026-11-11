@@ -2,7 +2,7 @@
 import QtQuick
 import "../plasma/wallpapers/org.nothing.dotimage/contents/ui" as Dot
 
-// org.nothing.dotimage at 1:1 (no scaling): 1920x1080 screens, cropped, default settings
+// org.nothing.dotimage, HALFTONE look, at 1:1 (no scaling): 1920x1080 screens, cropped, default settings
 // unless labelled. Synthetic cards only (tools/dotimage_testcard.py --all).
 //   tools/render.sh previews/DotImageDetail.qml previews/dotimage-detail.png 1600 900
 Rectangle {
@@ -17,7 +17,7 @@ Rectangle {
             id: f; width: 1920; height: 1080
             x: -cr.at.x + cr.width / 2; y: -cr.at.y + cr.height / 2
             source: Qt.resolvedUrl("assets/dotimage-testcard.png")
-            transitionMs: 0; animated: false
+            transitionMs: 0; animated: false; look: 1   // halftone look
         }
         Rectangle { anchors.fill: parent; color: "transparent"; border.color: "#2a2a2a"; border.width: 1 }
         Rectangle { x: 8; y: 8; width: lbl.width + 12; height: lbl.height + 6; color: "#000000" }

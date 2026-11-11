@@ -53,6 +53,8 @@ WallpaperItem {
         source: root.slideshow ? root.slideUrl : root.toUrl(root.cfg.Image)
         fillMode: Math.max(0, Math.min(2, root.cfg.FillMode))
         focusY: Math.max(0, Math.min(1, root.cfg.FocusY))
+        look: root.cfg.Look === 1 ? 1 : 0
+        finePitch: [3, 4, 6, 8].includes(root.cfg.FinePitch) ? root.cfg.FinePitch : 0
         pitch: Math.max(3, Math.min(16, root.cfg.DotPitch))
         minDot: Math.max(0, Math.min(0.6, root.cfg.MinDotSize))
         levels: [0, 3, 4, 5, 6].includes(root.cfg.Levels) ? root.cfg.Levels : 6
@@ -140,7 +142,7 @@ WallpaperItem {
     Timer {   // one line in the journal so the active path is verifiable
         interval: 3000; running: true
         onTriggered: console.log("org.nothing.dotimage: renderer =", field.useShader ? "shader" : "canvas fallback",
-                                  "| animate =", field.animated, "| pitch =", field.pitch,
+                                  "| animate =", field.animated, "| look =", field.look === 0 ? "glyph" : "halftone", "| pitch =", field.dotPitch,
                                   "| mode =", root.slideshow ? "slideshow (" + folder.count + ")" : "single")
     }
 }

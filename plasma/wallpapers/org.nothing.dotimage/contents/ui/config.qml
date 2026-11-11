@@ -28,6 +28,10 @@ Kirigami.FormLayout {
     property real cfg_FocusY: 0.3
     property real cfg_FocusYDefault: 0.3
     property int cfg_FillModeDefault: 0
+    property int cfg_Look: 0
+    property int cfg_LookDefault: 0
+    property int cfg_FinePitch: 0
+    property int cfg_FinePitchDefault: 0
     property alias cfg_DotPitch: pitch.value
     property int cfg_DotPitchDefault: 5
     property int cfg_Levels: 6
@@ -204,8 +208,23 @@ Kirigami.FormLayout {
     Item { Kirigami.FormData.isSection: true }
 
     // ---- dots ------------------------------------------------------------------
+    QQC2.ComboBox {
+        Kirigami.FormData.label: "Look:"
+        model: ["Glyph field (fine dots over the dim field)", "Halftone (one dot grid)"]
+        currentIndex: root.cfg_Look === 1 ? 1 : 0
+        onActivated: index => root.cfg_Look = index
+    }
+    QQC2.ComboBox {
+        Kirigami.FormData.label: "Picture dots:"
+        visible: root.cfg_Look === 0
+        model: ["Auto (4 px, coarser for small pictures)", "3 px (finest)", "4 px", "6 px", "8 px"]
+        readonly property var values: [0, 3, 4, 6, 8]
+        currentIndex: Math.max(0, values.indexOf(root.cfg_FinePitch))
+        onActivated: index => root.cfg_FinePitch = values[index]
+    }
     QQC2.SpinBox {
         id: pitch
+        visible: root.cfg_Look === 1
         Kirigami.FormData.label: "Dot pitch:"
         from: 3; to: 16
         textFromValue: v => v + " px"
@@ -213,6 +232,7 @@ Kirigami.FormLayout {
     }
     QQC2.ComboBox {
         Kirigami.FormData.label: "Dot sizes:"
+        visible: root.cfg_Look === 1
         model: ["Smooth (continuous)", "3", "4", "5", "6 (default)"]
         readonly property var values: [0, 3, 4, 5, 6]
         currentIndex: Math.max(0, values.indexOf(root.cfg_Levels))
@@ -220,6 +240,7 @@ Kirigami.FormLayout {
     }
     RowLayout {
         Kirigami.FormData.label: "Smallest dot:"
+        visible: root.cfg_Look === 1
         QQC2.Slider { id: minDot; from: 0.0; to: 0.6; stepSize: 0.02 }
         QQC2.Label { text: Math.round(minDot.value * 100) + " %"; opacity: 0.7 }
     }
@@ -258,7 +279,7 @@ Kirigami.FormLayout {
         QQC2.Label { text: contrast.value.toFixed(2); opacity: 0.7 }
     }
     QQC2.CheckBox { id: edges; Kirigami.FormData.label: "Detail:"; text: "Sharpen edges (line art)" }
-    QQC2.CheckBox { id: bgGrid; text: "Faint background dot grid" }
+    QQC2.CheckBox { id: bgGrid; visible: root.cfg_Look === 1; text: "Faint background dot grid" }
 
     Item { Kirigami.FormData.isSection: true }
 

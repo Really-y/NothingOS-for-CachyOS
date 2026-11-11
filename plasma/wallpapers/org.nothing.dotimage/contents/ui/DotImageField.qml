@@ -7,11 +7,16 @@ import QtQuick.Window
 //
 // Two picture slots (A, B) ping-pong: a new `source` loads into the hidden slot, and once
 // the picture and its auto levels are ready, `fade` animates over so the dots morph from
-// the old picture to the new one. Each slot is the picture fitted to the screen and
-// shrunk by a ShaderEffectSource to 2 texels per grid cell (the shader samples cell centres).
+// the old picture to the new one. Each slot is the picture framed on the screen and
+// rendered by a ShaderEffectSource at 2 texels per (fine) dot cell, with mipmaps (the shader
+// samples cell centres; the Glyph look's soft mask reads a high mip).
+//
+// Looks: 0 "Glyph field" (org.nothing.dots language: dim 24 px field + the picture as a fine
+// dot matrix that feathers into it), 1 "Halftone" (one grid, quantised dot sizes).
 //
 // Timeline (pure function of `time`, s): cycle = 8 s, loop = 3 cycles = 24 s.
 //   0.00–0.32 cycle  Glyph band sweeps top-left -> bottom-right
+//   every 3rd cycle  Glyph look, mono + red: one ring ripples out of the red accent
 //   always           sparse twinkle, 4 s / 2 s periods (integer number per loop)
 Item {
     id: field
@@ -19,7 +24,16 @@ Item {
     property url source
     property int fillMode: 0              // 0 Fill (cover), 1 Fit (contain), 2 Center
     property real focusY: 0.3            // Fill only: 0 top … 0.5 centre … 1 bottom
-    property int pitch: 5
+    property int look: 0                  // 0 Glyph field, 1 Halftone
+    property int pitch: 5                 // halftone grid
+    property int finePitch: 0             // glyph look: picture dots 3/4/6/8 px (divide the 24 px
+                                          // field); 0 = auto from the picture's resolution
+    readonly property int fieldPitch: 24
+    // auto: each fine cell should cover >= ~1.6 source pixels, else the dots only show the
+    // source's grain (a 637 px wide picture on 1080p -> 6 px; anything >= ~1200 px -> 4 px)
+    readonly property real _srcScale: (slotA.source.toString() === source.toString() ? slotA : slotB).pxScale
+    readonly property int autoFine: [4, 6, 8].find(v => v >= 1.6 * _srcScale) || 8
+    readonly property int dotPitch: look === 0 ? ([3, 4, 6, 8].includes(finePitch) ? finePitch : autoFine) : pitch
     property real maxRatio: 0.84
     property real minDot: 0.18
     property int levels: 6                // 0 = continuous
@@ -45,10 +59,22 @@ Item {
         const x = l / d
         return x - Math.sin(2 * Math.PI * x) / (2 * Math.PI) * 0.5
     }
-    // true while the band is on screen (driver uses the higher frame rate)
-    readonly property bool active: sweep >= 0 || fadeAnim.running
+    readonly property var _red: front === 0 ? slotA : slotB
+    readonly property bool hasRipple: animated && look === 0 && colorMode === 2 && _red.redFrac > 0.0005
+    readonly property point ripple: {
+        if (!hasRipple || Math.floor(time / cycle) % 3 !== 2) return Qt.point(0, 0)
+        const q = ((time % cycle) - 0.45 * cycle) / (0.36 * cycle)
+        if (q < 0 || q >= 1) return Qt.point(0, 0)
+        const ease = 1 - Math.pow(1 - q, 3)
+        return Qt.point(ease * Math.max(width, height) * 0.55, Math.pow(1 - q, 1.6) * Math.min(1, q * 10))
+    }
+    // true while the band / ripple moves (driver uses the higher frame rate)
+    readonly property bool active: sweep >= 0 || ripple.y > 0 || fadeAnim.running
     // seconds until the next sweep starts (driver sleeps this long when nothing else moves)
-    readonly property real untilSweep: cycle - (time % cycle)
+    readonly property real untilSweep: {
+        const l = time % cycle
+        return hasRipple && Math.floor(time / cycle) % 3 === 2 && l < 0.45 * cycle ? 0.45 * cycle - l : cycle - l
+    }
 
     readonly property bool useShader: GraphicsInfo.api !== GraphicsInfo.Software
                                       && shader.status !== ShaderEffect.Error
@@ -87,10 +113,14 @@ Item {
         id: slot
         property alias source: img.source
         readonly property bool ready: source.toString() === ""
-            || ((img.status === Image.Ready || img.status === Image.Error) && (!field.autoLevels || probe.done))
+            || ((img.status === Image.Ready || img.status === Image.Error) && probe.done)
         readonly property vector3d levels: field.autoLevels ? probe.levels
             : Qt.vector3d(field.blackPoint, Math.max(field.blackPoint + 0.02, field.whitePoint), 1)
         readonly property alias texture: tex
+        readonly property real redFrac: probe.redFrac
+        readonly property real pxScale: img.status === Image.Ready ? img.s : 1   // screen px per decoded px
+        // red accent centroid on screen (picture uv -> frame px)
+        readonly property point redPos: Qt.point(img.x + probe.redUV.x * img.width, img.y + probe.redUV.y * img.height)
         width: field.width; height: field.height
         onReadyChanged: if (ready) field._tryFlip()
 
@@ -106,7 +136,9 @@ Item {
                 autoTransform: true
                 cache: false
                 smooth: true
-                mipmap: true                // trilinear shrink into the 2-texel-per-cell texture
+                // trilinear only when the picture is shrunk into the texture; a small picture
+                // being enlarged stays plain bilinear (mipmaps would only soften it)
+                mipmap: s * slot.texScale < 1
                 fillMode: Image.Stretch     // geometry below keeps the aspect ratio
                 // decode at most ~1.5x the screen's long side (Center keeps native pixels)
                 sourceSize: field.fillMode === 2 ? undefined
@@ -124,16 +156,18 @@ Item {
             }
         }
         readonly property int cap: Math.max(16, Math.round(1.5 * Math.max(width, height) * Screen.devicePixelRatio))
+        readonly property real texScale: tex.textureSize.width / Math.max(1, width)
         ShaderEffectSource {
             id: tex
             sourceItem: frame
             hideSource: true
             visible: false
             smooth: true
-            textureSize: Qt.size(Math.max(2, Math.ceil(field.width / field.pitch) * 2),
-                                 Math.max(2, Math.ceil(field.height / field.pitch) * 2))
+            mipmap: true                    // the Glyph look's soft mask reads a high mip
+            textureSize: Qt.size(Math.max(2, Math.ceil(field.width / field.dotPitch) * 2),
+                                 Math.max(2, Math.ceil(field.height / field.dotPitch) * 2))
         }
-        LevelProbe { id: probe; source: field.autoLevels ? img.source : ""; opacity: 0 }
+        LevelProbe { id: probe; source: img.source; opacity: 0 }
     }
 
     Slot { id: slotA }
@@ -149,7 +183,11 @@ Item {
             console.warn("org.nothing.dotimage: shader failed, using static Canvas:", log)
 
         property size res: Qt.size(width, height)
-        property real pitch: field.pitch
+        property real look: field.look
+        property real pitch: field.dotPitch
+        property real fieldPitch: field.fieldPitch
+        // blur ~ one field cell: texel = dotPitch / 2 px
+        property real maskLod: Math.max(0, Math.log(field.fieldPitch / (field.dotPitch / 2)) / Math.LN2 - 1)
         property real maxRatio: field.maxRatio
         property real minDot: Math.min(field.minDot, field.maxRatio - 0.05)
         property real levels: field.levels
@@ -162,7 +200,10 @@ Item {
         property real edge: field.edges ? 1 : 0
         property real bgOn: field.backgroundGrid ? 1 : 0
         property real bgLum: 0.10
+        property real base: 0.078                 // field dots ~#141414 .. #1c1c1c (org.nothing.dots)
         property real sweep: field.sweep
+        property point ripple: field.ripple
+        property point redPos: field._red.redPos
         property real twinkle: field.animated && field.twinkle ? 1 : 0
         property real phase: 2 * Math.PI * 6 * (field.time % field.loopLength) / field.loopLength
         property var srcA: slotA.texture

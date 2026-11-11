@@ -2,7 +2,7 @@
 import QtQuick
 import "../plasma/wallpapers/org.nothing.dotimage/contents/ui" as Dot
 
-// org.nothing.dotimage on a synthetic test card (previews/assets/dotimage-testcard.png,
+// org.nothing.dotimage, HALFTONE look, on a synthetic test card (previews/assets/dotimage-testcard.png,
 // made by tools/dotimage_testcard.py). Each frame is a full 1920x1080 screen scaled down.
 //   tools/render.sh previews/DotImagePreview.qml previews/dotimage-modes.png 1600 900
 // Optional env-free variants: DotImageDetail.qml (1:1 crops, two pitches).
@@ -19,7 +19,7 @@ Rectangle {
             Dot.DotImageField {
                 id: f; anchors.fill: parent
                 source: Qt.resolvedUrl("assets/dotimage-testcard.png")
-                transitionMs: 0; animated: false
+                transitionMs: 0; animated: false; look: 1   // halftone look
             }
         }
         Rectangle { anchors.fill: parent; color: "transparent"; border.color: "#2a2a2a"; border.width: 1 }
