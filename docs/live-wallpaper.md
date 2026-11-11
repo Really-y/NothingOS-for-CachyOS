@@ -102,14 +102,3 @@ QT_QPA_PLATFORMTHEME=kde tools/render.sh previews/LiveWallpaperDetail.qml  previ
 
 Preview files starting with `// render: rhi` render through offscreen OpenGL so
 the real shader is used.
-
-## 6. Content rules for this project
-
-Characters are original (no existing characters or copied artwork) and
-non-explicit.
-
-## 7. Settings and revert
-
-Right-click the desktop → *Configure Desktop and Wallpaper* → Style
-(Sultry / Casual / Glam / Cute), position, size, dot pitch, animation.
-`scripts/build-wallpaper.sh --revert` puts the static dot wallpaper back.
