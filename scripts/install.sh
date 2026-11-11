@@ -15,9 +15,24 @@ for k in "font:Inter,10,-1,5,400,0,0,0,0,0" "menuFont:Inter,10,-1,5,400,0,0,0,0,
 kw --file kdeglobals --group WM --key activeFont "Inter,10,-1,5,500,0,0,0,0,0"
 for g in gtk-3.0 gtk-4.0; do mkdir -p "$HOME/.config/$g"; kw --file "$HOME/.config/$g/settings.ini" --group Settings --key gtk-font-name "Inter 10"; done
 gsettings set org.gnome.desktop.interface font-name "Inter 10" 2>/dev/null || true
-echo "· kvantum";      mkdir -p "$HOME/.config/Kvantum"; cp -r "$ROOT/kvantum/NothingDark" "$HOME/.config/Kvantum/"
-kw --file "$HOME/.config/Kvantum/kvantum.kvconfig" --group General --key theme NothingDark
-kw --file kdeglobals --group KDE --key widgetStyle Breeze
+echo "· kvantum";      python3 "$ROOT/kvantum/gen_kvantum.py" >/dev/null; mkdir -p "$HOME/.config/Kvantum"
+# the old Orchis-based NothingDark must go: QT_STYLE_OVERRIDE=kvantum-dark resolves "<theme>Dark" first
+rm -rf "$HOME/.config/Kvantum/Nothing"; [ -d "$HOME/.config/Kvantum/NothingDark" ] && mv "$HOME/.config/Kvantum/NothingDark" "$D/nothingos-backup/kvantum-NothingDark-$(date +%s)"; cp -r "$ROOT/kvantum/Nothing" "$HOME/.config/Kvantum/"
+kw --file "$HOME/.config/Kvantum/kvantum.kvconfig" --group General --key theme Nothing
+kw --file kdeglobals --group KDE --key widgetStyle kvantum
+echo "· dolphin";      "$ROOT/scripts/dolphin.sh"
+# Flatpak Dolphin only sees Kvantum through the org.kde.KStyle.Kvantum extension (downloads from Flathub; opt-in)
+if flatpak info org.kde.dolphin >/dev/null 2>&1; then
+  RT=$(flatpak info -m org.kde.dolphin | sed -n 's|^runtime=org.kde.Platform/[^/]*/||p' | head -1)
+  if ! flatpak info "org.kde.KStyle.Kvantum//$RT" >/dev/null 2>&1; then
+    if [ "${NOTHING_FLATPAK_KVANTUM:-0}" = 1 ]; then
+      flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+      flatpak install --user -y --noninteractive flathub "org.kde.KStyle.Kvantum//$RT" || true
+    else
+      echo "  (Flatpak Dolphin: run with NOTHING_FLATPAK_KVANTUM=1 to install org.kde.KStyle.Kvantum//$RT)"
+    fi
+  fi
+fi
 echo "· decoration";   python3 "$ROOT/plasma/aurorae/gen_aurorae.py" >/dev/null; mkdir -p "$D/aurorae/themes"; rm -rf "$D/aurorae/themes/Nothing"; cp -r "$ROOT/plasma/aurorae/Nothing" "$D/aurorae/themes/"
 kw --file kwinrc --group org.kde.kdecoration2 --key library org.kde.kwin.aurorae
 kw --file kwinrc --group org.kde.kdecoration2 --key theme __aurorae__svg__Nothing
