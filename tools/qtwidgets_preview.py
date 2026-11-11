@@ -355,8 +355,9 @@ def gallery():
     w.resize(1000, 700)
     g = QGridLayout(w)
     g.setContentsMargins(24, 24, 24, 24)
-    g.setHorizontalSpacing(24)
-    g.setVerticalSpacing(14)
+    # leave the grid's spacing to the style: unequal h/v spacing makes the nested
+    # row layouts inherit -1 and collapse to 0px gaps (a harness bug, not the theme's)
+    g.setColumnMinimumWidth(1, 24)
 
     def label(t):
         lab = QLabel(t.upper())
@@ -497,7 +498,7 @@ def gallery():
     row.addWidget(tip_anchor)
     col.addWidget(label("Scrollbars · tooltip"))
     col.addLayout(row)
-    g.addLayout(col, 0, 1)
+    g.addLayout(col, 0, 2)
 
     w.show()
     app.processEvents()
