@@ -67,13 +67,18 @@ FocusScope {
             roundToIconSize: false
             animated: false
         }
-        DotString {
+        DotLetter {
             visible: !slot.info.themed && !slot.info.glyph && !slot.info.loading
             anchors.centerIn: parent
-            text: (slot.label.match(/[A-Za-z0-9]/) || ["?"])[0].toUpperCase()
-            pitch: Math.round(bar.iconSize / 11.5)   // 4px at 46: 5×7 letter fits inside the 43px disc
-            dotRatio: 0.7
-            color: Theme.fg
+            letter: (slot.label.match(/[A-Za-z0-9]/) || ["?"])[0].toUpperCase()
+        }
+        // hover: the disc brightens one step (#1a1a1a → ≈#222); white glyphs stay white
+        Rectangle {
+            anchors.centerIn: parent
+            width: parent.width * 60 / 64; height: width; radius: width / 2
+            color: "#ffffff"
+            opacity: slot.lifted ? 0.04 : 0
+            Behavior on opacity { NumberAnimation { duration: Theme.fast } }
         }
         // keyboard focus: thin white ring just outside the disc
         Rectangle {

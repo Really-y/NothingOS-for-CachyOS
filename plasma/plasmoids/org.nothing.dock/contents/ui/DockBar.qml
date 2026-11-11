@@ -12,9 +12,9 @@ FocusScope {
     property int spacing: 10
     property int padding: Math.round((pillHeight - iconSize) / 2)   // concentric end caps
     property color fill: Theme.card
-    // 68px pill: disc box 8–54, dots 58–62
+    // 68px pill: disc box 8–54 (visible disc ≈ 9.4–52.6), dots 56–60 → 8px bottom padding
     readonly property int iconY: pillHeight - iconSize - 14
-    readonly property int dotY: iconY + iconSize + 4
+    readonly property int dotY: iconY + iconSize + 2
 
     // (model) -> { themed: bool, icon: name/url, glyph: name/url } — how to draw the disc
     property var iconInfo: function (m) { return { themed: true, icon: m.decoration }; }
