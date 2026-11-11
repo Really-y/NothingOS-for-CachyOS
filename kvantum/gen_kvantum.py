@@ -29,6 +29,9 @@ DIM = "#5e5e5e"
 RED = "#d71921"
 NONE = None        # transparent element (exists, draws nothing)
 
+# Kvantum hard limits for item views (checked in its source): [ItemView] frames are capped at 6px
+# (ThemeConfig.cpp) and frame.expansion is clamped to h/2 while expansion needs min(w,h) <= it,
+# so view selections can never be pills nor have radius > 6px.  6px radius, no inset, is the max.
 STATES = ("normal", "focused", "pressed", "toggled", "disabled")
 
 svg = []
@@ -69,6 +72,30 @@ def box(name, state, fill, u=10):
     svg.append(f'<path id="{p}-topright" d="M{x1},{y0} V{y0+u} H{x1+u} A{u},{u} 0 0 0 {x1},{y0} Z" {f}/>')
     svg.append(f'<path id="{p}-bottomleft" d="M{x0+u},{y1+u} V{y1} H{x0} A{u},{u} 0 0 0 {x0+u},{y1+u} Z" {f}/>')
     svg.append(f'<path id="{p}-bottomright" d="M{x1},{y1+u} V{y1} H{x1+u} A{u},{u} 0 0 1 {x1},{y1+u} Z" {f}/>')
+
+
+def inset_box(name, state, fill, u=10, a=2):
+    """Square nine-slice whose shape sits a/u inside every outer edge (transparent band), so a
+    selection never touches the view edge.  Corners are true quarter circles of radius u-a, so the
+    shape stays circular when Kvantum scales the corners (frame.expansion -> full pills)."""
+    ox, oy = _place(3 * u, 3 * u)
+    f = _fill(fill)
+    T = 'fill="#000" fill-opacity="0"'
+    p = f"{name}-{state}"
+    c = u - a
+    svg.append(f'<rect id="{p}" x="{ox+u}" y="{oy+u}" width="{u}" height="{u}" {f}/>')
+    edges = {"top": (ox+u, oy, u, u, ox+u, oy+a, u, c), "bottom": (ox+u, oy+2*u, u, u, ox+u, oy+2*u, u, c),
+             "left": (ox, oy+u, u, u, ox+a, oy+u, c, u), "right": (ox+2*u, oy+u, u, u, ox+2*u, oy+u, c, u)}
+    for side, (bx, by, bw, bh, x, y, w, h) in edges.items():
+        svg.append(f'<g id="{p}-{side}"><rect x="{bx}" y="{by}" width="{bw}" height="{bh}" {T}/>'
+                   f'<rect x="{x}" y="{y}" width="{w}" height="{h}" {f}/></g>')
+    # corner piece box (bx,by); circle centre = inner corner (cx,cy)
+    corners = {"topleft": (ox, oy, ox+u, oy+u, -1, -1), "topright": (ox+2*u, oy, ox+2*u, oy+u, 1, -1),
+               "bottomleft": (ox, oy+2*u, ox+u, oy+2*u, -1, 1), "bottomright": (ox+2*u, oy+2*u, ox+2*u, oy+2*u, 1, 1)}
+    for k, (bx, by, cx, cy, sx, sy) in corners.items():
+        sweep = 1 if sx * sy > 0 else 0
+        d = f"M{cx+sx*c},{cy} A{c},{c} 0 0 {sweep} {cx},{cy+sy*c} L{cx},{cy} Z"
+        svg.append(f'<g id="{p}-{k}"><rect x="{bx}" y="{by}" width="{u}" height="{u}" {T}/><path d="{d}" {f}/></g>')
 
 
 def ring(name, state, color, sw=1.6, u=10):
@@ -129,11 +156,10 @@ boxes("lineedit", {"normal": S2, "focused": S4, "pressed": S4, "toggled": S4,
 boxes("combo", {"normal": S2, "focused": S3, "pressed": S4, "toggled": S4,
                 "disabled": "#0d0d0d"})
 # item views: hover = faint pill, selection = white pill (black text)
-boxes("itemview", {"normal": NONE, "focused": S2, "pressed": WHITE2, "toggled": WHITE,
-                   "disabled": NONE})
-box("itemview", "toggled-inactive", WHITE2)
-box("itemview", "pressed-inactive", WHITE2)
-box("itemview", "focused-inactive", S2)
+# ("pressed" = selected in the focused view, i.e. Dolphin's normal selection -> white too)
+for _st, _c in {"normal": NONE, "focused": S2, "pressed": WHITE, "toggled": WHITE, "disabled": NONE,
+                "toggled-inactive": WHITE2, "pressed-inactive": WHITE2, "focused-inactive": S2}.items():
+    inset_box("itemview", _st, _c, a=0)  # no room for an inset: see note below
 # tabs: pills; active = white
 boxes("tab", {"normal": NONE, "focused": S2, "pressed": S3, "toggled": WHITE,
               "disabled": NONE})
@@ -146,12 +172,12 @@ boxes("scrollbargroove", {"normal": NONE})
 # sliders: thick pill groove, white fill
 boxes("slider", {"normal": S4, "focused": S4, "pressed": S4, "toggled": WHITE, "disabled": S2})
 # menus / popups
-boxes("menu", {"normal": S1})
+boxes("menu", {"normal": S2})   # one surface grey for popups and cards
 boxes("menuitem", {"normal": NONE, "focused": WHITE, "pressed": WHITE2, "toggled": WHITE})
 boxes("menubar", {"normal": NONE})
 boxes("menubaritem", {"normal": NONE, "focused": S2, "pressed": S3, "toggled": S3})
 boxes("tooltip", {"normal": S2})
-boxes("group", {"normal": S1})
+boxes("group", {"normal": S2})
 boxes("common", {"normal": NONE, "focused": NONE})
 boxes("header", {"normal": NONE, "focused": S1, "pressed": S2, "toggled": NONE})
 boxes("toolbar", {"normal": NONE})
@@ -160,12 +186,16 @@ boxes("splitter", {"normal": NONE, "focused": NONE, "pressed": NONE})
 boxes("focus", {"normal": NONE})
 boxes("statusbar", {"normal": NONE})
 boxes("window", {"normal": BLACK})
-boxes("progress", {"normal": NONE})
-boxes("progress-pattern", {"normal": NONE, "disabled": NONE})
 
 # progress: dot rows (tiled interior patterns; 1 tile = one dot)
-for eid, c in (("progress-normal", S4), ("progress-pattern-normal", WHITE),
-               ("progress-pattern-disabled", DIM)):
+# groove: dim dot tiles + its right frame piece = one whole dim dot, so the bar always ends on a dot;
+# fill: white dot tiles + its right frame piece ("tip") = one whole white dot, so a cut falls inside
+# NOTE: one-dot end pieces were tried (round 3) and rejected: Kvantum forces the groove's
+# left = right frame width and tiles the interior from the left, so an end piece lands off the
+# 12px grid and merges with a clipped interior dot.  Plain tiling is the cleanest available.
+for eid, c in [(f"{base}{side}", col) for base, col in (("progress-normal", S4), ("progress-pattern-normal", WHITE),
+                                                      ("progress-pattern-disabled", DIM), ("progress-pattern-focused", WHITE))
+               for side in ("", "-left", "-right")]:
     ox, oy = _place(12, 12)
     svg.append(f'<g id="{eid}" transform="translate({ox},{oy})">'
                f'<rect width="12" height="12" fill="#000" fill-opacity="0"/>'
@@ -676,10 +706,10 @@ frame.expansion=0
 inherits=PanelButtonCommand
 frame.element=itemview
 interior.element=itemview
-frame.top=10
-frame.bottom=10
-frame.left=10
-frame.right=10
+frame.top=6
+frame.bottom=6
+frame.left=6
+frame.right=6
 frame.expansion=0
 text.normal.color={WHITE}
 text.focus.color={WHITE}

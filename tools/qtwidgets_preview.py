@@ -56,12 +56,14 @@ import re  # noqa: E402
 
 _THEMES = [os.path.expanduser("~/.local/share/icons/Nothing"), "/usr/share/icons/Papirus-Dark",
            "/usr/share/icons/Papirus", "/usr/share/icons/breeze-dark", "/usr/share/icons/hicolor"]
-_SIZES = ["22", "22x22", "24", "24x24", "scalable", "48", "48x48", "64x64", "32x32", "16x16"]
+_SMALL = ["22", "22x22", "24", "24x24", "16x16", "scalable", "32x32", "48", "48x48", "64x64"]
+_LARGE = ["scalable", "64x64", "48", "48x48", "32x32", "24x24", "24", "22", "22x22", "16x16"]
 
 
-def _find_svg(name):
+def _find_svg(name, px=22):
+    """Like KIconLoader: per theme (in inheritance order) pick the directory closest to px."""
     for root in _THEMES:
-        for sz in _SIZES:
+        for sz in (_SMALL if px <= 24 else _LARGE):
             d = os.path.join(root, sz)
             if not os.path.isdir(d):
                 continue
@@ -73,20 +75,26 @@ def _find_svg(name):
 
 
 class KdeLikeEngine(QIconEngine):
-    def __init__(self, path):
+    def __init__(self, name):
         super().__init__()
-        self.path = path
-        with open(path, "rb") as fh:
-            self.src = fh.read().decode("utf-8", "replace")
+        self.name = name
+        self.cache = {}
 
     def clone(self):
-        return KdeLikeEngine(self.path)
+        return KdeLikeEngine(self.name)
+
+    def src(self, px):
+        path = _find_svg(self.name, px)
+        if path not in self.cache:
+            with open(path, "rb") as fh:
+                self.cache[path] = fh.read().decode("utf-8", "replace")
+        return self.cache[path]
 
     def paint(self, painter, rect, mode, state):
         pal = QApplication.palette()
         col = pal.color(QPalette.ColorRole.HighlightedText if mode == QIcon.Mode.Selected
                         else QPalette.ColorRole.Text).name()
-        svg = re.sub(r"\.ColorScheme-Text\s*\{\s*color:\s*#[0-9a-fA-F]+", ".ColorScheme-Text { color:" + col, self.src)
+        svg = re.sub(r"\.ColorScheme-Text\s*\{\s*color:\s*#[0-9a-fA-F]+", ".ColorScheme-Text { color:" + col, self.src(rect.height()))
         r = QSvgRenderer(QByteArray(svg.encode()))
         if mode == QIcon.Mode.Disabled:
             painter.setOpacity(0.4)
@@ -102,13 +110,45 @@ class KdeLikeEngine(QIconEngine):
 
 
 def kicon(name):
-    path = _find_svg(name)
-    return QIcon(KdeLikeEngine(path)) if path else QIcon.fromTheme(name)
+    return QIcon(KdeLikeEngine(name)) if _find_svg(name) else QIcon.fromTheme(name)
+
+
+class HoverButton(QPushButton):
+    """Forced-hover sample: the real style draws it with State_MouseOver (offscreen has no pointer)."""
+    def paintEvent(self, e):
+        from PyQt6.QtWidgets import QStyle, QStyleOptionButton, QStylePainter
+        opt = QStyleOptionButton()
+        self.initStyleOption(opt)
+        opt.state |= QStyle.StateFlag.State_MouseOver
+        opt.styleObject = None  # skip Kvantum's "hover bug" check (QCursor is outside offscreen)
+        p = QStylePainter(self)
+        p.drawControl(QStyle.ControlElement.CE_PushButton, opt)
+
+
+class HoverToolButton(QToolButton):
+    def paintEvent(self, e):
+        from PyQt6.QtWidgets import QStyle, QStyleOptionToolButton, QStylePainter
+        opt = QStyleOptionToolButton()
+        self.initStyleOption(opt)
+        opt.state |= QStyle.StateFlag.State_MouseOver | QStyle.StateFlag.State_Raised
+        opt.styleObject = None
+        p = QStylePainter(self)
+        p.drawComplexControl(QStyle.ComplexControl.CC_ToolButton, opt)
 
 
 def hover(w):
-    w.setAttribute(Qt.WidgetAttribute.WA_UnderMouse, True)
+    """Mark a widget as hovered.  Qt recomputes WA_UnderMouse on show, so force_hover()
+    re-applies it after the window is visible (offscreen has no real pointer)."""
+    w.setProperty("_force_hover", True)
     return w
+
+
+def force_hover(root):
+    for c in root.findChildren(QWidget):
+        if c.property("_force_hover"):
+            c.setAttribute(Qt.WidgetAttribute.WA_Hover, True)
+            c.setAttribute(Qt.WidgetAttribute.WA_UnderMouse, True)
+            c.update()
 
 
 def tbtn(icon, checkable=False, checked=False, text=None):
@@ -332,7 +372,7 @@ def gallery():
     d.setDefault(True)
     row.addWidget(d)
     row.addWidget(QPushButton("Normal"))
-    row.addWidget(hover(QPushButton("Hover")))
+    row.addWidget(HoverButton("Hover"))
     dis = QPushButton("Disabled")
     dis.setEnabled(False)
     row.addWidget(dis)
@@ -344,7 +384,11 @@ def gallery():
     row.addWidget(t)
     row.addWidget(QPushButton(kicon("document-save"), "Save"))
     row.addWidget(tbtn("go-previous"))
-    row.addWidget(hover(tbtn("go-next")))
+    hb = HoverToolButton()
+    hb.setIcon(kicon("go-next"))
+    hb.setIconSize(QSize(22, 22))
+    hb.setAutoRaise(True)
+    row.addWidget(hb)
     row.addWidget(tbtn("view-list-icons", True, True))
     row.addStretch(1)
     col.addLayout(row)
@@ -460,6 +504,7 @@ def gallery():
     w.activateWindow()
     le2.setFocus()
     settle()
+    force_hover(w)  # right before grab: event processing would clear it again
     pm = w.grab()
     QToolTip.showText(tip_anchor.mapToGlobal(QPoint(0, 0)), "Tooltip in a #1a1a1a pill", tip_anchor)
     app.processEvents()
