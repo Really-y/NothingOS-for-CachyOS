@@ -19,7 +19,7 @@ Rectangle {
         const o = {}; for (const k of n) o[k + "-symbolic"] = true;
         // theme glyph files written by icons/appicons.py (installed in ~/.local/share/icons/Nothing)
         o["nothing-glyph-icon-firefox"] = true;
-        for (const id of ["Alacritty", "FreeTube", "alacritty-terminal", "com.anydesk.Anydesk", "com.brave.Browser", "com.google.Chrome", "discord", "firefox", "localsend", "mpv", "org.gnome.Meld", "org.gnome.Nautilus", "org.kde.discover", "org.kde.dolphin", "org.kde.spectacle", "org.qbittorrent.qBittorrent", "org.telegram.desktop", "steam", "systemsettings", "vscodium"]) o["nothing-glyph-" + id] = true;
+        for (const id of ["vesktop", "steam", "com.rtosta.zapzap", "Alacritty", "FreeTube", "alacritty-terminal", "com.anydesk.Anydesk", "com.brave.Browser", "com.google.Chrome", "discord", "firefox", "localsend", "mpv", "org.gnome.Meld", "org.gnome.Nautilus", "org.kde.discover", "org.kde.dolphin", "org.kde.spectacle", "org.qbittorrent.qBittorrent", "org.telegram.desktop", "steam", "systemsettings", "vscodium"]) o["nothing-glyph-" + id] = true;
         return o;
     }
     // same distinct assignment main.qml does over the installed apps

@@ -45,6 +45,17 @@ PlasmoidItem {
     }
     // row 0 = "All Applications" (flat, alphabetical AppsModel)
     property var allApps: null
+    // extra .desktop entries of an app that's already listed (same glyph, same app)
+    readonly property var hiddenIds: ["org.kde.kdeconnect.nonplasma", "org.kde.kdeconnect.sms"]
+    KItemModels.KSortFilterProxyModel {
+        id: visibleApps
+        sourceModel: root.allApps
+        filterRowCallback: (row, parent) => {
+            const id = String(sourceModel.data(sourceModel.index(row, 0, parent), sourceModel.KItemModels.KRoleNames.role("favoriteId")))
+                .replace(/^applications:/, "").replace(/\.desktop$/, "");
+            return root.hiddenIds.indexOf(id) < 0;
+        }
+    }
     readonly property var favorites: rootModel.favoritesModel
 
     readonly property Kicker.RunnerModel runnerModel: Kicker.RunnerModel {
@@ -76,7 +87,10 @@ PlasmoidItem {
     function resolve(zone, row) {
         const searching = fullRepresentationItem && fullRepresentationItem.panel.searching;
         if (zone === 0) return { model: favorites, row: row };
-        if (zone === 1 && !searching) return { model: allApps, row: row };
+        if (zone === 1 && !searching) {
+            const src = visibleApps.mapToSource(visibleApps.index(row, 0));
+            return { model: allApps, row: src.row };
+        }
         const proxy = zone === 1 ? runnerApps : runnerOther;
         const src = proxy.mapToSource(proxy.index(row, 0));
         return { model: runnerMatches, row: src.row };
@@ -225,11 +239,11 @@ PlasmoidItem {
 
             pinnedModel: root.favorites
             pinnedCount: root.favorites ? root.favorites.count : 0
-            appsModel: searching ? runnerApps : root.allApps
-            appsCount: searching ? runnerApps.count : (root.allApps ? root.allApps.count : 0)
+            appsModel: searching ? runnerApps : visibleApps
+            appsCount: searching ? runnerApps.count : visibleApps.count
             resultsModel: runnerOther
             resultsCount: runnerOther.count
-            totalApps: root.allApps ? root.allApps.count : 0
+            totalApps: visibleApps.count
             busy: root.runnerModel.querying
             symbolicNames: root.symbolicNames
             glyphMap: root.glyphMap

@@ -146,7 +146,8 @@ if __name__ == "__main__":
     print("wrote", len(os.listdir(d)), "place icons to", OUT)
     import appicons
     rep = appicons.build(OUT)
-    print(f"apps: {len(rep['symbol'])} Material symbols, {len(rep['dot'])} dot-letter fallbacks, "
+    nb = sum("brand:" in l for l in rep["symbol"])
+    print(f"apps: {nb} brand marks, {len(rep['symbol']) - nb} Material symbols, {len(rep['dot'])} dot-letter fallbacks, "
           f"{rep['dock_icons']} dock icons; not themed in the dock: {', '.join(rep['dock_skipped'])}")
     for line in rep["dot"]:
         print("  dot:", line)

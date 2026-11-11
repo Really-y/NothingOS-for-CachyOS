@@ -243,7 +243,8 @@ Item {
                             width: 40; height: 40; radius: 20
                             x: 8; anchors.verticalCenter: parent.verticalCenter
                             color: row.selected && root.keyboardNav ? Theme.fg : (row.selected ? Theme.card3 : root.widgetFill)
-                            MonoIcon { anchors.centerIn: parent; size: 18; discSize: 40; source: row.model.decoration; hint: "";   // results: match by icon name only (a file named "firefox…" is not a browser)
+                            MonoIcon { anchors.centerIn: parent; size: 22; discSize: 40;   // glyph ≈ 54% of the disc, like the tiles
+                                 source: row.model.decoration; hint: "";   // results: match by icon name only (a file named "firefox…" is not a browser)
                                  favoriteId: row.model.favoriteId || ""; label: row.model.display || ""; symbolicNames: root.symbolicNames; dark: row.selected && root.keyboardNav }
                         }
                         Column {
@@ -333,7 +334,7 @@ Item {
                 readonly property bool target: cell.selected && !focused        // Enter target while typing
                 color: focused ? Theme.fg : (target ? "#2a2a2a" : (cell.containsMouse ? Theme.card3 : panel.widgetFill))
                 Behavior on color { ColorAnimation { duration: Theme.fast } }
-                MonoIcon { anchors.centerIn: parent; size: 28; discSize: 64; source: cell.model.decoration;   // themed apps: the theme's glyph at disc size
+                MonoIcon { anchors.centerIn: parent; size: 35; discSize: 64; source: cell.model.decoration;   // themed apps: the theme's glyph at disc size
                      favoriteId: cell.model.favoriteId || ""; label: cell.model.display || ""; hint: (cell.model.display || "") + " " + (cell.model.description || ""); key: cell.model.decoration + "|" + cell.model.display; glyphMap: panel.glyphMap; symbolicNames: panel.symbolicNames; dark: disc.focused }
             }
             Text {
