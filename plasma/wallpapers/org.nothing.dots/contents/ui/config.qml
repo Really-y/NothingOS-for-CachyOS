@@ -19,8 +19,8 @@ Kirigami.FormLayout {
     property bool cfg_PointerGlowDefault: false
     property alias cfg_ShowCharacter: character.checked
     property bool cfg_ShowCharacterDefault: true
-    property string cfg_CharacterStyle: "casual"
-    property string cfg_CharacterStyleDefault: "casual"
+    property string cfg_CharacterStyle: "sultry"
+    property string cfg_CharacterStyleDefault: "sultry"
     property alias cfg_CharacterPosition: charPos.value
     property real cfg_CharacterPositionDefault: 0.75
     property alias cfg_CharacterScale: charScale.value
@@ -50,8 +50,8 @@ Kirigami.FormLayout {
     QQC2.CheckBox { id: character; Kirigami.FormData.label: "Character:"; text: "Dot-matrix anime character" }
     QQC2.ComboBox {
         Kirigami.FormData.label: "Style:"
-        model: ["Casual", "Glam", "Cute"]
-        readonly property var values: ["casual", "glam", "cute"]
+        model: ["Sultry", "Casual", "Glam", "Cute"]
+        readonly property var values: ["sultry", "casual", "glam", "cute"]
         currentIndex: Math.max(0, values.indexOf(root.cfg_CharacterStyle))
         onActivated: index => root.cfg_CharacterStyle = values[index]
         enabled: character.checked

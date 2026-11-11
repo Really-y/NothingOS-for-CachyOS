@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Bake each character style into the two textures the org.nothing.dots shader samples.
 
-styles: cute = girl.svg, glam = glam.svg, casual = casual.svg  ->  figure-<style>.png, figure-<style>-aux.png
+styles: cute = girl.svg, glam = glam.svg, casual = casual.svg, sultry = sultry.svg  ->  figure-<style>.png, figure-<style>-aux.png
 
 figure-*.png    R = luminance, eyes open      G = luminance, eyes closed
                 B = silhouette (coverage)
@@ -24,7 +24,7 @@ from PIL import Image, ImageFilter
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "..", "..", "plasma", "wallpapers", "org.nothing.dots", "contents", "ui")
-STYLES = {"cute": "girl.svg", "glam": "glam.svg", "casual": "casual.svg"}
+STYLES = {"cute": "girl.svg", "glam": "glam.svg", "casual": "casual.svg", "sultry": "sultry.svg"}
 SVG = ""
 W, H = 600, 800          # canvas
 TW, TH = 600, 800        # texture (1 canvas px per texel: 1-dot features survive)

@@ -1,0 +1,19 @@
+  <g id="body">
+    <!-- body turned ~25deg away: near (viewer-left) shoulder broader, far shoulder foreshortened;
+         shoulders slope from the neck to rounded caps -->
+    <path fill="url(#skinBody)" d="M 282,404 L 318,404 C 322,426 344,436 384,442 C 426,448 452,460 458,490
+      L 458,506 L 144,506 L 146,490 C 152,462 178,450 214,444 C 258,436 278,426 282,404 Z"/>
+    <path fill="none" stroke="#7a7a7a" stroke-width="5" stroke-linecap="round"
+          d="M 290,440 C 266,448 240,452 214,458 M 312,440 C 334,447 356,450 378,454"/>
+    <!-- sleeves (slightly darker, tapering), separated from the torso by a negative-space gap -->
+    <path fill="#333333" d="M 144,500 C 136,600 132,700 140,830 L 184,830 C 186,730 190,640 198,560 L 200,500 Z"/>
+    <path fill="#333333" d="M 458,500 C 464,590 466,700 460,830 L 424,830 C 424,730 426,640 432,560 L 434,500 Z"/>
+    <!-- fitted bodice: soft convex neckline, waist, flare to the hip, waved hem off-frame -->
+    <path fill="#3a3a3a" d="M 212,504 C 280,496 350,496 424,504 C 420,560 408,640 402,712
+      C 400,750 412,790 420,830 L 214,830 C 222,790 232,750 230,712 C 224,640 216,560 212,504 Z"/>
+    <!-- binding along the neckline (light), drape folds >= 2 dots wide, lit near rim -->
+    <path fill="none" stroke="#8c8c8c" stroke-width="6" stroke-linecap="round" d="M 146,503 C 250,494 360,494 456,503"/>
+    <path fill="none" stroke="#262626" stroke-width="9" stroke-linecap="round"
+          d="M 252,560 C 292,600 332,628 372,646 M 240,646 C 284,680 334,702 394,712 M 300,744 C 330,764 356,792 372,826"/>
+    <path fill="none" stroke="#5a5a5a" stroke-width="8" stroke-linecap="round" d="M 142,520 C 136,610 134,700 142,810"/>
+  </g>

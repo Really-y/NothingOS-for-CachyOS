@@ -30,8 +30,8 @@
       <default>true</default>
     </entry>
     <entry name="CharacterStyle" type="String">
-      <label>Character style: casual (waist-up, relaxed outfit), glam (portrait) or cute</label>
-      <default>casual</default>
+      <label>Character style: sultry (elegant dress), casual, glam (portrait) or cute</label>
+      <default>sultry</default>
     </entry>
     <entry name="CharacterPosition" type="Double">
       <label>Character horizontal centre, fraction of screen width</label>
