@@ -1,31 +1,46 @@
 #!/usr/bin/env python3
-"""Render the Nothing Kvantum theme offscreen -> previews/qt-dolphin.png, previews/qt-widgets.png
+"""Render the Nothing Kvantum themes offscreen -> previews/qt-dolphin.png, previews/qt-widgets.png
 
-Uses the real Kvantum style plugin with the theme from kvantum/Nothing (via a
-private XDG_CONFIG_HOME, so the user's live config is never touched), the real
-Nothing icon theme, and Inter as UI font.  Usage: tools/qtwidgets_preview.py [theme]
+Uses the real Kvantum style plugin with kvantum/Nothing and kvantum/NothingFiles (via a
+private XDG_CONFIG_HOME whose kvantum.kvconfig mirrors the live one, incl. the
+[Applications] NothingFiles=dolphin mapping, so the user's config is never touched), the
+real Nothing icon theme and Inter.  Each part runs in its own process because Kvantum picks
+the theme from the application name once:  the Dolphin mock runs as "dolphin".
+
+Both parts verify their selections: label pixels inside a selected row must contrast with
+the selection fill, in an active AND an inactive window (exit status 1 otherwise).
+Usage: tools/qtwidgets_preview.py            (runs both parts)
 """
 import os
+import subprocess
 import sys
 import tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-THEME = sys.argv[1] if len(sys.argv) > 1 else "Nothing"
+PART = sys.argv[1] if len(sys.argv) > 1 else None
+if PART is None:
+    rc = 0
+    for part in ("dolphin", "widgets"):
+        rc |= subprocess.call([sys.executable, os.path.abspath(__file__), part])
+    sys.exit(rc)
 
-# private config dir: Kvantum/kvantum.kvconfig -> theme, Kvantum/<theme> -> repo copy
 cfg = tempfile.mkdtemp(prefix="kvprev-")
 os.makedirs(os.path.join(cfg, "Kvantum"))
-src = os.path.join(ROOT, "kvantum", THEME)
-if os.path.isdir(src):
-    os.symlink(src, os.path.join(cfg, "Kvantum", THEME))
+for t in ("Nothing", "NothingFiles"):
+    os.symlink(os.path.join(ROOT, "kvantum", t), os.path.join(cfg, "Kvantum", t))
 with open(os.path.join(cfg, "Kvantum", "kvantum.kvconfig"), "w") as f:
-    f.write(f"[General]\ntheme={THEME}\n")
+    # PREVIEW_NO_APPTHEME=1 reproduces the live bug (Dolphin on the plain theme)
+    f.write("[General]\ntheme=Nothing\n" + ("" if os.environ.get("PREVIEW_NO_APPTHEME")
+                                             else "\n[Applications]\nNothingFiles=dolphin\n"))
 os.environ["XDG_CONFIG_HOME"] = cfg
 os.environ["QT_QPA_PLATFORM"] = "offscreen"
 os.environ.pop("QT_STYLE_OVERRIDE", None)
 
 from PyQt6.QtCore import QPoint, QSize, Qt  # noqa: E402
 from PyQt6.QtGui import QAction, QColor, QFont, QIcon, QPainter, QPixmap  # noqa: E402
+from PyQt6.QtCore import QRect  # noqa: E402
+from PyQt6.QtGui import QPalette as _QP  # noqa: E402,F401
+from PyQt6.QtWidgets import QStyle, QStyledItemDelegate, QStyleOptionViewItem  # noqa: E402
 from PyQt6.QtWidgets import (  # noqa: E402
     QAbstractItemView, QApplication, QCheckBox, QComboBox, QFrame, QGridLayout, QGroupBox,
     QHBoxLayout, QLabel, QLineEdit, QListView, QListWidget, QListWidgetItem, QMainWindow,
@@ -34,6 +49,7 @@ from PyQt6.QtWidgets import (  # noqa: E402
     QTreeWidgetItem, QVBoxLayout, QWidget)
 
 app = QApplication(sys.argv)
+app.setApplicationName("dolphin" if PART == "dolphin" else "qtwidgets-preview")
 # the session exports QT_STYLE_OVERRIDE=kvantum-dark, which resolves <theme>Dark first
 style = QApplication.setStyle("kvantum-dark") or QApplication.setStyle("kvantum")
 if style is None:
@@ -181,6 +197,132 @@ def composite(base, popup, pos):
     return pm
 
 
+# ── selection contrast check ──────────────────────────────────────────────
+def check_selection(img, rect, label):
+    """In a selected row, count pixels of the fill colour vs pixels far from it (= label/glyph).
+    Fails if the label is invisible (no pixel differs strongly from the fill)."""
+    from collections import Counter
+    px = Counter(img.pixelColor(x, y).name() for x in range(rect.left() + 2, rect.right() - 2)
+                 for y in range(rect.top() + 2, rect.bottom() - 2))
+    fill = QColor(px.most_common(1)[0][0])
+    far = sum(n for c, n in px.items() if abs(QColor(c).lightness() - fill.lightness()) > 110)
+    ok = far > 40
+    print(f"  {label}: fill {fill.name()}, label pixels {far} -> {'OK' if ok else 'INVISIBLE'}")
+    if not ok:
+        FAIL.append(label)
+
+
+class DolphinDelegate(QStyledItemDelegate):
+    """Paints like Dolphin's KStandardItemListWidget (kitemlistwidget.cpp / kstandarditemlistwidget.cpp,
+    release/26.04): style PE_PanelItemViewItem with State_Selected (+State_Active only when the window is
+    active and the view focused), then a Normal-mode icon and the label in QPalette::Text --
+    Dolphin does NOT use HighlightedText for selected items (only while pressed)."""
+    def __init__(self, view, icons_layout=False):
+        super().__init__(view)
+        self.view = view
+        self.icons = icons_layout
+
+    def paint(self, p, option, index):
+        o = QStyleOptionViewItem(option)
+        sel = bool(option.state & QStyle.StateFlag.State_Selected)
+        o.state = QStyle.StateFlag.State_Enabled | QStyle.StateFlag.State_Item
+        if sel:
+            o.state |= QStyle.StateFlag.State_Selected
+            if self.view.isActiveWindow() and self.view.hasFocus():
+                o.state |= QStyle.StateFlag.State_Active
+        if sel or (option.state & QStyle.StateFlag.State_MouseOver):
+            if not sel:
+                o.state |= QStyle.StateFlag.State_MouseOver
+            self.view.style().drawPrimitive(QStyle.PrimitiveElement.PE_PanelItemViewItem, o, p, self.view)
+        icon = index.data(Qt.ItemDataRole.DecorationRole)
+        text = index.data(Qt.ItemDataRole.DisplayRole) or ""
+        r = option.rect
+        group = (QPalette.ColorGroup.Active if self.view.isActiveWindow() and self.view.hasFocus()
+                 else QPalette.ColorGroup.Inactive)
+        if not (index.flags() & Qt.ItemFlag.ItemIsEnabled):
+            p.setPen(QColor("#8e8e8e"))
+        else:
+            p.setPen(option.palette.color(group, QPalette.ColorRole.Text))
+        isz = self.view.iconSize()
+        if self.icons:
+            if icon:
+                icon.paint(p, QRect(r.center().x() - isz.width() // 2, r.top() + 8, isz.width(), isz.height()))
+            p.drawText(QRect(r.left() + 4, r.top() + 12 + isz.height(), r.width() - 8, 40),
+                       Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop | Qt.TextFlag.TextWordWrap, text)
+        else:
+            x = r.left() + 10
+            if icon:
+                icon.paint(p, QRect(x, r.center().y() - isz.height() // 2, isz.width(), isz.height()))
+                x += isz.width() + 10
+            p.drawText(QRect(x, r.top(), r.right() - x, r.height()), Qt.AlignmentFlag.AlignVCenter, text)
+
+    def sizeHint(self, option, index):
+        return QSize(120, 132) if self.icons else QSize(200, 36)
+
+
+def places_panel(delegate):
+    lv = QListWidget()
+    lv.setFrameShape(QFrame.Shape.NoFrame)
+    lv.setIconSize(QSize(20, 20))
+    for ic, name in (("user-home", "Home"), ("user-desktop", "Desktop"), ("folder-download", "Downloads")):
+        lv.addItem(QListWidgetItem(kicon(ic), name))
+    if delegate:
+        lv.setItemDelegate(DolphinDelegate(lv))
+    lv.setCurrentRow(0)
+    return lv
+
+
+def window_states(delegate, title):
+    """Two copies of a Places-like panel: one in the active, focused window, one in an inactive window."""
+    out = []
+    inactive = QWidget()
+    inactive.resize(230, 130)
+    QVBoxLayout(inactive).addWidget(places_panel(delegate))
+    active = QWidget()
+    active.resize(230, 130)
+    lv = places_panel(delegate)
+    QVBoxLayout(active).addWidget(lv)
+    inactive.show()
+    active.show()
+    active.activateWindow()
+    lv.setFocus()
+    settle()
+    for w, state in ((active, "active"), (inactive, "inactive")):
+        view = w.findChild(QListWidget)
+        img = w.grab().toImage()
+        rect = view.visualItemRect(view.item(0)).translated(view.viewport().mapTo(w, QPoint(0, 0)))
+        check_selection(img, rect, f"{title} {state} window ({'active' if w.isActiveWindow() else 'inactive'})")
+        out.append((state, w.grab()))
+    return out
+
+
+def strip(parts, title):
+    """Label + the active/inactive panels side by side, for compositing into a preview."""
+    W = sum(pm.width() for _, pm in parts) + 16 * (len(parts) + 1)
+    pm = QPixmap(W, 160)
+    pm.fill(QColor("#000"))
+    p = QPainter(pm)
+    p.setPen(QColor("#8e8e8e"))
+    p.setFont(QFont("Space Mono", 8))
+    x = 16
+    for state, sub in parts:
+        p.drawText(x, 14, f"{title} · {state} window".upper())
+        p.drawPixmap(x, 22, sub)
+        x += sub.width() + 16
+    p.end()
+    return pm
+
+
+def stack(top, bottom):
+    pm = QPixmap(max(top.width(), bottom.width()), top.height() + bottom.height())
+    pm.fill(QColor("#000"))
+    p = QPainter(pm)
+    p.drawPixmap(0, 0, top)
+    p.drawPixmap(0, top.height(), bottom)
+    p.end()
+    return pm
+
+
 # ── Dolphin mock ─────────────────────────────────────────────────────────
 def dolphin():
     win = QMainWindow()
@@ -261,6 +403,7 @@ def dolphin():
             if name == "Home":
                 sel = it
     places.setCurrentItem(sel)
+    places.setItemDelegate(DolphinDelegate(places))
 
     # icon grid
     grid = QListWidget()
@@ -285,6 +428,7 @@ def dolphin():
         grid.addItem(it)
     grid.item(8).setSelected(True)
     grid.setCurrentRow(8)
+    grid.setItemDelegate(DolphinDelegate(grid, icons_layout=True))
 
     tabs = QTabBar()
     tabs.setDocumentMode(True)
@@ -346,6 +490,12 @@ def dolphin():
     settle()
     pm = composite(win, menu, QPoint(640, 300))
     menu.close()
+    img = pm.toImage()
+    for view, item, label in ((places, sel, "Dolphin mock: Places 'Home'"),
+                              (grid, grid.item(8), "Dolphin mock: icon tile 'Projects'")):
+        rect = view.visualItemRect(item).translated(view.viewport().mapTo(win, QPoint(0, 0)))
+        check_selection(img, rect, label)
+    pm = stack(pm, strip(window_states(True, "Dolphin places"), "Dolphin places"))
     pm.save(os.path.join(OUT, "qt-dolphin.png"))
 
 
@@ -516,10 +666,17 @@ def gallery():
         p.drawPixmap(tip_anchor.mapTo(w, QPoint(-tp.width() + tip_anchor.width(), -tp.height() - 8)), tp)
     # an open combo popup is not grab-able; draw the menu style instead
     p.end()
+    pm = stack(pm, strip(window_states(False, "QListView"), "QListView"))
     pm.save(os.path.join(OUT, "qt-widgets.png"))
 
 
-dolphin()
-gallery()
-print(os.path.join(OUT, "qt-dolphin.png"))
-print(os.path.join(OUT, "qt-widgets.png"))
+FAIL = []
+if PART == "dolphin":
+    dolphin()
+    print(os.path.join(OUT, "qt-dolphin.png"))
+else:
+    gallery()
+    print(os.path.join(OUT, "qt-widgets.png"))
+for f in FAIL:
+    print("FAIL:", f)
+sys.exit(1 if FAIL else 0)

@@ -11,6 +11,7 @@ fill, so a frame of size N px gives a rounded rect of radius N; with
 frame.expansion the radius grows up to half the widget height (= pill).
 """
 import os
+import re
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "Nothing")
@@ -843,19 +844,55 @@ inherits=Window
 """
 
 
-def main():
-    os.makedirs(OUT, exist_ok=True)
+def files_variant(doc, kv):
+    """NothingFiles: the theme Kvantum gives to Dolphin (kvantum.kvconfig [Applications]).
+
+    Dolphin's KItemListView ignores HighlightedText: a selected row/tile is drawn with
+    QPalette::Text (white here; HighlightedText only while the mouse is pressed) and a
+    Normal-mode icon.  A white selection pill therefore hides the label and glyph
+    (live bug in the Places panel).  So in Dolphin the selection is a light-grey pill
+    (#3a3a3a) that white text and white glyphs read on; everything else is unchanged.
+    """
+    global svg
+    keep = [e for e in svg if 'id="itemview-' not in e]
+    svg = []
+    for st, c in {"normal": NONE, "focused": S2, "pressed": S5, "toggled": S5, "disabled": NONE,
+                  "toggled-inactive": S4, "pressed-inactive": S4, "focused-inactive": S2}.items():
+        inset_box("itemview", st, c, a=0)
+    doc = _doc(keep + svg)
+    sec = kv.index("[ItemView]")
+    end = kv.index("\n[", sec + 1)
+    body = kv[sec:end].replace(f"text.press.color={BLACK}", f"text.press.color={WHITE}") \
+                      .replace(f"text.toggle.color={BLACK}", f"text.toggle.color={WHITE}")
+    kv = kv[:sec] + body + kv[end:]
+    kv = re.sub(r"^comment=.*$", "comment=Nothing OS for Dolphin: as Nothing, but a #3a3a3a selection pill "
+                "(Dolphin draws selected labels in the Text colour, so white-on-white otherwise)", kv, count=1, flags=re.M)
+    return doc, kv
+
+
+def _doc(elements):
     w, h = 2010, _cursor[1] + 130
-    doc = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}">\n'
-           + "\n".join(svg) + "\n</svg>\n")
-    # NothingDark.* inside the same folder: the session runs QT_STYLE_OVERRIDE=kvantum-dark,
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}">\n'
+            + "\n".join(elements) + "\n</svg>\n")
+
+
+def write(folder, name, doc, kv):
+    d = os.path.join(HERE, folder)
+    os.makedirs(d, exist_ok=True)
+    # <name>Dark.* in the same folder: the session runs QT_STYLE_OVERRIDE=kvantum-dark,
     # which looks up "<theme>Dark" first; ship the identical theme under that name too.
-    for name in ("Nothing", "NothingDark"):
-        with open(os.path.join(OUT, f"{name}.svg"), "w") as f:
+    for n in (name, name + "Dark"):
+        with open(os.path.join(d, f"{n}.svg"), "w") as f:
             f.write(doc)
-        with open(os.path.join(OUT, f"{name}.kvconfig"), "w") as f:
-            f.write(KV)
-    print(OUT)
+        with open(os.path.join(d, f"{n}.kvconfig"), "w") as f:
+            f.write(kv)
+    print(d)
+
+
+def main():
+    doc = _doc(svg)
+    write("Nothing", "Nothing", doc, KV)
+    write("NothingFiles", "NothingFiles", *files_variant(doc, KV))
 
 
 if __name__ == "__main__":

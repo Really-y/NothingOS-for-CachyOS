@@ -17,8 +17,10 @@ for g in gtk-3.0 gtk-4.0; do mkdir -p "$HOME/.config/$g"; kw --file "$HOME/.conf
 gsettings set org.gnome.desktop.interface font-name "Inter 10" 2>/dev/null || true
 echo "· kvantum";      python3 "$ROOT/kvantum/gen_kvantum.py" >/dev/null; mkdir -p "$HOME/.config/Kvantum"
 # the old Orchis-based NothingDark must go: QT_STYLE_OVERRIDE=kvantum-dark resolves "<theme>Dark" first
-rm -rf "$HOME/.config/Kvantum/Nothing"; [ -d "$HOME/.config/Kvantum/NothingDark" ] && mv "$HOME/.config/Kvantum/NothingDark" "$D/nothingos-backup/kvantum-NothingDark-$(date +%s)"; cp -r "$ROOT/kvantum/Nothing" "$HOME/.config/Kvantum/"
+rm -rf "$HOME/.config/Kvantum/Nothing" "$HOME/.config/Kvantum/NothingFiles"; cp -r "$ROOT/kvantum/NothingFiles" "$HOME/.config/Kvantum/"; [ -d "$HOME/.config/Kvantum/NothingDark" ] && mv "$HOME/.config/Kvantum/NothingDark" "$D/nothingos-backup/kvantum-NothingDark-$(date +%s)"; cp -r "$ROOT/kvantum/Nothing" "$HOME/.config/Kvantum/"
 kw --file "$HOME/.config/Kvantum/kvantum.kvconfig" --group General --key theme Nothing
+# Dolphin draws selected labels in the Text colour (not HighlightedText): give it the grey-selection variant
+kw --file "$HOME/.config/Kvantum/kvantum.kvconfig" --group Applications --key NothingFiles dolphin
 kw --file kdeglobals --group KDE --key widgetStyle kvantum
 echo "· dolphin";      "$ROOT/scripts/dolphin.sh"
 # Flatpak Dolphin only sees Kvantum through the org.kde.KStyle.Kvantum extension (downloads from Flathub; opt-in)
