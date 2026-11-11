@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Nothing icon theme: monochrome folders/places, inherits Papirus-Dark.
+"""Nothing icon theme: monochrome folders/places + app icons (appicons.py), inherits Papirus-Dark.
 
 Folder glyphs are real vector paths pulled out of Material Symbols Rounded
 (instanced at a thin weight) so they match the rest of the UI.
@@ -104,10 +104,10 @@ def trash_svg(font, symbol):
 
 INDEX = """[Icon Theme]
 Name=Nothing
-Comment=Monochrome Nothing places on top of Papirus-Dark
+Comment=Monochrome Nothing places and app icons on top of Papirus-Dark
 Inherits=Papirus-Dark,breeze-dark,hicolor
 Example=folder
-Directories=scalable/places
+Directories=scalable/places,scalable/apps
 
 [scalable/places]
 Size=64
@@ -115,6 +115,13 @@ MinSize=16
 MaxSize=512
 Type=Scalable
 Context=Places
+
+[scalable/apps]
+Size=64
+MinSize=16
+MaxSize=512
+Type=Scalable
+Context=Applications
 """
 
 if __name__ == "__main__":
@@ -129,4 +136,11 @@ if __name__ == "__main__":
                 f.write(svg)
     with open(os.path.join(OUT, "index.theme"), "w") as f:
         f.write(INDEX)
-    print("wrote", len(os.listdir(d)), "icons to", OUT)
+    print("wrote", len(os.listdir(d)), "place icons to", OUT)
+    import appicons
+    rep = appicons.build(OUT)
+    print(f"apps: {len(rep['symbolic'])} symbolic glyphs, {len(rep['silhouette'])} silhouettes, "
+          f"{len(rep['failed'])} failed, {len(rep['skipped'])} skipped (non-app names)")
+    for k in ("silhouette", "failed", "skipped"):
+        if rep[k]:
+            print(f"  {k}: {', '.join(rep[k])}")

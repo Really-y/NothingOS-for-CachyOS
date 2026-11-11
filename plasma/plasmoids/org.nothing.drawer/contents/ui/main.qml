@@ -115,7 +115,7 @@ PlasmoidItem {
         for (let i = 0; i < allApps.count; i++) {
             const ix = allApps.index(i, 0);
             const d = allApps.data(ix, dec), n = allApps.data(ix, disp);
-            apps.push({ key: d + "|" + n, source: d, hint: n + " " + (allApps.data(ix, desc) || "") });
+            apps.push({ key: d + "|" + n, name: n, source: d, hint: n + " " + (allApps.data(ix, desc) || "") });
         }
         glyphMap = IconMap.assign(apps, symbolicNames);
     }

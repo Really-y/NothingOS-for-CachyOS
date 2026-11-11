@@ -1,5 +1,6 @@
 .pragma library
 
+// Rules mirror icons/appicons.py (system-wide app icons) — keep them in sync.
 // Picks a monochrome "-symbolic" glyph for every app so the drawer renders all apps
 // as flat white line glyphs, and (via assign()) gives installed apps DISTINCT glyphs
 // where the theme has alternatives. `available` is the set of "<name>-symbolic"
@@ -12,19 +13,23 @@ const overrides = {
     "org.kde.kate": ["accessories-text-editor", "text-editor"],
     "kwrite": ["text-editor", "document-edit"],
     "org.kde.kwrite": ["text-editor", "document-edit"],
+    "com.google.chrome": ["google-chrome"], "google-chrome": ["google-chrome"],
+    "vscodium": ["applications-development", "code-context"], "code": ["applications-development", "code-context"],
+    "steam": ["input-gaming", "applications-games"],
 };
 
 // keyword (matched against icon name + app name + generic name) → glyph candidates,
 // most fitting first. All matching rules contribute, in this order.
 const rules = [
     [/steam_icon_|steam|lutris|heroic|proton|bottles|\bgames?\b|minecraft|tlauncher|days to die/, ["applications-games", "input-gaming", "input-gamepad"]],
-    [/print|scan|cups|hplip|\bhp\b/, ["printer", "document-print"]],
+    [/screenshot|spectacle|screen capture|flameshot/, ["accessories-screenshot", "camera-photo"]],
+    [/printer|cups|hplip|\bscan|\bhp\b/, ["printer", "document-print"]],
     [/torrent|download/, ["edit-download", "download"]],
     [/localsend|share|send/, ["document-share"]],
     [/termin|konsole|alacritty|kitty|xterm|wezterm|\bfoot\b|tilix|console/, ["utilities-terminal", "dialog-scripts", "system-run"]],
     [/dolphin|nautilus|thunar|nemo|pcmanfm|file manager|^files$/, ["system-file-manager", "folder-open", "document-open-folder", "folder"]],
     [/volman|removable|usb|ventoy|flash/, ["media-flash", "drive-harddisk"]],
-    [/firefox|chrom|brave|vivaldi|opera|epiphany|librewolf|browser|\bweb\b/, ["web-browser", "internet-web-browser", "globe"]],
+    [/firefox|chrom|brave|vivaldi|opera|epiphany|librewolf|browser|\bweb\b/, ["web-browser", "globe", "applications-internet"]],
     [/spotify|music|elisa|rhythmbox|amarok|strawberry/, ["audio-x-generic", "emblem-music", "audio-headphones"]],
     [/pavucontrol|volume control|sound|mixer|audio/, ["audio-headphones", "multimedia-player", "audio-x-generic"]],
     [/vlc|mpv|haruna|celluloid|totem|freetube|youtube|media player|video player/, ["video-x-generic", "media-playback-start", "emblem-videos", "multimedia-player"]],
@@ -65,10 +70,13 @@ function has(available, name) {
 // Fitting glyph names (without "-symbolic"), best first, unique. Only the app's own
 // glyph(s) and its FIRST matching category count as good fits; later matches are
 // weaker guesses and only used when nothing better exists.
-function tiers(source, hint, available) {
+function tiers(source, hint, available, ignoreTheme) {
     const good = [], weak = [];
     const add = (list, n) => { if (has(available, n) && good.indexOf(n) < 0 && weak.indexOf(n) < 0) list.push(n); };
     if (typeof source !== "string" || source === "" || !available) return { good: good, weak: weak };
+    // the Nothing icon theme (icons/appicons.py) ships the system-wide glyph for this app:
+    // use exactly that so the drawer matches the dock / menus
+    if (!ignoreTheme && has(available, "nothing-app-" + source)) return { good: ["nothing-app-" + source], weak: [] };
     const s = source.toLowerCase();
     if (overrides[s]) overrides[s].forEach(n => add(good, n));
     if (s.indexOf("/") < 0) {
@@ -95,7 +103,7 @@ function candidates(source, hint, available) {
 // own icon). Entries with the same icon+name (duplicate .desktop files) share a key.
 // apps: [{ key, source, hint }] → { key: "<glyph>-symbolic" }
 function assign(apps, available) {
-    const used = {}, map = {}, seen = {};
+    const used = {}, usedBy = {}, map = {}, seen = {};
     apps = apps.filter(a => { if (seen[a.key]) return false; seen[a.key] = true; return true; });
     // apps with fewer options pick first so they don't lose their only glyph
     const list = apps.map(a => { const t = tiers(a.source, a.hint, available);
@@ -105,11 +113,26 @@ function assign(apps, available) {
     for (const x of list) {
         // best unused good fit → unused weaker guess → otherwise "" = flat silhouette of
         // the app's own icon (never share a glyph with a different app)
-        const g = x.t.good.find(n => !used[n]) || x.t.weak.find(n => !used[n]);
-        if (g) { used[g] = true; map[x.a.key] = g + "-symbolic"; }
+        // The theme's per-icon glyph (= what the dock shows). Entries of the same app family
+        // (Thunar / Thunar Preferences, XTerm / UXTerm) share it; a different app that merely
+        // borrows the same icon name (Alacritty → utilities-terminal) picks its own glyph.
+        let g = "";
+        const themed = x.t.good.length === 1 && x.t.good[0].indexOf("nothing-app-") === 0 ? x.t.good[0] : "";
+        if (themed && (!used[themed] || sameFamily(usedBy[themed], x.a.name))) g = themed;
+        else {
+            const t = themed ? tiers(x.a.source, x.a.hint, available, true) : x.t;
+            g = t.good.find(n => !used[n]) || t.weak.find(n => !used[n]) || "";
+        }
+        if (g) { used[g] = true; if (!usedBy[g]) usedBy[g] = x.a.name || ""; map[x.a.key] = g + "-symbolic"; }
         else map[x.a.key] = "";
     }
     return map;
+}
+
+function sameFamily(a, b) {
+    a = String(a || "").toLowerCase(); b = String(b || "").toLowerCase();
+    if (!a || !b) return false;
+    return a.indexOf(b) >= 0 || b.indexOf(a) >= 0 || a.split(" ")[0] === b.split(" ")[0];
 }
 
 function resolve(source, hint, available, assigned, key) {

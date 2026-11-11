@@ -22,7 +22,7 @@ Rectangle {
     readonly property var glyphs: {
         const a = [];
         for (const m of [pinned, apps, found]) for (let i = 0; i < m.count; i++) {
-            const e = m.get(i); a.push({ key: e.decoration + "|" + e.display, source: e.decoration, hint: e.display });
+            const e = m.get(i); a.push({ key: e.decoration + "|" + e.display, name: e.display, source: e.decoration, hint: e.display });
         }
         return IconMap.assign(a, sym);
     }
