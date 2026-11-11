@@ -20,6 +20,15 @@ Item {
     property bool searching: query.length > 0
     property alias query: search.text
     property bool busy: false          // runner still querying
+    // quick search (Alt+Space): search field only, no grid until something is typed
+    property bool searchMode: false
+    // KRunner syntaxes worth knowing (calculator, unit converter, web shortcuts, kill runner)
+    readonly property var hints: [
+        { icon: "calculate", q: "12 * 7 + 3", what: "Calculate" },
+        { icon: "straighten", q: "10 km in mi", what: "Convert" },
+        { icon: "public", q: "dd:nothing phone", what: "Web search" },
+        { icon: "close", q: "kill firefox", what: "Quit app" }
+    ]
 
     property real pad: 24
     property real bleed: 0
@@ -38,11 +47,13 @@ Item {
     readonly property color widgetFill: "#1a1a1a"
     readonly property real viewY: flick.contentY
     readonly property real viewHeight: flick.height
-    readonly property bool pinnedShown: !searching && pinnedCount > 0
+    readonly property bool pinnedShown: !searching && !searchMode && pinnedCount > 0
+    readonly property bool appsShown: searching || !searchMode
+    readonly property bool hintsShown: searchMode && !searching
     readonly property bool resultsShown: searching && resultsCount > 0
     readonly property int cols: Math.max(1, Math.floor((width - pad * 2) / 112))
 
-    function zoneCount(z) { return z === 0 ? (pinnedShown ? pinnedCount : 0) : z === 1 ? appsCount : (resultsShown ? resultsCount : 0); }
+    function zoneCount(z) { return z === 0 ? (pinnedShown ? pinnedCount : 0) : z === 1 ? (appsShown ? appsCount : 0) : (resultsShown ? resultsCount : 0); }
     function firstZone() { for (let z = 0; z < 3; z++) if (zoneCount(z) > 0) return z; return 1; }
     function resetSelection() { zone = firstZone(); sel = 0; flick.contentY = 0; }
     function focusSearch() { search.forceActiveFocus(); }
@@ -89,6 +100,7 @@ Item {
     onResultsCountChanged: if (zone === 2 && sel >= resultsCount) resetSelection()
     onQueryChanged: resetSelection()
     onPinnedShownChanged: resetSelection()
+    onSearchModeChanged: resetSelection()
     onResultsShownChanged: if (zoneCount(zone) === 0) resetSelection()
 
     implicitWidth: 712
@@ -110,7 +122,7 @@ Item {
         RowLayout {
             Layout.fillWidth: true
             spacing: 12
-            DotString { text: root.searching ? "FIND" : "APPS"; size: 50; dotRatio: 0.65 }   // pitch 5px
+            DotString { text: root.searching ? "FIND" : (root.searchMode ? "SEARCH" : "APPS"); size: 50; dotRatio: 0.65 }   // pitch 5px
             Item { Layout.fillWidth: true }
             Rectangle {
                 visible: root.busy
@@ -161,7 +173,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                 }
             }
-            Label { id: escHint; text: "esc"; size: 11; color: Theme.fg3; anchors.right: parent.right; anchors.rightMargin: 20; anchors.verticalCenter: parent.verticalCenter }
+            Label { id: escHint; visible: !root.searchMode; text: "esc"; size: 11; color: Theme.fg3; anchors.right: parent.right; anchors.rightMargin: 20; anchors.verticalCenter: parent.verticalCenter }
         }
 
         // ── scrolling content ────────────────────────────────────────────
@@ -198,8 +210,9 @@ Item {
                     panel: root
                     width: content.width
                     zoneId: 1
-                    model: root.appsModel
-                    count: root.appsCount
+                    visible: root.appsShown
+                    model: root.appsShown ? root.appsModel : null
+                    count: root.appsShown ? root.appsCount : 0
                 }
                 Text {
                     visible: root.searching && root.appsCount === 0 && root.resultsCount === 0 && !root.busy
@@ -208,6 +221,44 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                     text: "·  ·  ·   nothing found   ·  ·  ·"
                     color: Theme.fg3; font.family: Theme.mono; font.pixelSize: 12; font.weight: Font.Normal
+                }
+
+                // ── quick-search empty state: what KRunner understands ──────
+                SectionLabel { visible: root.hintsShown; text: "Try"; leftPadding: 4 }
+                Repeater {
+                    model: root.hintsShown ? root.hints : []
+                    delegate: Pressable {
+                        id: hint
+                        required property var modelData
+                        width: content.width
+                        height: 56
+                        pressScale: 0.98
+                        onClicked: { root.query = modelData.q; root.focusSearch(); }
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: height / 2
+                            color: hint.containsMouse ? Theme.card : "transparent"
+                        }
+                        Rectangle {
+                            id: hdisc
+                            width: 40; height: 40; radius: 20
+                            x: 8; anchors.verticalCenter: parent.verticalCenter
+                            color: root.widgetFill
+                            Icon { anchors.centerIn: parent; name: hint.modelData.icon; size: 20; color: Theme.fg }
+                        }
+                        Text {
+                            anchors.left: hdisc.right; anchors.leftMargin: 14
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: hint.modelData.q
+                            color: hint.containsMouse ? Theme.fg : Theme.fg2
+                            font.family: Theme.sans; font.pixelSize: 14; font.weight: Font.Normal
+                        }
+                        SectionLabel {
+                            anchors.right: parent.right; anchors.rightMargin: 18
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: hint.modelData.what
+                        }
+                    }
                 }
 
                 SectionLabel { visible: root.resultsShown; text: "Files, settings & more"; leftPadding: 4; topPadding: 14 }
@@ -289,6 +340,22 @@ Item {
                 gradient: Gradient {
                     GradientStop { position: 0; color: "#00000000" }
                     GradientStop { position: 1; color: Theme.bg }
+                }
+            }
+        }
+
+        // ── quick-search key legend ──────────────────────────────────────
+        Row {
+            visible: root.searchMode
+            Layout.leftMargin: 4
+            spacing: 22
+            Repeater {
+                model: [["↵", "open"], ["↑↓", "move"], ["tab", "next"], ["esc", root.searching ? "clear" : "close"]]
+                delegate: Row {
+                    required property var modelData
+                    spacing: 8
+                    Label { text: modelData[0]; size: 10; color: Theme.fg2; font.letterSpacing: 1.2 }
+                    Label { text: modelData[1]; size: 10; color: Theme.fg3; font.letterSpacing: 1.6 }
                 }
             }
         }

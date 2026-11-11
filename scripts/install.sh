@@ -48,6 +48,7 @@ echo "· konsole";      mkdir -p "$D/konsole"; cp "$ROOT/terminal/Nothing.colors
 
 echo "· nothingd (Rust)"; "$ROOT/daemon/install.sh" >/dev/null
 echo "· plasmoids";    "$ROOT/scripts/build-plasmoids.sh" >/dev/null
+echo "· quick search"; "$ROOT/scripts/quicksearch.sh" install >/dev/null   # Alt+Space/Alt+F2 → drawer search mode; KRunner tuned
 echo "· splash+lock";  "$ROOT/plasma/lookandfeel/install.sh" >/dev/null
 # bare Meta opens the launcher-provider applet (org.nothing.drawer)
 kw --file kwinrc --group ModifierOnlyShortcuts --key Meta "org.kde.plasmashell,/PlasmaShell,org.kde.PlasmaShell,activateLauncherMenu"

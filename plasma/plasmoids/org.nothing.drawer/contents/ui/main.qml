@@ -188,11 +188,24 @@ PlasmoidItem {
         onObjectRemoved: (index, object) => actionMenu.removeMenuItem(object)
     }
 
+    // ── quick search (Alt+Space / Alt+F2 → plasma/search/nothing-search) ──
+    // The trigger writes General/searchRequest through the shell scripting API and then
+    // calls activateLauncherMenu (same path as Meta). An expand that follows a request
+    // within 2 s opens in search mode; Meta / clicking the dots open the normal drawer.
+    property bool searchMode: false
+    property double searchArmedAt: 0
+    readonly property string searchRequest: Plasmoid.configuration.searchRequest || ""
+    onSearchRequestChanged: searchArmedAt = Date.now()
+
     onExpandedChanged: {
-        if (root.expanded && fullRepresentationItem) {
-            fullRepresentationItem.panel.clear();
-            fullRepresentationItem.panel.focusSearch();
+        if (root.expanded) {
+            root.searchMode = Date.now() - root.searchArmedAt < 2000;
+            if (fullRepresentationItem) {
+                fullRepresentationItem.panel.clear();
+                fullRepresentationItem.panel.focusSearch();
+            }
         }
+        root.searchArmedAt = 0;
     }
     Component.onCompleted: {
         Plasmoid.activationTogglesExpanded = true;   // Meta / global shortcut toggles the popup
@@ -245,6 +258,7 @@ PlasmoidItem {
             resultsCount: runnerOther.count
             totalApps: visibleApps.count
             busy: root.runnerModel.querying
+            searchMode: root.searchMode
             symbolicNames: root.symbolicNames
             glyphMap: root.glyphMap
 

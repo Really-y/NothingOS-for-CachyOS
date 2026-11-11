@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Nothing Search
+Comment=Quick search in the Nothing app drawer (KRunner results)
+Icon=search
+Exec=@BIN@
+NoDisplay=true
+StartupNotify=false
+X-KDE-Shortcuts=Alt+Space,Alt+F2,Search

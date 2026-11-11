@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0 http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+  <kcfgfile name=""/>
+  <group name="General">
+    <!-- written (ms timestamp) by plasma/search/nothing-search right before it calls
+         activateLauncherMenu: the next expand opens the drawer in quick-search mode -->
+    <entry name="searchRequest" type="String">
+      <default></default>
+    </entry>
+  </group>
+</kcfg>

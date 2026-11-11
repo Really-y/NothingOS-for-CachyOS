@@ -1,0 +1,17 @@
+#!/bin/sh
+# Nothing quick search (bound to Alt+Space / Alt+F2 / Search by scripts/quicksearch.sh).
+# Arms the org.nothing.drawer applet(s) for search mode, then opens the launcher the same
+# way the Meta key does. No drawer in the layout (or no plasmashell) → plain KRunner.
+n=$(qdbus6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript '
+var n = 0;
+for (const p of panels()) for (const w of p.widgets("org.nothing.drawer")) {
+    w.currentConfigGroup = ["General"];
+    w.writeConfig("searchRequest", String(Date.now()));
+    w.reloadConfig();
+    n++;
+}
+print(n);' 2>/dev/null)
+if [ "${n:-0}" -gt 0 ] 2>/dev/null; then
+    exec qdbus6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.activateLauncherMenu
+fi
+exec qdbus6 org.kde.krunner /App org.kde.krunner.App.toggleDisplay
