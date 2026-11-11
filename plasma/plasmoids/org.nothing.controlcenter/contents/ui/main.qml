@@ -172,20 +172,16 @@ PlasmoidItem {
         }, error => { root.nightAvailable = false; });
     }
     function toggleNightLight() {
-        if (!nightEnabled) {
-            // Night Light is switched off in settings: turn it on persistently.
-            run("kwriteconfig6 --file kwinrc --group NightColor --key Active true && qdbus6 org.kde.KWin /KWin reconfigure");
-        } else {
-            // Same as the native shortcut / brightness applet: temporary inhibit toggle inside KWin.
-            DBus.SessionBus.asyncCall({
-                service: "org.kde.kglobalaccel", path: "/component/kwin",
-                iface: "org.kde.kglobalaccel.Component", member: "invokeShortcut",
-                arguments: [new DBus.string("Toggle Night Color")]
-            }, () => {}, () => {});
-        }
+        // Persistent on/off via kwinrc [NightColor] Active, then ask KWin to reload its config.
+        // (No kglobalaccel: invoking global shortcuts at runtime is off-limits.)
+        const on = !root.nightLight;
+        root.nightEnabled = on;                    // optimistic; corrected by the refresh below
+        root.nightInhibited = false;
+        run("kwriteconfig6 --file kwinrc --group NightColor --key Active " + (on ? "true" : "false")
+            + " && qdbus6 org.kde.KWin /KWin reconfigure");
         nightRefresh.restart();
     }
-    Timer { id: nightRefresh; interval: 400; onTriggered: root.refreshNightLight() }
+    Timer { id: nightRefresh; interval: 900; onTriggered: root.refreshNightLight() }
     Timer { interval: 30000; repeat: true; running: true; triggeredOnStart: true; onTriggered: root.refreshNightLight() }
 
     // ── sessions / commands ──────────────────────────────────────────────
