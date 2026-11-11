@@ -26,7 +26,7 @@ Item {
 
     // the character
     property bool showFigure: true
-    property string figureStyle: "sultry" // "sultry" (elegant dress) | "casual" | "glam" (portrait) | "cute" — wallpapers/glyphgirl/*.svg
+    property string figureStyle: "sultry" // "sultry" (backless gown, back view) | "casual" | "glam" (portrait) | "cute" — wallpapers/glyphgirl/*.svg
     property real figureX: 0.75           // horizontal centre, fraction of width
     property real figureScale: 1.15       // height, fraction of screen height
     // fine grid per style; 8 and 6 divide the 24 px field and share its origin (no moire)
@@ -102,7 +102,7 @@ Item {
     readonly property point clipUV: _style === "cute" ? Qt.point(228.0 / 600, 214.4 / 800)     // hair-clip end
                                   : _style === "glam" ? Qt.point(399.67 / 600, 403.02 / 800)   // earring
                                   : _style === "casual" ? Qt.point(371.76 / 600, 301.37 / 800) // earring (casual)
-                                  : Qt.point(368.76 / 600, 297.69 / 800)                       // earring (sultry)
+                                  : Qt.point(330.0 / 600, 302.0 / 800)                       // earring (sultry, over-the-shoulder head)
     readonly property point redPos: showFigure
         ? Qt.point(figRect.x + (0.5 + (clipUV.x - 0.5) * (1 + breathe)) * figRect.width,
                    figRect.y + (1 + (clipUV.y - 1) * (1 + breathe)) * figRect.height)

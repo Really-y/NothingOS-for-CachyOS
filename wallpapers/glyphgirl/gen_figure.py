@@ -28,8 +28,10 @@ STYLES = {"cute": "girl.svg", "glam": "glam.svg", "casual": "casual.svg", "sultr
 SVG = ""
 W, H = 600, 800          # canvas
 TW, TH = 600, 800        # texture (1 canvas px per texel: 1-dot features survive)
-GROUPS = ["hair-back", "neck", "body", "hair-curtain", "face", "eyes-open", "eyes-closed",
+GROUPS = ["hair-back", "neck", "body", "rim", "hair-curtain", "hand", "face", "eyes-open", "eyes-closed",
           "hair-side", "bangs", "ahoge", "clip"]
+# hair-curtain sway starts higher where the hair is lifted (sultry: from her hand, nape tendrils)
+CURTAIN_RAMP = {"sultry": (200, 560)}
 
 
 def variant(show):
@@ -92,9 +94,10 @@ def bake(style):
         return t * t * (3 - 2 * t)
 
 
+    curtain = CURTAIN_RAMP.get(style, (300, 720))
     sway = np.maximum.reduce([
         visible("hair-back") * ramp(300, 720) * 1.0,
-        visible("hair-curtain") * ramp(300, 720) * 1.0,
+        visible("hair-curtain") * ramp(*curtain) * 1.0,
         visible("hair-side") * ramp(260, 490) * 0.45,
         visible("bangs") * ramp(170, 322) * 0.15,
         visible("ahoge") * ramp(92, 48) * 1.6,
