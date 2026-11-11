@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- "Glam" style for org.nothing.dots: an original ADULT woman (no existing character, no
+     logos), confident and stylish, non-explicit. Same conventions as girl.svg:
+     values are LUMINANCE MAPS (grey = dot brightness/size), features 0 = missing dots,
+     highlights 1.0 are forced to full-size dots. ~3.2 canvas px per dot on screen.
+     Head tilted 5 degrees toward the desktop. Red accent = the earring bead (shader). -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="600" height="800" viewBox="0 0 600 800">
+  <defs>
+    <linearGradient id="iris" x1="0" y1="-16" x2="0" y2="18" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#141414"/>
+      <stop offset="0.6" stop-color="#5a5a5a"/>
+      <stop offset="1" stop-color="#8c8c8c"/>
+    </linearGradient>
+    <linearGradient id="shoulders" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#bdbdbd"/>
+      <stop offset="0.5" stop-color="#cfcfcf"/>
+      <stop offset="1" stop-color="#9a9a9a"/>
+    </linearGradient>
+    <filter id="soft" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="7"/></filter>
+    <filter id="soft2" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="3"/></filter>
+    <path id="faceShape" d="M 198,290 C 198,236 242,212 300,212 C 358,212 402,236 402,290
+      L 402,352 C 402,402 376,440 336,470 C 322,481 312,488 300,490 C 288,488 278,481 264,470
+      C 224,440 198,402 198,352 Z"/>
+    <clipPath id="faceClip"><use xlink:href="#faceShape"/></clipPath>
+    <clipPath id="neckClip"><path d="M 272,430 L 272,570 L 328,570 L 328,430 Z"/></clipPath>
+    <!-- almond eye, viewer-right orientation (outer corner at +x, lifted), centred on 0,0 -->
+    <path id="sclera" d="M -34,6 C -24,-14 18,-20 34,-8 C 26,10 10,16 -4,16 C -20,16 -30,12 -34,6 Z"/>
+    <clipPath id="scleraClip"><use xlink:href="#sclera"/></clipPath>
+    <g id="eyeOpen">
+      <use xlink:href="#sclera" fill="#d4d4d4"/>
+      <g clip-path="url(#scleraClip)">
+        <circle cx="-3" cy="1" r="17" fill="url(#iris)" stroke="#262626" stroke-width="3"/>
+        <circle cx="-3" cy="0" r="6" fill="#000000"/>
+      </g>
+      <!-- heavy upper lid + winged liner (half-lidded, confident) -->
+      <path fill="#000000" d="M -37,8 C -27,-18 18,-26 36,-10 L 58,-24 L 44,-4
+        C 24,-14 -16,-10 -31,8 Z"/>
+      <!-- long outer lashes -->
+      <path fill="none" stroke="#000000" stroke-width="5" stroke-linecap="round"
+            d="M 24,-17 L 32,-27"/>
+      <!-- lower lid, outer half -->
+      <path d="M 2,16 C 16,15 26,10 33,2" fill="none" stroke="#595959" stroke-width="5" stroke-linecap="round"/>
+    </g>
+    <g id="eyeClosed">
+      <path d="M -32,4 C -14,14 14,12 34,-4" fill="none" stroke="#000000" stroke-width="8" stroke-linecap="round"/>
+      <path d="M 30,-2 L 54,-14" stroke="#000000" stroke-width="7" stroke-linecap="round"/>
+    </g>
+    <path id="brow" d="M 218,298 C 232,286 254,282 276,288 C 256,288 236,292 220,302 Z"/>
+  </defs>
+
+  <g id="hair-back" transform="rotate(-5 300 480)">
+    <!-- long voluminous waves -->
+    <path fill="#474747" d="M 300,80 C 190,82 134,170 130,280 C 126,380 114,460 104,540
+      C 96,600 112,650 98,700 C 90,730 100,750 92,770 C 124,752 146,724 156,690 L 444,690
+      C 454,724 476,752 508,770 C 500,750 510,730 502,700 C 488,650 504,600 496,540
+      C 486,460 474,380 470,280 C 466,170 410,82 300,80 Z"/>
+    <path fill="none" stroke="#8c8c8c" stroke-width="10" stroke-linecap="round"
+          d="M 152,220 C 140,300 146,380 132,460 C 120,530 124,600 112,680"/>
+    <path fill="none" stroke="#666666" stroke-width="8" stroke-linecap="round"
+          d="M 456,240 C 464,320 456,400 470,480 C 480,550 476,620 488,690"/>
+  </g>
+
+  <g id="neck">
+    <path fill="#c4c4c4" d="M 272,430 L 272,570 L 328,570 L 328,430 Z"/>
+    <path fill="#7a7a7a" filter="url(#soft2)" clip-path="url(#neckClip)"
+          d="M 262,452 C 282,486 318,486 338,452 L 338,488 C 318,500 282,500 262,488 Z"/>
+    <!-- choker with a small ring -->
+    <path fill="#141414" d="M 270,512 C 288,518 312,518 330,512 L 330,526 C 312,532 288,532 270,526 Z"/>
+    <circle cx="300" cy="536" r="6" fill="none" stroke="#999999" stroke-width="4"/>
+  </g>
+
+  <g id="body">
+    <!-- bare shoulders + collarbones, off-shoulder black top (modest neckline) -->
+    <path fill="url(#shoulders)" d="M 40,830 C 50,700 92,632 182,604 C 232,590 262,574 272,548
+      L 328,548 C 338,574 368,590 418,604 C 508,632 550,700 560,830 Z"/>
+    <path fill="none" stroke="#808080" stroke-width="6" stroke-linecap="round"
+          d="M 286,574 C 262,584 232,588 204,594 M 314,574 C 338,584 368,588 396,594"/>
+    <path fill="#262626" d="M 40,830 C 48,740 66,694 92,664 C 200,690 400,690 508,664
+      C 534,694 552,740 560,830 Z"/>
+    <path fill="none" stroke="#808080" stroke-width="8" stroke-linecap="round"
+          d="M 94,664 C 200,690 400,690 506,664"/>
+    <path fill="none" stroke="#3c3c3c" stroke-width="8" stroke-linecap="round"
+          d="M 150,720 C 220,740 380,740 450,720"/>
+  </g>
+
+  <g id="hair-curtain" transform="rotate(-5 300 480)">
+    <!-- the viewer-left side falls in front of the shoulder in loose waves -->
+    <path fill="#4a4a4a" d="M 168,240 C 152,320 158,410 176,486 C 190,540 182,590 160,640
+      C 148,668 150,696 140,722 C 172,706 192,680 198,650 C 204,690 196,720 186,748
+      C 220,720 232,680 228,636 C 224,580 216,520 214,460 C 210,380 208,310 214,250 Z"/>
+    <path fill="none" stroke="#8c8c8c" stroke-width="10" stroke-linecap="round"
+          d="M 166,280 C 160,350 166,420 182,486 C 194,536 186,590 166,640"/>
+    <path fill="none" stroke="#2a2a2a" stroke-width="8" stroke-linecap="round"
+          d="M 196,330 C 192,400 196,470 206,530 C 212,580 206,630 196,680"/>
+  </g>
+
+  <g id="face" transform="rotate(-5 300 480)">
+    <!-- ear (viewer-right): hair tucked behind it, earring below -->
+    <path fill="#c8c8c8" d="M 398,324 C 416,318 426,336 424,354 C 422,374 412,392 398,392 Z"/>
+    <path fill="none" stroke="#7a7a7a" stroke-width="5" stroke-linecap="round" d="M 406,336 C 416,342 416,362 408,376"/>
+    <use xlink:href="#faceShape" fill="#e6e6e6"/>
+    <!-- cheekbone shade + soft shadow under the hair -->
+    <g clip-path="url(#faceClip)">
+      <path fill="#b8b8b8" filter="url(#soft)" d="M 196,380 C 212,410 236,430 250,446 L 196,450 Z"/>
+      <path fill="#b8b8b8" filter="url(#soft)" d="M 404,380 C 388,410 364,430 350,446 L 404,450 Z"/>
+      <path fill="#a6a6a6" filter="url(#soft)" d="M 196,214 L 404,214 L 404,262 C 360,268 300,246 250,236 L 196,280 Z"/>
+    </g>
+    <use xlink:href="#brow" fill="#595959"/>
+    <use xlink:href="#brow" fill="#595959" transform="translate(600,0) scale(-1,1)"/>
+    <!-- nose: side shadow + tip -->
+    <path d="M 310,372 C 312,388 312,400 306,410" fill="none" stroke="#9a9a9a" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 296,414 L 304,414" stroke="#5a5a5a" stroke-width="4" stroke-linecap="round"/>
+    <!-- lips: defined, gentle smirk -->
+    <path fill="#5a5a5a" d="M 276,446 C 288,438 296,440 300,443 C 304,440 314,438 326,444
+      C 314,449 288,450 276,446 Z"/>
+    <path fill="#8c8c8c" d="M 281,449 C 290,463 312,463 321,447 C 310,452 292,452 281,449 Z"/>
+    <path d="M 276,446 Q 300,452 326,443" fill="none" stroke="#141414" stroke-width="4" stroke-linecap="round"/>
+    <ellipse cx="304" cy="455" rx="6" ry="2.6" fill="#d0d0d0"/>
+  </g>
+
+  <g id="eyes-open" transform="rotate(-5 300 480)">
+    <use xlink:href="#eyeOpen" transform="translate(356,338) scale(1.25)"/>
+    <use xlink:href="#eyeOpen" transform="translate(244,338) scale(-1.25,1.25)"/>
+    <circle cx="240" cy="332" r="5.5" fill="#ffffff"/>
+    <circle cx="345" cy="332" r="5.5" fill="#ffffff"/>
+    <circle cx="255" cy="346" r="3.2" fill="#ffffff"/>
+    <circle cx="360" cy="346" r="3.2" fill="#ffffff"/>
+  </g>
+
+  <g id="eyes-closed" display="none" transform="rotate(-5 300 480)">
+    <use xlink:href="#eyeClosed" transform="translate(356,340) scale(1.2)"/>
+    <use xlink:href="#eyeClosed" transform="translate(244,340) scale(-1.2,1.2)"/>
+  </g>
+
+  <g id="hair-side" transform="rotate(-5 300 480)">
+    <!-- left temple framing (part on the viewer-left) -->
+    <path fill="#474747" d="M 252,96 C 200,100 166,150 160,220 C 156,280 164,330 174,380
+      C 184,350 190,300 200,262 C 214,226 234,204 252,186 Z"/>
+  </g>
+
+  <g id="bangs" transform="rotate(-5 300 480)">
+    <!-- deep side part; one big side-swept wave across the forehead to the right temple -->
+    <path fill="#474747" d="M 252,92 C 324,86 404,118 432,190 C 448,240 444,292 420,334
+      C 412,304 398,282 380,268 C 358,254 328,244 300,238 C 280,234 264,230 254,226
+      C 250,190 248,140 252,92 Z"/>
+    <path fill="none" stroke="#8c8c8c" stroke-width="10" stroke-linecap="round"
+          d="M 262,112 C 320,108 382,134 410,186"/>
+    <path fill="none" stroke="#737373" stroke-width="8" stroke-linecap="round"
+          d="M 268,170 C 316,170 370,190 400,226"/>
+    <path fill="none" stroke="#2a2a2a" stroke-width="8" stroke-linecap="round"
+          d="M 258,140 C 312,136 370,160 402,206 M 262,200 C 310,206 360,224 392,256"/>
+    <path fill="none" stroke="#8c8c8c" stroke-width="10" stroke-linecap="round"
+          d="M 248,100 C 200,104 170,150 164,214"/>
+  </g>
+
+  <g id="clip" transform="rotate(-5 300 480)">
+    <!-- earring hook; the red bead under it is drawn by the shader (clipUV) -->
+    <path d="M 410,390 L 410,404" stroke="#a6a6a6" stroke-width="5" stroke-linecap="round"/>
+  </g>
+</svg>

@@ -19,6 +19,8 @@ Kirigami.FormLayout {
     property bool cfg_PointerGlowDefault: false
     property alias cfg_ShowCharacter: character.checked
     property bool cfg_ShowCharacterDefault: true
+    property string cfg_CharacterStyle: "glam"
+    property string cfg_CharacterStyleDefault: "glam"
     property alias cfg_CharacterPosition: charPos.value
     property real cfg_CharacterPositionDefault: 0.75
     property alias cfg_CharacterScale: charScale.value
@@ -45,7 +47,15 @@ Kirigami.FormLayout {
         opacity: 0.7
     }
 
-    QQC2.CheckBox { id: character; Kirigami.FormData.label: "Character:"; text: "Dot-matrix anime girl" }
+    QQC2.CheckBox { id: character; Kirigami.FormData.label: "Character:"; text: "Dot-matrix anime character" }
+    QQC2.ComboBox {
+        Kirigami.FormData.label: "Style:"
+        model: ["Glam", "Cute"]
+        readonly property var values: ["glam", "cute"]
+        currentIndex: Math.max(0, values.indexOf(root.cfg_CharacterStyle))
+        onActivated: index => root.cfg_CharacterStyle = values[index]
+        enabled: character.checked
+    }
     QQC2.Slider {
         id: charPos
         Kirigami.FormData.label: "Position:"
@@ -59,7 +69,7 @@ Kirigami.FormLayout {
         enabled: character.checked
     }
 
-    QQC2.CheckBox { id: redDot; Kirigami.FormData.label: "Accent:"; text: "Breathing red dot (her hair clip)" }
+    QQC2.CheckBox { id: redDot; Kirigami.FormData.label: "Accent:"; text: "Breathing red dot (her earring / hair clip)" }
     QQC2.CheckBox { id: ripples; text: "Occasional ripple from the red dot"; enabled: redDot.checked && animate.checked }
     QQC2.CheckBox { id: pointerGlow; Kirigami.FormData.label: "Pointer:"; text: "Dots glow near the pointer"; enabled: animate.checked }
     QQC2.CheckBox { id: animate; Kirigami.FormData.label: "Motion:"; text: "Animate (off = static frame)" }

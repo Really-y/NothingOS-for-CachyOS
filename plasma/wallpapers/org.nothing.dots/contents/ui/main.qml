@@ -29,6 +29,7 @@ WallpaperItem {
         ripples: root.cfg.Ripples
         animated: root.animate
         showFigure: root.cfg.ShowCharacter
+        figureStyle: root.cfg.CharacterStyle
         figureX: Math.min(0.9, Math.max(0.1, root.cfg.CharacterPosition))
         figureScale: Math.min(1.4, Math.max(0.5, root.cfg.CharacterScale))
         mouse: pointer.item ? Qt.point(pointer.item.mouseX, pointer.item.mouseY) : Qt.point(-1000, -1000)

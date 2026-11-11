@@ -29,6 +29,10 @@
       <label>Show the dot-matrix anime character</label>
       <default>true</default>
     </entry>
+    <entry name="CharacterStyle" type="String">
+      <label>Character style: glam (adult, stylish) or cute</label>
+      <default>glam</default>
+    </entry>
     <entry name="CharacterPosition" type="Double">
       <label>Character horizontal centre, fraction of screen width</label>
       <default>0.75</default>

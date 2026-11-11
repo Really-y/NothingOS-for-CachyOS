@@ -26,6 +26,6 @@ Rectangle {
         Frame { time: 0;    label: "T+0.0S  REST" }
         Frame { time: 2.6;  label: "T+2.6S  GLYPH SWEEP THROUGH HER" }
         Frame { time: 7.33; label: "T+7.3S  BLINK · HAIR SWAY" }
-        Frame { time: 27.4; label: "T+27.4S  RIPPLE FROM THE HAIR CLIP" }
+        Frame { time: 27.4; label: "T+27.4S  RIPPLE FROM THE EARRING" }
     }
 }

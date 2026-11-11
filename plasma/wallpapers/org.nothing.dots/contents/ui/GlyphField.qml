@@ -26,6 +26,7 @@ Item {
 
     // the character
     property bool showFigure: true
+    property string figureStyle: "glam"   // "glam" (adult, stylish) | "cute" — wallpapers/glyphgirl/*.svg
     property real figureX: 0.75           // horizontal centre, fraction of width
     property real figureScale: 1.15       // height, fraction of screen height
     property int figurePitch: 5          // house pitch (5/8/12/15); fine enough for her eyes
@@ -96,19 +97,22 @@ Item {
     readonly property bool idleMotion: animated && showFigure
 
     // ---- the one red dot: her hair-clip bead, else bottom-right ----
-    readonly property point clipUV: Qt.point(228.0 / 600, 214.4 / 800)   // girl.svg clip bar end, after the 4° head tilt
+    // red bead per style, in canvas uv after the head tilt (see the svg sources)
+    readonly property point clipUV: figureStyle === "cute" ? Qt.point(228.0 / 600, 214.4 / 800)   // hair-clip end
+                                                           : Qt.point(403.7 / 600, 402.7 / 800)   // earring
     readonly property point redPos: showFigure
         ? Qt.point(figRect.x + (0.5 + (clipUV.x - 0.5) * (1 + breathe)) * figRect.width,
                    figRect.y + (1 + (clipUV.y - 1) * (1 + breathe)) * figRect.height)
         : Qt.point((Math.floor((width - 216) / pitch) + 0.5) * pitch,
                    (Math.floor((height - 168) / pitch) + 0.5) * pitch)
     readonly property real redR: showFigure ? Math.max(4.5, figRect.height / 800 * 5.5) : 0.5 * dotRatio * pitch
+    readonly property string _style: figureStyle === "cute" ? "cute" : "glam"
 
     readonly property bool useShader: GraphicsInfo.api !== GraphicsInfo.Software
                                       && shader.status !== ShaderEffect.Error
 
-    Image { id: figTexImg; source: "figure.png"; visible: false; smooth: true; mipmap: false }
-    Image { id: figAuxImg; source: "figure-aux.png"; visible: false; smooth: true }
+    Image { id: figTexImg; source: "figure-" + field._style + ".png"; visible: false; smooth: true; mipmap: false }
+    Image { id: figAuxImg; source: "figure-" + field._style + "-aux.png"; visible: false; smooth: true }
 
     ShaderEffect {
         id: shader
@@ -152,7 +156,7 @@ Item {
         sourceComponent: Canvas {
             id: cv
             renderStrategy: Canvas.Cooperative
-            readonly property url figUrl: Qt.resolvedUrl("figure.png")
+            readonly property url figUrl: Qt.resolvedUrl("figure-" + field._style + ".png")
             Component.onCompleted: loadImage(figUrl)
             onImageLoaded: requestPaint()
             onWidthChanged: requestPaint()
