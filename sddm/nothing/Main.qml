@@ -342,6 +342,7 @@ Rectangle {
                         anchors.verticalCenter: parent.verticalCenter
                         color: root.fg
                         font.family: root.fSans
+                        font.weight: Font.Normal
                         font.pixelSize: 17
                         selectionColor: root.fg
                         selectedTextColor: root.bg
@@ -357,6 +358,7 @@ Rectangle {
                             text: "Username"
                             color: root.fg3
                             font.family: root.fSans
+                            font.weight: Font.Normal
                             font.pixelSize: 16
                         }
 
@@ -460,6 +462,7 @@ Rectangle {
                         selectionColor: "transparent"
                         selectedTextColor: root.bg
                         font.family: root.fSans
+                        font.weight: Font.Normal
                         font.pixelSize: 17
                         clip: true
                         focus: !root.manualUser
@@ -477,6 +480,7 @@ Rectangle {
                             text: !root.needsPassword ? "No password needed" : "Enter password"
                             color: root.fg3
                             font.family: root.fSans
+                            font.weight: Font.Normal
                             font.pixelSize: 16
                             font.letterSpacing: 0
                         }
