@@ -3,6 +3,7 @@
 #
 #   scripts/build-wallpaper.sh            # recompile shaders if changed, install/update package
 #   scripts/build-wallpaper.sh --shaders  # only recompile shaders (.frag -> .frag.qsb, committed)
+#   scripts/build-wallpaper.sh --figure   # re-bake the character (wallpapers/glyphgirl/girl.svg -> figure*.png)
 #   scripts/build-wallpaper.sh --apply    # also set it on every desktop, live (no plasmashell restart)
 #   scripts/build-wallpaper.sh --revert   # put every desktop back on the static Nothing image
 set -euo pipefail
@@ -31,6 +32,7 @@ js_apply() {  # $1 = plugin, $2 = extra JS run per desktop
 
 case "${1:-}" in
     --shaders) shaders; exit 0 ;;
+    --figure) python3 "$ROOT/wallpapers/glyphgirl/gen_figure.py"; exit 0 ;;
     --revert)
         js_apply org.kde.image "d.currentConfigGroup = ['Wallpaper','org.kde.image','General']; $( [ -f "$STATIC_IMG" ] && echo "d.writeConfig('Image', 'file://$STATIC_IMG');" )"
         echo "wallpaper -> org.kde.image"; exit 0 ;;

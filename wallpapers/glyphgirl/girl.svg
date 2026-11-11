@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Original character for org.nothing.dots (no existing character, no logos).
+     Values are LUMINANCE MAPS, not colours: grey level = brightness of the dot that
+     ends up on screen (the wallpaper turns this into a dot matrix).
+     Light comes from the viewer's left. Groups are rendered separately by gen_figure.py:
+     hair-back, body, neck, face, eyes-open, eyes-closed, hair-side, bangs, clip. -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="600" height="800" viewBox="0 0 600 800">
+  <defs>
+    <linearGradient id="iris" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#262626"/>
+      <stop offset="0.4" stop-color="#6a6a6a"/>
+      <stop offset="1" stop-color="#e0e0e0"/>
+    </linearGradient>
+    <linearGradient id="skin" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#bcbcbc"/>
+      <stop offset="0.6" stop-color="#ababab"/>
+      <stop offset="1" stop-color="#8c8c8c"/>
+    </linearGradient>
+    <linearGradient id="hoodie" x1="0" y1="0" x2="1" y2="0.3">
+      <stop offset="0" stop-color="#3a3a3a"/>
+      <stop offset="1" stop-color="#1c1c1c"/>
+    </linearGradient>
+    <!-- one eye, viewer-right orientation (outer corner at +x), centred on 0,0 -->
+    <g id="eyeOpen">
+      <path d="M -30,-4 C -26,-25 20,-31 33,-12 L 31,18 C 20,31 -16,32 -27,18 Z" fill="#e6e6e6"/>
+      <ellipse cx="2" cy="6" rx="21" ry="27" fill="url(#iris)" stroke="#000000" stroke-width="3"/>
+      <ellipse cx="1" cy="0" rx="7" ry="11" fill="#000000"/>
+      <!-- upper lash line with an outer flick -->
+      <path d="M -34,1 C -30,-27 18,-37 37,-17 C 40,-14 42,-10 43,-5 C 36,-12 30,-18 24,-21 C 6,-28 -20,-24 -29,4 Z" fill="#000000"/>
+      <path d="M -24,29 C -10,36 12,36 26,25" fill="none" stroke="#555555" stroke-width="3" stroke-linecap="round"/>
+      <path d="M -22,-36 C -6,-46 18,-45 32,-34" fill="none" stroke="#808080" stroke-width="2.5" stroke-linecap="round"/>
+    </g>
+    <g id="eyeClosed">
+      <path d="M -33,4 C -16,20 18,20 38,0" fill="none" stroke="#000000" stroke-width="7" stroke-linecap="round"/>
+      <path d="M 34,3 L 44,-4" stroke="#000000" stroke-width="5" stroke-linecap="round"/>
+      <path d="M -24,-14 C -8,-24 18,-24 34,-14" fill="none" stroke="#808080" stroke-width="2.5" stroke-linecap="round"/>
+    </g>
+  </defs>
+
+  <g id="hair-back">
+    <path fill="#161616" d="M 300,96 C 200,96 146,166 140,270 C 134,380 126,480 112,580
+      C 100,640 90,680 80,706 C 96,708 106,700 114,690 L 122,730 C 136,718 144,706 150,694 L 162,740
+      C 174,694 184,644 190,600 L 410,600 C 416,644 426,694 438,740 L 450,694
+      C 456,706 464,718 478,730 L 486,690 C 494,700 504,708 520,706
+      C 510,680 500,640 488,580 C 474,480 466,380 460,270 C 454,166 400,96 300,96 Z"/>
+    <!-- rim light on the lit (left) side -->
+    <path fill="none" stroke="#8a8a8a" stroke-width="7" stroke-linecap="round"
+          d="M 220,110 C 170,140 144,200 140,280 C 134,390 126,490 112,584 C 102,640 92,676 82,702"/>
+    <path fill="none" stroke="#3e3e3e" stroke-width="5" stroke-linecap="round"
+          d="M 160,330 C 154,430 146,530 128,660 M 440,330 C 446,430 454,530 472,660"/>
+    <path fill="none" stroke="#333333" stroke-width="4" stroke-linecap="round"
+          d="M 384,112 C 432,144 456,200 460,280 C 466,390 474,490 488,584 C 498,640 508,676 518,702"/>
+  </g>
+
+  <g id="body">
+    <path fill="url(#hoodie)" d="M 40,800 C 52,688 120,628 226,600 C 248,594 262,580 268,556
+      L 332,556 C 338,580 352,594 374,600 C 480,628 548,688 560,800 Z"/>
+    <path fill="none" stroke="#8a8a8a" stroke-width="6" stroke-linecap="round"
+          d="M 44,790 C 56,688 122,630 226,602"/>
+    <path fill="none" stroke="#3a3a3a" stroke-width="3" stroke-linecap="round"
+          d="M 374,602 C 470,628 540,684 556,790"/>
+    <!-- hood roll around the neck -->
+    <path fill="#484848" d="M 206,606 C 222,566 262,550 300,566 C 338,550 378,566 394,606
+      C 366,630 332,612 300,624 C 268,612 234,630 206,606 Z"/>
+    <path fill="none" stroke="#9a9a9a" stroke-width="5" stroke-linecap="round"
+          d="M 210,604 C 226,570 262,556 298,568"/>
+    <!-- folds -->
+    <path fill="none" stroke="#161616" stroke-width="5" stroke-linecap="round"
+          d="M 300,640 L 300,800"/>
+    <!-- drawstrings -->
+    <path fill="none" stroke="#cccccc" stroke-width="6" stroke-linecap="round"
+          d="M 282,618 C 280,650 276,680 274,712 M 318,618 C 322,650 326,684 328,716"/>
+    <rect x="268" y="710" width="12" height="20" rx="4" fill="#e4e4e4"/>
+    <rect x="322" y="714" width="12" height="20" rx="4" fill="#e4e4e4"/>
+  </g>
+
+  <g id="neck">
+    <path fill="#8e8e8e" d="M 276,430 L 276,560 C 288,572 312,572 324,560 L 324,430 Z"/>
+    <path fill="#3a3a3a" d="M 276,440 C 284,486 316,486 324,440 L 324,500 C 312,512 288,512 276,500 Z"/>
+  </g>
+
+  <g id="face">
+    <path fill="url(#skin)" d="M 182,300 C 182,372 196,410 226,442 C 254,470 282,484 300,487
+      C 318,484 346,470 374,442 C 404,410 418,372 418,300 C 418,196 182,196 182,300 Z"/>
+    <!-- shade on the far (right) cheek and under the bangs -->
+    <path fill="#7a7a7a" d="M 404,320 C 404,380 392,416 364,446 C 348,462 326,476 304,484
+      C 330,470 368,438 384,398 C 394,372 398,346 404,320 Z"/>
+    <path fill="#949494" d="M 186,270 L 414,270 L 414,304 C 380,292 340,310 300,300 C 260,310 220,292 186,306 Z"/>
+    <!-- brows (mostly under the bangs) -->
+    <path fill="none" stroke="#3a3a3a" stroke-width="4" stroke-linecap="round"
+          d="M 216,304 C 230,298 246,297 260,300 M 340,300 C 354,297 370,298 384,304"/>
+    <!-- nose + mouth -->
+    <path fill="none" stroke="#6e6e6e" stroke-width="5" stroke-linecap="round" d="M 306,398 L 300,410"/>
+    <path fill="none" stroke="#262626" stroke-width="6" stroke-linecap="round" d="M 286,443 Q 300,453 314,442"/>
+    <path fill="none" stroke="#c8c8c8" stroke-width="3" stroke-linecap="round" d="M 293,455 Q 300,458 307,455"/>
+  </g>
+
+  <g id="eyes-open">
+    <use xlink:href="#eyeOpen" transform="translate(358,350) scale(1.16)"/>
+    <use xlink:href="#eyeOpen" transform="translate(242,350) scale(-1.16,1.16)"/>
+    <!-- highlights: same light direction for both eyes -->
+    <ellipse cx="231" cy="332" rx="8" ry="10" fill="#ffffff"/>
+    <ellipse cx="349" cy="332" rx="8" ry="10" fill="#ffffff"/>
+    <circle cx="254" cy="370" r="4" fill="#e8e8e8"/>
+    <circle cx="370" cy="370" r="4" fill="#e8e8e8"/>
+  </g>
+
+  <g id="eyes-closed" display="none">
+    <use xlink:href="#eyeClosed" transform="translate(358,352) scale(1.16)"/>
+    <use xlink:href="#eyeClosed" transform="translate(242,352) scale(-1.16,1.16)"/>
+  </g>
+
+  <g id="hair-side">
+    <path fill="#1c1c1c" d="M 192,232 C 160,300 150,380 152,460 C 154,540 142,600 126,664
+      C 148,646 160,626 168,604 C 172,644 168,684 158,716 C 190,676 200,612 198,552
+      C 196,482 202,402 218,322 Z"/>
+    <path fill="#1a1a1a" d="M 408,232 C 440,300 452,384 450,462 C 448,540 460,604 476,668
+      C 454,650 442,630 434,606 C 430,646 434,686 444,718 C 412,676 402,614 404,552
+      C 406,482 398,402 382,322 Z"/>
+    <path fill="none" stroke="#6a6a6a" stroke-width="5" stroke-linecap="round"
+          d="M 186,262 C 166,330 160,400 164,470 C 166,540 158,600 140,650"/>
+    <path fill="none" stroke="#000000" stroke-width="5" stroke-linecap="round"
+          d="M 196,330 C 186,400 182,470 184,540 C 186,590 178,640 166,690
+             M 404,330 C 414,400 418,470 416,540 C 414,590 422,640 434,690"/>
+  </g>
+
+  <g id="bangs">
+    <path fill="#1e1e1e" d="M 178,262 C 175,150 230,92 300,92 C 372,92 426,150 424,262
+      Q 432,300 428,344 Q 418,312 408,290 Q 404,310 396,322 Q 390,300 380,282
+      Q 374,296 364,304 Q 356,290 346,272 Q 338,286 328,294 Q 320,276 310,256
+      Q 302,276 290,296 Q 282,284 272,272 Q 264,290 254,302 Q 246,292 234,282
+      Q 226,302 214,318 Q 206,302 198,290 Q 190,320 172,348 Q 170,300 178,262 Z"/>
+    <!-- strand separations -->
+    <path fill="none" stroke="#000000" stroke-width="5" stroke-linecap="round"
+          d="M 300,212 C 304,236 308,250 310,262 M 262,214 C 268,250 270,270 272,284
+             M 228,226 C 232,256 234,272 236,286 M 338,214 C 342,250 344,266 344,280
+             M 372,226 C 376,256 378,272 378,286 M 200,250 C 198,268 198,280 198,290
+             M 404,252 C 406,270 407,282 408,290"/>
+    <!-- glossy band (the anime "angel ring"), broken into strands -->
+    <path fill="none" stroke="#7a7a7a" stroke-width="8" stroke-linecap="round"
+          d="M 206,186 C 222,170 240,160 258,154 M 270,150 C 284,147 296,146 308,147
+             M 320,148 C 336,151 352,158 366,166 M 378,174 C 386,180 392,186 396,192"/>
+    <path fill="none" stroke="#b0b0b0" stroke-width="5" stroke-linecap="round"
+          d="M 232,170 C 240,165 248,161 256,158 M 280,149 C 288,148 296,148 302,148"/>
+    <path fill="none" stroke="#9a9a9a" stroke-width="7" stroke-linecap="round"
+          d="M 196,170 C 220,124 258,100 300,98"/>
+    <path fill="none" stroke="#3c3c3c" stroke-width="3" stroke-linecap="round"
+          d="M 404,170 C 380,124 342,100 300,98"/>
+  </g>
+
+  <g id="clip">
+    <!-- hair clip bar; the red bead at its end is drawn by the shader (clipPos) -->
+    <path d="M 206,238 L 250,214" stroke="#c4c4c4" stroke-width="10" stroke-linecap="round"/>
+  </g>
+</svg>

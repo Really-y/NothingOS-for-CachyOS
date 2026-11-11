@@ -17,5 +17,9 @@ Window {
     }
 }
 EOQ
-QT_QPA_PLATFORM=offscreen QT_QUICK_BACKEND=software timeout 20 /usr/lib/qt6/bin/qml "$TMP/Render.qml" 2>&1 | grep -vE "QML debugging|^$" || true
+# Previews that need shaders (ShaderEffect) carry a "// render: rhi" marker and render with the
+# OpenGL RHI (offscreen QPA + GLX on the X/Xwayland display); everything else stays on software.
+BACKEND=(QT_QUICK_BACKEND=software)
+grep -q "^// render: rhi" "$QML" && BACKEND=(QT_QUICK_BACKEND=rhi QSG_RHI_BACKEND=opengl)
+env QT_QPA_PLATFORM=offscreen "${BACKEND[@]}" timeout 20 /usr/lib/qt6/bin/qml "$TMP/Render.qml" 2>&1 | grep -vE "QML debugging|^$" || true
 [ -f "$OUT" ] && echo "rendered $OUT"

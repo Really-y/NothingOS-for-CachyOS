@@ -56,6 +56,9 @@ kw --file kdeglobals --group Sounds --key Enable true
 
 echo "· wallpaper";    mkdir -p "$D/wallpapers/nothing"; cp "$ROOT"/wallpapers/*.png "$D/wallpapers/nothing/"
 plasma-apply-wallpaperimage "$D/wallpapers/nothing/nothing-sweep.png" >/dev/null || true
+# live dot-matrix wallpaper (Glyph field + character); NOTHING_LIVE_WALLPAPER=0 keeps the static image
+if [ "${NOTHING_LIVE_WALLPAPER:-1}" = 1 ]; then "$ROOT/scripts/build-wallpaper.sh" --apply >/dev/null || true
+else "$ROOT/scripts/build-wallpaper.sh" >/dev/null || true; fi
 
 echo "· icons";        python3 "$ROOT/icons/gen_icons.py" >/dev/null; mkdir -p "$D/icons"; rm -rf "$D/icons/Nothing"; cp -r "$ROOT/icons/Nothing" "$D/icons/"; /usr/lib/plasma-changeicons Nothing >/dev/null 2>&1 || true
 

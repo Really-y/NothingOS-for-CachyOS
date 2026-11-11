@@ -1,0 +1,16 @@
+{
+    "KPackageStructure": "Plasma/Wallpaper",
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "X-KDE-ParentApp": "org.kde.plasmashell",
+    "KPlugin": {
+        "Id": "org.nothing.dots",
+        "Name": "Nothing Glyph Field",
+        "Description": "Live dot-grid wallpaper in Nothing OS style: a slow Glyph sweep and one breathing red dot",
+        "Icon": "preferences-desktop-wallpaper",
+        "Category": "",
+        "Authors": [{ "Name": "NothingOS for CachyOS" }],
+        "License": "GPL-3.0-or-later",
+        "Version": "1.0",
+        "Website": ""
+    }
+}

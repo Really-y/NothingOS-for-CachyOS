@@ -7,6 +7,9 @@ SRC="${1:-$FIRST}"
 [ -d "$SRC" ] || { echo "Ehtiyat nüsxə tapılmadı: $SRC"; exit 1; }
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 pkill -x qs 2>/dev/null || true
+# live wallpaper -> static image first (live, via plasmashell scripting), then drop the package
+"$ROOT/scripts/build-wallpaper.sh" --revert >/dev/null 2>&1 || true
+kpackagetool6 -t Plasma/Wallpaper -r org.nothing.dots >/dev/null 2>&1 || true
 systemctl --user disable --now nothingd.service 2>/dev/null || true
 # give notifications back to dunst if that was the original setup
 systemctl --user unmask dunst.service 2>/dev/null || true
