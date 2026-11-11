@@ -13,7 +13,7 @@ Rectangle {
             model: [ { t: 1.0, label: "T+1.0S" }, { t: 7.32, label: "T+7.3S  BLINK" } ]
             Item {
                 width: 800; height: 900; clip: true
-                Dots.GlyphField { x: -1060; y: -180; width: 1920; height: 1080; time: modelData.t }
+                Dots.GlyphField { x: -1040; y: 0; width: 1920; height: 1080; time: modelData.t }
                 Text { x: 14; y: 12; text: modelData.label; color: "#8e8e8e"; font.family: "Space Mono"; font.pixelSize: 11; font.letterSpacing: 1.2 }
             }
         }

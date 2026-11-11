@@ -35,7 +35,7 @@
     </entry>
     <entry name="CharacterScale" type="Double">
       <label>Character height, fraction of screen height (bottom-aligned)</label>
-      <default>0.80</default>
+      <default>1.0</default>
     </entry>
     <entry name="Animate" type="Bool">
       <label>Animate (off = static frame, no CPU/GPU use)</label>

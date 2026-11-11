@@ -77,7 +77,7 @@ void main()
     if (covC > 0.0) {
         vec2 uv = c / res;
         float g = clamp(uv.x * 0.55 + uv.y * 0.45, 0.0, 1.0);
-        float lum = base * (0.85 + 0.35 * g * g) + lift(c);
+        float lum = min(0.30, base * (0.85 + 0.35 * g * g) + lift(c));   // never brighter than her hair rim
         if (figOn > 0.5) {
             vec2 fu = figUV(c);
             if (all(greaterThanEqual(fu, vec2(0.0))) && all(lessThanEqual(fu, vec2(1.0))))
@@ -86,24 +86,31 @@ void main()
         col = vec3(lum * covC);
     }
 
-    // ---- figure (fine dot matrix) ----
+    // ---- figure (fine dot matrix; dot SIZE and brightness follow luminance) ----
     if (figOn > 0.5) {
         vec2 f = (floor(p / figPitch) + 0.5) * figPitch;
-        float covF = clamp(0.5 * dotRatio * figPitch - length(p - f) + 0.5, 0.0, 1.0);
+        float dist = length(p - f);
         vec2 uv = figUV(f);
-        if (covF > 0.0 && uv.x > -0.05 && uv.x < 1.05 && uv.y > -0.05 && uv.y < 1.0) {
-            float w = texture(figAux, uv).r;
-            if (w > 0.0)   // hair: travelling wave from root to tip, two harmonics
-                uv.x -= w * swayAmp * (sin(swayPhase - uv.y * 5.0 + uv.x * 2.0)
-                                       + 0.35 * sin(2.0 * swayPhase - uv.y * 9.0 + 1.3));
-            vec2 d = 0.25 * figPitch / figRect.zw;            // 4 taps ~ area average of the cell
+        // early out: outside the largest possible dot, or outside her canvas
+        if (dist < 0.40 * figPitch + 0.5 && uv.x > -0.05 && uv.x < 1.05 && uv.y > -0.05 && uv.y < 1.0) {
+            vec3 a = texture(figAux, uv).rgb;               // sway, feathered silhouette, face mask
+            if (a.r > 0.0)   // hair: travelling wave from root to tip, two harmonics
+                uv.x -= a.r * swayAmp * (sin(swayPhase - uv.y * 5.0 + uv.x * 2.0)
+                                         + 0.35 * sin(2.0 * swayPhase - uv.y * 9.0 + 1.3));
+            vec2 d = 0.25 * figPitch / figRect.zw;          // 4 taps ~ area average of the cell
             vec3 t = texture(figTex, uv + vec2(-d.x, -d.y)).rgb + texture(figTex, uv + vec2(d.x, -d.y)).rgb
                    + texture(figTex, uv + vec2(-d.x,  d.y)).rgb + texture(figTex, uv + vec2(d.x,  d.y)).rgb;
             t *= 0.25;
             float sil = smoothstep(0.30, 0.55, t.b);
-            if (sil > 0.0) {
-                float lum = max(0.055, mix(t.r, t.g, blink)) + 1.15 * lift(f);
-                col = max(col, vec3(lum * covF * sil));
+            float lum = mix(t.r, t.g, blink);
+            float face = smoothstep(0.4, 0.8, a.b);
+            // in the face, dark features are MISSING dots; elsewhere keep the faint grid floor
+            lum = face > 0.5 ? (lum < 0.05 ? 0.0 : lum) : max(0.055, lum);
+            if (sil > 0.0 && lum > 0.0) {
+                float r = 0.5 * mix(0.30, 0.80, clamp(lum, 0.0, 1.0)) * figPitch;
+                float covF = clamp(r - dist + 0.5, 0.0, 1.0);
+                float v = min(1.0, lum + 0.6 * lift(f));
+                col = max(col, vec3(v * covF * sil));
             }
         }
     }

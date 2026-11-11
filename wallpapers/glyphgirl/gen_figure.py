@@ -3,8 +3,10 @@
 
 figure.png      R = luminance, eyes open      G = luminance, eyes closed
                 B = silhouette (coverage)
+                (a 1-dot jaw/cheek contour at 0.45 is baked into R and G)
 figure-aux.png  R = hair sway weight (0 = rigid, 1 = free tip), dilated past the silhouette
-                G = silhouette dilated (hides the coarse background dots around her)
+                G = silhouette, dilated + feathered over ~1 coarse dot (fades the background grid)
+                B = face mask (skin + eyes): dark features there become missing dots
 
 Needs rsvg-convert, numpy, Pillow. Run after editing girl.svg:
     python3 wallpapers/glyphgirl/gen_figure.py
@@ -22,7 +24,8 @@ OUT = os.path.join(HERE, "..", "..", "plasma", "wallpapers", "org.nothing.dots",
 SVG = open(os.path.join(HERE, "girl.svg")).read()
 W, H = 600, 800          # canvas
 TW, TH = 300, 400        # texture (2 canvas px per texel)
-GROUPS = ["hair-back", "body", "neck", "face", "eyes-open", "eyes-closed", "hair-side", "bangs", "clip"]
+GROUPS = ["hair-back", "body", "neck", "hair-curtain", "face", "eyes-open", "eyes-closed",
+          "hair-side", "bangs", "ahoge", "clip"]
 
 
 def variant(show):
@@ -62,11 +65,16 @@ alpha = {g: render([g])[1] for g in GROUPS if g not in ("eyes-closed",)}
 order = [g for g in GROUPS if g != "eyes-closed"]
 
 
-def visible(g):
+def visible(g, through=()):
     v = alpha[g].copy()
     for later in order[order.index(g) + 1:]:
-        v *= 1 - alpha[later]
+        if later not in through:
+            v *= 1 - alpha[later]
     return v
+
+
+def erode(x, n):
+    return np.asarray(Image.fromarray(np.uint8(np.clip(x, 0, 1) * 255)).filter(ImageFilter.MinFilter(n)), np.float32) / 255
 
 
 y = np.linspace(0, 1, H, dtype=np.float32)[:, None] * H
@@ -79,15 +87,24 @@ def ramp(y0, y1):
 
 sway = np.maximum.reduce([
     visible("hair-back") * ramp(300, 720) * 1.0,
-    visible("hair-side") * ramp(280, 720) * 1.0,
-    visible("bangs") * ramp(170, 340) * 0.22,
+    visible("hair-curtain") * ramp(300, 720) * 1.0,
+    visible("hair-side") * ramp(260, 490) * 0.45,
+    visible("bangs") * ramp(170, 322) * 0.15,
+    visible("ahoge") * ramp(92, 48) * 1.6,
 ])
 sway = small(sway)
 sway = np.maximum(blur(sway, 2), blur(dilate(sway, 9), 5) * 0.9)   # reach past the tips
 
+# 1-dot jaw/cheek contour (~5 canvas px) where the face meets neck / hair
+face_region = visible("face", through=("eyes-open",))
+contour = np.clip(face_region - erode(face_region, 11), 0, 1) * ramp(300, 330)
+lum_open = lum_open * (1 - contour) + 0.45 * contour
+lum_closed = lum_closed * (1 - contour) + 0.45 * contour
+face_mask = small(np.clip(face_region + visible("neck"), 0, 1))
+
 S = small(sil)
 fig = np.dstack([small(lum_open), small(lum_closed), S])
-aux = np.dstack([sway, blur(dilate(S, 9), 1.5), np.zeros_like(S)])
+aux = np.dstack([sway, blur(dilate(S, 7), 6), face_mask])
 Image.fromarray(np.uint8(np.clip(fig, 0, 1) * 255)).save(os.path.join(OUT, "figure.png"), optimize=True)
 Image.fromarray(np.uint8(np.clip(aux, 0, 1) * 255)).save(os.path.join(OUT, "figure-aux.png"), optimize=True)
 print("ok", os.path.relpath(os.path.join(OUT, "figure.png")))

@@ -27,7 +27,7 @@ Item {
     // the character
     property bool showFigure: true
     property real figureX: 0.75           // horizontal centre, fraction of width
-    property real figureScale: 0.80       // height, fraction of screen height (bottom-aligned)
+    property real figureScale: 1.0        // height, fraction of screen height (bottom-aligned)
     property int figurePitch: 5          // house pitch (5/8/12/15); fine enough for her eyes
     readonly property rect figRect: {
         const h = Math.round(figureScale * height), w = Math.round(h * 0.75)
@@ -94,13 +94,13 @@ Item {
     readonly property bool idleMotion: animated && showFigure
 
     // ---- the one red dot: her hair-clip bead, else bottom-right ----
-    readonly property point clipUV: Qt.point(256 / 600, 211 / 800)   // girl.svg canvas
+    readonly property point clipUV: Qt.point(246 / 600, 210 / 800)   // girl.svg canvas (clip bar end)
     readonly property point redPos: showFigure
         ? Qt.point(figRect.x + (0.5 + (clipUV.x - 0.5) * (1 + breathe)) * figRect.width,
                    figRect.y + (1 + (clipUV.y - 1) * (1 + breathe)) * figRect.height)
         : Qt.point((Math.floor((width - 216) / pitch) + 0.5) * pitch,
                    (Math.floor((height - 168) / pitch) + 0.5) * pitch)
-    readonly property real redR: showFigure ? Math.max(4.5, figRect.height / 800 * 6.5) : 0.5 * dotRatio * pitch
+    readonly property real redR: showFigure ? Math.max(4.5, figRect.height / 800 * 5.5) : 0.5 * dotRatio * pitch
 
     readonly property bool useShader: GraphicsInfo.api !== GraphicsInfo.Software
                                       && shader.status !== ShaderEffect.Error
