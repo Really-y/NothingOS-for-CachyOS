@@ -11,7 +11,7 @@
     </entry>
     <entry name="SweepSpeed" type="Double">
       <label>Glyph sweep speed multiplier (1 = one sweep every 11 s)</label>
-      <default>1.0</default>
+      <default>1.15</default>
     </entry>
     <entry name="ShowRedDot" type="Bool">
       <label>Show the breathing red dot</label>
@@ -35,7 +35,7 @@
     </entry>
     <entry name="CharacterScale" type="Double">
       <label>Character height, fraction of screen height (bottom-aligned)</label>
-      <default>1.0</default>
+      <default>1.15</default>
     </entry>
     <entry name="Animate" type="Bool">
       <label>Animate (off = static frame, no CPU/GPU use)</label>

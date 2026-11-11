@@ -27,11 +27,13 @@ Item {
     // the character
     property bool showFigure: true
     property real figureX: 0.75           // horizontal centre, fraction of width
-    property real figureScale: 1.0        // height, fraction of screen height (bottom-aligned)
+    property real figureScale: 1.15       // height, fraction of screen height
     property int figurePitch: 5          // house pitch (5/8/12/15); fine enough for her eyes
     readonly property rect figRect: {
         const h = Math.round(figureScale * height), w = Math.round(h * 0.75)
-        return Qt.rect(Math.round(figureX * width - w / 2), height - h, w, h)
+        // bottom-aligned; when taller than the screen, keep the ahoge ~2 % below the top edge
+        // (the hoodie runs off the bottom instead), which also lifts her face
+        return Qt.rect(Math.round(figureX * width - w / 2), Math.round(Math.max(height - h, -0.035 * h)), w, h)
     }
 
     readonly property real cycle: 11.0 / Math.max(0.25, speed)
@@ -94,7 +96,7 @@ Item {
     readonly property bool idleMotion: animated && showFigure
 
     // ---- the one red dot: her hair-clip bead, else bottom-right ----
-    readonly property point clipUV: Qt.point(246 / 600, 210 / 800)   // girl.svg canvas (clip bar end)
+    readonly property point clipUV: Qt.point(228.0 / 600, 214.4 / 800)   // girl.svg clip bar end, after the 4° head tilt
     readonly property point redPos: showFigure
         ? Qt.point(figRect.x + (0.5 + (clipUV.x - 0.5) * (1 + breathe)) * figRect.width,
                    figRect.y + (1 + (clipUV.y - 1) * (1 + breathe)) * figRect.height)

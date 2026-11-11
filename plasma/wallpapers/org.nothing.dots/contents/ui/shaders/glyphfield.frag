@@ -103,9 +103,16 @@ void main()
             t *= 0.25;
             float sil = smoothstep(0.30, 0.55, t.b);
             float lum = mix(t.r, t.g, blink);
+            // eye highlights (1.0 in the art) bypass the area average: any tap on one -> full dot
+            vec2 o = vec2(d.x, -d.y);
+            float hi = max(max(mix(texture(figTex, uv - d).r, texture(figTex, uv - d).g, blink),
+                               mix(texture(figTex, uv + d).r, texture(figTex, uv + d).g, blink)),
+                           max(mix(texture(figTex, uv - o).r, texture(figTex, uv - o).g, blink),
+                               mix(texture(figTex, uv + o).r, texture(figTex, uv + o).g, blink)));
             float face = smoothstep(0.4, 0.8, a.b);
             // in the face, dark features are MISSING dots; elsewhere keep the faint grid floor
             lum = face > 0.5 ? (lum < 0.05 ? 0.0 : lum) : max(0.055, lum);
+            if (hi > 0.97) lum = 1.0;
             if (sil > 0.0 && lum > 0.0) {
                 float r = 0.5 * mix(0.30, 0.80, clamp(lum, 0.0, 1.0)) * figPitch;
                 float covF = clamp(r - dist + 0.5, 0.0, 1.0);

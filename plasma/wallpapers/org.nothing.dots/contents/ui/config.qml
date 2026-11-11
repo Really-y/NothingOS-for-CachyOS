@@ -22,7 +22,7 @@ Kirigami.FormLayout {
     property alias cfg_CharacterPosition: charPos.value
     property real cfg_CharacterPositionDefault: 0.75
     property alias cfg_CharacterScale: charScale.value
-    property real cfg_CharacterScaleDefault: 1.0
+    property real cfg_CharacterScaleDefault: 1.15
     property alias cfg_Animate: animate.checked
     property bool cfg_AnimateDefault: true
 
@@ -55,7 +55,7 @@ Kirigami.FormLayout {
     QQC2.Slider {
         id: charScale
         Kirigami.FormData.label: "Size:"
-        from: 0.6; to: 1.25; stepSize: 0.01
+        from: 0.6; to: 1.4; stepSize: 0.01
         enabled: character.checked
     }
 

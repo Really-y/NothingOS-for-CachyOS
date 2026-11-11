@@ -23,8 +23,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "..", "..", "plasma", "wallpapers", "org.nothing.dots", "contents", "ui")
 SVG = open(os.path.join(HERE, "girl.svg")).read()
 W, H = 600, 800          # canvas
-TW, TH = 300, 400        # texture (2 canvas px per texel)
-GROUPS = ["hair-back", "body", "neck", "hair-curtain", "face", "eyes-open", "eyes-closed",
+TW, TH = 600, 800        # texture (1 canvas px per texel: 1-dot features survive)
+GROUPS = ["hair-back", "neck", "body", "hair-curtain", "face", "eyes-open", "eyes-closed",
           "hair-side", "bangs", "ahoge", "clip"]
 
 
@@ -93,7 +93,7 @@ sway = np.maximum.reduce([
     visible("ahoge") * ramp(92, 48) * 1.6,
 ])
 sway = small(sway)
-sway = np.maximum(blur(sway, 2), blur(dilate(sway, 9), 5) * 0.9)   # reach past the tips
+sway = np.maximum(blur(sway, 4), blur(dilate(sway, 17), 10) * 0.9)   # reach past the tips
 
 # 1-dot jaw/cheek contour (~5 canvas px) where the face meets neck / hair
 face_region = visible("face", through=("eyes-open",))
@@ -104,7 +104,7 @@ face_mask = small(np.clip(face_region + visible("neck"), 0, 1))
 
 S = small(sil)
 fig = np.dstack([small(lum_open), small(lum_closed), S])
-aux = np.dstack([sway, blur(dilate(S, 7), 6), face_mask])
+aux = np.dstack([sway, blur(dilate(S, 13), 12), face_mask])
 Image.fromarray(np.uint8(np.clip(fig, 0, 1) * 255)).save(os.path.join(OUT, "figure.png"), optimize=True)
 Image.fromarray(np.uint8(np.clip(aux, 0, 1) * 255)).save(os.path.join(OUT, "figure-aux.png"), optimize=True)
 print("ok", os.path.relpath(os.path.join(OUT, "figure.png")))
