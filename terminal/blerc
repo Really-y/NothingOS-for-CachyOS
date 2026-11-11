@@ -1,0 +1,44 @@
+# Nothing — ble.sh faces (installed to ~/.blerc by scripts/install.sh)
+# ble.sh 0.3 takes palette indices only: 15 white, 245 grey #8a8a8a, 8 dim #5e5e5e,
+# 1 red #d71921 (one red, errors only), 16 black, 235 hairline. No hue anywhere.
+
+# commands: plain white
+for f in command_builtin command_builtin_dot command_alias command_function command_file \
+         command_keyword command_jobs syntax_command syntax_default syntax_function_name; do
+  ble-color-setface "$f" fg=15
+done
+ble-color-setface command_directory   fg=15,underline
+ble-color-setface cmdinfo_cd_cdpath   fg=15,underline
+
+# arguments, quotes, expansions: grey
+for f in syntax_quoted syntax_quotation syntax_expr syntax_varname syntax_param_expansion \
+         syntax_tilde syntax_glob syntax_brace syntax_delimiter syntax_history_expansion \
+         syntax_document syntax_document_begin; do
+  ble-color-setface "$f" fg=245
+done
+ble-color-setface syntax_comment      fg=8
+ble-color-setface syntax_error        fg=1
+
+# file names: white, directories underlined, problems red
+for f in filename_other filename_executable filename_link filename_pipe filename_character \
+         filename_block filename_socket filename_setuid filename_setgid; do
+  ble-color-setface "$f" fg=15
+done
+ble-color-setface filename_directory        fg=15,underline
+ble-color-setface filename_directory_sticky fg=15,underline
+ble-color-setface filename_orphan           fg=1,underline
+ble-color-setface filename_warning          fg=1,underline
+
+# editing UI: inverted white like the rest of Nothing, suggestions dim
+ble-color-setface region            fg=16,bg=15
+ble-color-setface region_target     fg=16,bg=245
+ble-color-setface region_match      fg=15,bg=235
+ble-color-setface disabled          fg=8
+ble-color-setface overwrite_mode    fg=16,bg=245
+ble-color-setface auto_complete     fg=8
+ble-color-setface menu_complete     fg=16,bg=15
+ble-color-setface menu_filter_fixed fg=15,bold
+ble-color-setface menu_filter_input fg=16,bg=245
+ble-color-setface vbell             reverse
+ble-color-setface vbell_flash       reverse
+ble-color-setface vbell_erase       bg=16

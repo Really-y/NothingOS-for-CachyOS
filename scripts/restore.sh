@@ -23,6 +23,7 @@ rm -f "$HOME/.local/share/dbus-1/services/org.knopwob.dunst.service" "$HOME/.loc
 rm -f "$HOME"/.local/share/applications/nothingos-*.desktop
 "$ROOT/scripts/dolphin.sh" --revert 2>/dev/null || true
 "$ROOT/scripts/defaults.sh" --revert 2>/dev/null || true
+[ -L "$HOME/.blerc" ] && rm -f "$HOME/.blerc"; sed -i "s/^fastfetch  # Nothing (was: neofetch)$/neofetch/" "$HOME/.bashrc"
 for f in "$SRC"/*; do
   name=$(basename "$f")
   rm -rf "$HOME/.config/$name"

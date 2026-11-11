@@ -63,6 +63,20 @@ open(p, 'w').write(f'{head}{sep}NoDisplay=true\n{tag}\n{main}{nxt}{tail}')
 EOF
 done
 
+# Meta+E is bound to the Nautilus service in kglobalshortcutsrc. That file must not be
+# touched while KWin runs (kglobalaccel crash), so the hidden Nautilus entry launches Dolphin.
+DOLPHIN_EXEC=$(grep -m1 '^Exec=' "$(find_desktop "$FILES")" 2>/dev/null | cut -d= -f2- || true)
+[ -n "$DOLPHIN_EXEC" ] || DOLPHIN_EXEC="dolphin %u"
+cat > "$APPS/org.gnome.Nautilus.desktop" <<EOF
+[Desktop Entry]
+NoDisplay=true
+$TAG
+Type=Application
+Name=Dolphin
+Icon=system-file-manager
+Exec=$DOLPHIN_EXEC
+EOF
+
 # default handlers
 for m in x-scheme-handler/http x-scheme-handler/https x-scheme-handler/about x-scheme-handler/unknown \
          text/html application/xhtml+xml application/pdf image/png image/jpeg image/gif image/webp \
