@@ -46,7 +46,7 @@ FocusScope {
     Item {
         id: lift
         width: bar.iconSize; height: bar.iconSize
-        y: bar.iconY - (slot.lifted ? 4 : 0)
+        y: bar.iconY - (slot.lifted ? 2 : 0)
         Behavior on y { SpringAnimation { spring: 5; damping: 0.32; epsilon: 0.05 } }
         scale: mouse.pressed ? 0.94 : 1
         Behavior on scale { SpringAnimation { spring: 6; damping: 0.42; epsilon: 0.002 } }
@@ -71,8 +71,8 @@ FocusScope {
             visible: !slot.info.themed && !slot.info.glyph && !slot.info.loading
             anchors.centerIn: parent
             text: (slot.label.match(/[A-Za-z0-9]/) || ["?"])[0].toUpperCase()
-            pitch: bar.iconSize / 15
-            dotRatio: 0.82
+            pitch: Math.round(bar.iconSize / 11.5)   // 4px at 46: 5×7 letter fits inside the 43px disc
+            dotRatio: 0.7
             color: Theme.fg
         }
         // keyboard focus: thin white ring just outside the disc
@@ -87,13 +87,22 @@ FocusScope {
 
     // ── indicators: dots under the disc ───────────────────────────────
     // running = white dot per window (max 3) · active = first dot stretches to a pill
-    // minimized = grey dots · attention = one red dot (the only red) · launching = pulsing grey dot
+    // minimized = grey #5e5e5e dots (one per window, max 3) · attention = one red dot (the only red)
+    // launching = three 3px dots lighting up in sequence (#8e8e8e), one always lit
+    readonly property bool launching: startup && !running && !attention
+    property int launchStep: 0
+    Timer {
+        running: slot.launching
+        interval: 160; repeat: true
+        onTriggered: slot.launchStep = (slot.launchStep + 1) % 3
+    }
     Row {
         id: dots
+        visible: !slot.launching
         anchors.horizontalCenter: parent.horizontalCenter
         y: bar.dotY
         spacing: 3
-        readonly property int count: slot.attention ? 1 : (slot.running ? Math.min(slot.windows, 3) : (slot.startup ? 1 : 0))
+        readonly property int count: slot.attention ? 1 : (slot.running ? Math.min(slot.windows, 3) : 0)
         Repeater {
             model: dots.count
             Rectangle {
@@ -101,16 +110,23 @@ FocusScope {
                 height: 4
                 width: index === 0 && slot.active && !slot.attention ? 12 : 4
                 radius: 2
-                color: slot.attention ? Theme.red : (slot.startup && !slot.running) ? Theme.fg3
-                     : slot.minimized ? Theme.fg3 : Theme.fg
+                color: slot.attention ? Theme.red : slot.minimized ? Theme.fg3 : Theme.fg
                 Behavior on width { NumberAnimation { duration: Theme.normal; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.emphasized } }
                 Behavior on color { ColorAnimation { duration: Theme.fast } }
-                SequentialAnimation on opacity {
-                    running: slot.startup && !slot.running
-                    loops: Animation.Infinite
-                    NumberAnimation { from: 1; to: 0.25; duration: 520; easing.type: Easing.InOutSine }
-                    NumberAnimation { from: 0.25; to: 1; duration: 520; easing.type: Easing.InOutSine }
-                }
+            }
+        }
+    }
+    Row {
+        visible: slot.launching
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: bar.dotY + 0.5
+        spacing: 3
+        Repeater {
+            model: 3
+            Rectangle {
+                required property int index
+                width: 3; height: 3; radius: 1.5
+                color: index === slot.launchStep ? Theme.fg2 : Theme.dotDim
             }
         }
     }

@@ -30,14 +30,14 @@ for (const p of panels()) {
         dock.writeConfig("launchers", launchers);
         dock.reloadConfig();
     }
-    p.height = 64; p.floating = true; p.lengthMode = "fit"; p.alignment = "center"; p.hiding = "none";
+    p.height = 68; p.floating = true; p.lengthMode = "fit"; p.alignment = "center"; p.hiding = "none";
 }
 if (!haveBottom) {
     const p = new Panel("org.kde.panel");
     p.screen = 0;
     p.location = "bottom";
     p.addWidget(DOCK);
-    p.height = 64; p.floating = true; p.lengthMode = "fit"; p.alignment = "center"; p.hiding = "none";
+    p.height = 68; p.floating = true; p.lengthMode = "fit"; p.alignment = "center"; p.hiding = "none";
 }
 
 // 2. top bar on every screen (system tray only on the primary one)

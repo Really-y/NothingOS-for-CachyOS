@@ -291,7 +291,7 @@ PlasmoidItem {
         anchors.centerIn: parent
         width: implicitWidth
         height: root.vertical ? implicitHeight : root.height
-        pillHeight: Math.max(40, Math.min(root.vertical ? 64 : root.height, 64))
+        pillHeight: Math.max(40, Math.min(root.vertical ? 68 : root.height, 68))
         iconInfo: m => root.iconInfo(m)
 
         onActivated: (index, mods) => root.activate(index, mods)

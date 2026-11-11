@@ -11,7 +11,7 @@ Rectangle {
     width: implicitWidth
     height: implicitHeight
     radius: height / 2
-    color: Theme.widget
+    color: Theme.card
 
     Text {
         id: label

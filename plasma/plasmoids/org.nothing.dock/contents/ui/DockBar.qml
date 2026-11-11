@@ -7,13 +7,14 @@ import "nothing"
 FocusScope {
     id: dockBar
     property var model                      // TasksModel, or a ListModel with the same role names
-    property int pillHeight: 64
-    property int iconSize: Math.round(pillHeight * 0.72)   // 46 at 64: theme disc ≈ 43px
+    property int pillHeight: 68
+    property int iconSize: pillHeight - 22                  // 46 at 68: theme disc ≈ 43px
     property int spacing: 10
-    property int padding: 10
+    property int padding: Math.round((pillHeight - iconSize) / 2)   // concentric end caps
     property color fill: Theme.card
-    readonly property int iconY: Math.round((pillHeight - iconSize) / 2) - 3
-    readonly property int dotY: iconY + iconSize + Math.round((pillHeight - iconY - iconSize - 4) / 2) - 1
+    // 68px pill: disc box 8–54, dots 58–62
+    readonly property int iconY: pillHeight - iconSize - 14
+    readonly property int dotY: iconY + iconSize + 4
 
     // (model) -> { themed: bool, icon: name/url, glyph: name/url } — how to draw the disc
     property var iconInfo: function (m) { return { themed: true, icon: m.decoration }; }

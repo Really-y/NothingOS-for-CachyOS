@@ -34,7 +34,7 @@ Rectangle {
             }
             Column {
                 spacing: 50
-                Label { text: "Hover · Firefox" }
+                Label { text: "Hover · Firefox · Steam launching" }
                 DockBar { model: Tasks {} iconInfo: info; forcedHover: 5; inlineTooltip: true }
             }
         }
