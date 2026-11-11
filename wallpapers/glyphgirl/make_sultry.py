@@ -16,7 +16,7 @@ import os
 HERE = os.path.dirname(os.path.abspath(__file__))
 HEAD = (294, 282, -8, 1.35)       # translate x, y, rotate deg, scale  (local head frame -> canvas)
 BEAD_LOCAL = (49, 37)
-FRAME = (24, 0, 0.92)       # whole drawing: translate x, y, scale (keeps the hip flare in frame)
+FRAME = (43, 64, 0.83)       # whole drawing: translate x, y, scale (waist pinch + hip flare in frame)
 
 
 def head_to_canvas(p):

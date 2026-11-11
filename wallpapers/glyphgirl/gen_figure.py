@@ -34,7 +34,7 @@ GROUPS = ["hair-back", "neck", "body", "rim", "hair-curtain", "hand", "face", "e
 CURTAIN_RAMP = {"sultry": (200, 560)}
 # Nothing-style posterise: snap luminance to a few discrete dot sizes (0 = missing dot and
 # >= 0.97 forced highlights are kept as they are)
-QUANT = {"sultry": (0.28, 0.5, 0.68, 0.85)}
+QUANT = {"sultry": (0.26, 0.42, 0.56, 0.7, 0.85)}
 
 
 def variant(show):
