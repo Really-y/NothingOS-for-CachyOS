@@ -17,7 +17,7 @@ QtObject {
     readonly property color fg3: "#5e5e5e"
     readonly property color red: "#d71921"
 
-    readonly property string sans: "Space Grotesk"
+    readonly property string sans: "Inter"
     readonly property string mono: "Space Mono"
     readonly property string icons: "Material Symbols Rounded"
 

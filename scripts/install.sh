@@ -9,10 +9,10 @@ kw() { kwriteconfig6 "$@"; }
 
 echo "· fonts";        mkdir -p "$D/fonts/nothingos"; cp "$ROOT"/fonts/*.ttf "$D/fonts/nothingos/"; fc-cache -f >/dev/null
 echo "· colours";      mkdir -p "$D/color-schemes"; cp "$ROOT/plasma/colors/Nothing.colors" "$D/color-schemes/"; plasma-apply-colorscheme Nothing >/dev/null || true
-for k in "font:Space Grotesk,10,-1,5,400,0,0,0,0,0" "menuFont:Space Grotesk,10,-1,5,400,0,0,0,0,0" \
-         "toolBarFont:Space Grotesk,9,-1,5,400,0,0,0,0,0" "smallestReadableFont:Space Mono,8,-1,5,400,0,0,0,0,0" \
+for k in "font:Inter,10,-1,5,400,0,0,0,0,0" "menuFont:Inter,10,-1,5,400,0,0,0,0,0" \
+         "toolBarFont:Inter,9,-1,5,400,0,0,0,0,0" "smallestReadableFont:Space Mono,8,-1,5,400,0,0,0,0,0" \
          "fixed:Space Mono,10,-1,5,400,0,0,0,0,0"; do kw --file kdeglobals --group General --key "${k%%:*}" "${k#*:}"; done
-kw --file kdeglobals --group WM --key activeFont "Space Grotesk,10,-1,5,500,0,0,0,0,0"
+kw --file kdeglobals --group WM --key activeFont "Inter,10,-1,5,500,0,0,0,0,0"
 echo "· kvantum";      mkdir -p "$HOME/.config/Kvantum"; cp -r "$ROOT/kvantum/NothingDark" "$HOME/.config/Kvantum/"
 kw --file "$HOME/.config/Kvantum/kvantum.kvconfig" --group General --key theme NothingDark
 kw --file kdeglobals --group KDE --key widgetStyle Breeze

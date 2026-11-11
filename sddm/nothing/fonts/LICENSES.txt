@@ -22,3 +22,5 @@ Material Symbols Rounded  Copyright Google LLC
 
 The fonts are unmodified. In the git repository these files are symlinks to
 ../../../fonts/; sddm/install.sh copies the real files.
+
+Inter — SIL Open Font License 1.1 (https://github.com/rsms/inter)

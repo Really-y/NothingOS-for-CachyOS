@@ -30,7 +30,7 @@ Rectangle {
     readonly property var emphasized: [0.05, 0.7, 0.1, 1, 1, 1]
     readonly property var accelerate: [0.3, 0, 0.8, 0.15, 1, 1]
     readonly property string fDot: dotoFont.status === FontLoader.Ready ? dotoFont.font.family : "Doto"
-    readonly property string fSans: sansFont.status === FontLoader.Ready ? sansFont.font.family : "Space Grotesk"
+    readonly property string fSans: sansFont.status === FontLoader.Ready ? sansFont.font.family : "Inter"
     readonly property string fMono: monoFont.status === FontLoader.Ready ? monoFont.font.family : "Space Mono"
     readonly property string fIcon: iconFont.status === FontLoader.Ready ? iconFont.font.family : "Material Symbols Rounded"
     readonly property bool showClock: cfg("showClock", "true") !== "false"
@@ -74,7 +74,7 @@ Rectangle {
     FontLoader {
         id: sansFont
 
-        source: "fonts/SpaceGrotesk.ttf"
+        source: "fonts/Inter.ttf"
     }
 
     FontLoader {

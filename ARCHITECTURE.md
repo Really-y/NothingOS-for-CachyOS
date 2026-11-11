@@ -10,7 +10,7 @@ small Rust daemon for data. No separate shell process.
   used sparingly (live indicators, warnings, the "now" dot) — never as a large fill.
 - Active toggles = white surface + black glyph. Inactive = `#1c1c1c` + white glyph.
 - Type: **Doto** (dot-matrix, `font.variableAxes: {"ROND":100,"wght":800}`) for big numbers/time;
-  **Space Grotesk** for UI text; **Space Mono** UPPERCASE letter-spaced for small labels.
+  **Inter** for UI text (Nothing OS system font); **Space Mono** UPPERCASE letter-spaced for small labels.
 - Icons: **Material Symbols Rounded** ligatures, thin weight (300), `Icon { name: "wifi" }`.
 - Shapes: cards radius 30, tiles radius 24, pills fully round. Generous padding. Flat, no gradients, no blur, no drop shadows on cards.
 - Motif: dots (dot rings as gauges, dot rows as progress, dot grids).
