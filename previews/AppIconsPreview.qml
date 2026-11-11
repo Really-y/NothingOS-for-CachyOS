@@ -3,15 +3,15 @@ import "../plasma/plasmoids/shared"
 
 // Nothing app icons (icons/Nothing/scalable/apps) rendered through QtSvg, like KDE does:
 // a dock strip at 48px, the same icons small (22px, menus/task switcher) and the
-// silhouette fallbacks.
+// dot-letter fallbacks.
 Rectangle {
     color: "#0b0b0b"
     readonly property string dir: Qt.resolvedUrl("../icons/Nothing/scalable/apps/")
     readonly property var dock: ["firefox", "org.kde.dolphin", "utilities-terminal", "Alacritty", "discord",
         "org.telegram.desktop", "vscodium", "steam", "com.google.Chrome", "com.brave.Browser", "spectacle",
         "mpv", "freetube", "plasmadiscover", "org.qbittorrent.qBittorrent", "xarchiver", "kdeconnect",
-        "virt-manager", "org.wireshark.Wireshark", "com.anydesk.Anydesk"]
-    readonly property var fallback: ["steam_icon_322330", "steam_icon_5059220", "cachyos-pi", "org.kde.iconexplorer", "io.github.sigmasd.stimulator", "org.xfce.about"]
+        "virt-manager", "org.wireshark.Wireshark", "com.anydesk.Anydesk", "org.gnome.Nautilus", "localsend"]
+    readonly property var fallback: ["../../../../previews/assets/dotletter-L", "../../../../previews/assets/dotletter-S", "../../../../previews/assets/dotletter-R"]
 
     Column {
         x: 24; y: 24; spacing: 22
@@ -35,12 +35,13 @@ Rectangle {
                 Image { required property string modelData; width: 22; height: 22; sourceSize: Qt.size(22, 22); source: dir + modelData + ".svg" }
             }
         }
-        Label { text: "Silhouette fallback · 48px" }
+        Label { text: "Dot-letter fallback · 48px / 22px" }
         Row {
             spacing: 8
             Repeater {
-                model: fallback
-                Image { required property string modelData; width: 48; height: 48; sourceSize: Qt.size(96, 96); source: dir + modelData + ".svg" }
+                model: fallback.concat(fallback)
+                Image { required property string modelData; required property int index; readonly property int px: index < 3 ? 48 : 22
+                        width: px; height: px; anchors.verticalCenter: parent.verticalCenter; sourceSize: Qt.size(px * 2, px * 2); source: dir + modelData + ".svg" }
             }
         }
     }

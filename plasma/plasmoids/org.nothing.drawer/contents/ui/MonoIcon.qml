@@ -1,6 +1,7 @@
 import QtQuick
 import org.kde.kirigami as Kirigami
 import "iconmap.js" as IconMap
+import "nothing"
 
 // App icon as one flat monochrome glyph (white, or black when `dark`).
 // A themed "-symbolic" glyph is preferred: exact name, reverse-DNS tail, then a
@@ -15,28 +16,53 @@ Item {
     property int size: 24
     property bool dark: false
     property var symbolicNames: ({})
+    property int discSize: 64
+    property string favoriteId: ""          // "applications:<desktop-id>.desktop"
+    // The Nothing icon theme (icons/appicons.py) ships nothing-glyph-<desktop-id>.svg: the exact
+    // glyph the dock shows, laid out on a 64px canvas for a 64px disc. Use it as-is (no tint).
+    readonly property string themeGlyph: {
+        const id = String(favoriteId).replace(/^applications:/, "").replace(/\.desktop$/, "");
+        if (id && symbolicNames["nothing-glyph-" + id] === true) return "nothing-glyph-" + id;
+        const byIcon = typeof source === "string" ? "nothing-glyph-icon-" + source : "";
+        return byIcon && symbolicNames[byIcon] === true ? byIcon : "";
+    }
+    property string label: ""               // app name: first letter is the dot-matrix fallback
+    // nothing fits: house dot-matrix letter instead of any silhouette of the colour icon
+    readonly property bool dotLetter: themeGlyph === "" && glyph === ""
     property var glyphMap: ({})              // distinct per-app glyphs from IconMap.assign()
     property string key: ""
     readonly property string glyph: IconMap.resolve(source, hint, symbolicNames, glyphMap, key)
-    readonly property var iconSource: glyph !== "" ? glyph : source
+    readonly property var iconSource: themeGlyph !== "" ? themeGlyph : (glyph !== "" ? glyph : source)
     readonly property color ink: dark ? "#000000" : "#ffffff"
     readonly property bool gpu: GraphicsInfo.api !== GraphicsInfo.Software
 
-    width: size; height: size
+    width: themeGlyph !== "" ? discSize : size
+    height: width
+
+    DotString {
+        visible: root.dotLetter
+        anchors.centerIn: parent
+        text: (String(root.label).match(/[A-Za-z0-9]/) || ["?"])[0].toUpperCase()
+        size: root.size * 10 / 7 * 0.8
+        dotRatio: 0.65
+        color: root.ink
+    }
 
     Kirigami.Icon {
         id: icon
-        width: root.size; height: root.size
+        visible: !root.dotLetter
+        width: root.width; height: root.height
         x: root.gpu ? 0 : -100000          // software: keep it grabbable but out of sight
         source: root.iconSource
-        isMask: root.gpu
+        // theme glyphs are already white single paths: only recolour for the black-on-white focus state
+        isMask: root.gpu && (root.themeGlyph === "" || root.dark)
         roundToIconSize: false
         color: root.ink
     }
 
     // software path (previews only) ────────────────────────────────────
     Loader {
-        active: !root.gpu
+        active: !root.gpu && !root.dotLetter
         anchors.fill: parent
         sourceComponent: Item {
             Image {

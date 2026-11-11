@@ -94,7 +94,7 @@ PlasmoidItem {
         id: iconScan
         engine: "executable"
         // only the active theme chain (Nothing → Papirus-Dark → breeze-dark → breeze → hicolor) + flatpak exports
-        readonly property string cmd: "find -L \"$HOME/.local/share/icons\" /usr/share/icons/Papirus-Dark /usr/share/icons/Papirus /usr/share/icons/breeze-dark /usr/share/icons/breeze /usr/share/icons/hicolor /var/lib/flatpak/exports/share/icons \"$HOME/.local/share/flatpak/exports/share/icons\" -name '*-symbolic.svg' -printf '%f\\n' 2>/dev/null | sort -u"
+        readonly property string cmd: "find -L \"$HOME/.local/share/icons\" /usr/share/icons/Papirus-Dark /usr/share/icons/Papirus /usr/share/icons/breeze-dark /usr/share/icons/breeze /usr/share/icons/hicolor /var/lib/flatpak/exports/share/icons \"$HOME/.local/share/flatpak/exports/share/icons\" \\( -name '*-symbolic.svg' -o -name 'nothing-glyph-*.svg' \\) -printf '%f\\n' 2>/dev/null | sort -u"
         connectedSources: [cmd]
         onNewData: (source, data) => {
             const set = {};

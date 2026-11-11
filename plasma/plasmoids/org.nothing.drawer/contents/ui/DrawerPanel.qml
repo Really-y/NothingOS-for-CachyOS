@@ -243,8 +243,8 @@ Item {
                             width: 40; height: 40; radius: 20
                             x: 8; anchors.verticalCenter: parent.verticalCenter
                             color: row.selected && root.keyboardNav ? Theme.fg : (row.selected ? Theme.card3 : root.widgetFill)
-                            MonoIcon { anchors.centerIn: parent; size: 18; source: row.model.decoration; hint: "";   // results: match by icon name only (a file named "firefox…" is not a browser)
-                                 symbolicNames: root.symbolicNames; dark: row.selected && root.keyboardNav }
+                            MonoIcon { anchors.centerIn: parent; size: 18; discSize: 40; source: row.model.decoration; hint: "";   // results: match by icon name only (a file named "firefox…" is not a browser)
+                                 favoriteId: row.model.favoriteId || ""; label: row.model.display || ""; symbolicNames: root.symbolicNames; dark: row.selected && root.keyboardNav }
                         }
                         Column {
                             anchors.left: rdisc.right; anchors.leftMargin: 14
@@ -333,8 +333,8 @@ Item {
                 readonly property bool target: cell.selected && !focused        // Enter target while typing
                 color: focused ? Theme.fg : (target ? "#2a2a2a" : (cell.containsMouse ? Theme.card3 : panel.widgetFill))
                 Behavior on color { ColorAnimation { duration: Theme.fast } }
-                MonoIcon { anchors.centerIn: parent; size: 28; source: cell.model.decoration;   // 16px symbolic art has ~1px padding: 28px box ≈ 24px visible glyph
-                     hint: (cell.model.display || "") + " " + (cell.model.description || ""); key: cell.model.decoration + "|" + cell.model.display; glyphMap: panel.glyphMap; symbolicNames: panel.symbolicNames; dark: disc.focused }
+                MonoIcon { anchors.centerIn: parent; size: 28; discSize: 64; source: cell.model.decoration;   // themed apps: the theme's glyph at disc size
+                     favoriteId: cell.model.favoriteId || ""; label: cell.model.display || ""; hint: (cell.model.display || "") + " " + (cell.model.description || ""); key: cell.model.decoration + "|" + cell.model.display; glyphMap: panel.glyphMap; symbolicNames: panel.symbolicNames; dark: disc.focused }
             }
             Text {
                 anchors.top: disc.bottom; anchors.topMargin: 8

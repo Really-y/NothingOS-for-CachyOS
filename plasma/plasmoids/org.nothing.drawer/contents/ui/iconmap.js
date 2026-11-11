@@ -74,9 +74,6 @@ function tiers(source, hint, available, ignoreTheme) {
     const good = [], weak = [];
     const add = (list, n) => { if (has(available, n) && good.indexOf(n) < 0 && weak.indexOf(n) < 0) list.push(n); };
     if (typeof source !== "string" || source === "" || !available) return { good: good, weak: weak };
-    // the Nothing icon theme (icons/appicons.py) ships the system-wide glyph for this app:
-    // use exactly that so the drawer matches the dock / menus
-    if (!ignoreTheme && has(available, "nothing-app-" + source)) return { good: ["nothing-app-" + source], weak: [] };
     const s = source.toLowerCase();
     if (overrides[s]) overrides[s].forEach(n => add(good, n));
     if (s.indexOf("/") < 0) {
