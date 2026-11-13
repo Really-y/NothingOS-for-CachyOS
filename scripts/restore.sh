@@ -24,6 +24,7 @@ rm -f "$HOME"/.local/share/applications/nothingos-*.desktop
 "$ROOT/scripts/dolphin.sh" --revert 2>/dev/null || true
 "$ROOT/scripts/defaults.sh" --revert 2>/dev/null || true
 [ -L "$HOME/.blerc" ] && rm -f "$HOME/.blerc"; sed -i "s/^fastfetch  # Nothing (was: neofetch)$/neofetch/" "$HOME/.bashrc"
+sed -i "s/^fastfetch  # Nothing (was: neofetch)$/neofetch/; /# >>> nothing zsh styles/,/# <<< nothing zsh styles <<</d" "$HOME/.zshrc" 2>/dev/null || true
 for f in "$SRC"/*; do
   name=$(basename "$f")
   rm -rf "$HOME/.config/$name"

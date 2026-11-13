@@ -65,6 +65,9 @@ tune() {  # $1 = dolphinrc, $2 = global view .directory
   k --group IconsMode --key MaximumTextLines 2
   k --group IconsMode --key UseSystemFont true
   k --group PlacesPanel --key IconSize 22
+  # Dolphin paints selected file names in the normal text colour, so the global white
+  # selection hides them: Dolphin gets its own scheme with a grey selection.
+  k --group UiSettings --key ColorScheme NothingFiles
   kwriteconfig6 --file "$vp" --group Dolphin --key Version 4
   kwriteconfig6 --file "$vp" --group Dolphin --key ViewMode 0
   kwriteconfig6 --file "$vp" --group Dolphin --key PreviewsShown true
@@ -72,8 +75,31 @@ tune() {  # $1 = dolphinrc, $2 = global view .directory
   kwriteconfig6 --file "$vp" --group Dolphin --key Timestamp "$STAMP"
 }
 
+# Nothing colours with a grey (#3a3a3a) selection and white selected text
+files_scheme() {
+  mkdir -p "$1"
+  python3 - "$ROOT/plasma/colors/Nothing.colors" "$1/NothingFiles.colors" <<'PY'
+import sys, re
+s = open(sys.argv[1]).read()
+def sect(name, kv):
+    global s
+    m = re.search(r'(\[%s\]\n)(.*?)(\n\[|\Z)' % re.escape(name), s, re.S)
+    body = m.group(2)
+    for k, v in kv.items():
+        body = re.sub(r'^%s=.*$' % k, '%s=%s' % (k, v), body, flags=re.M)
+    s = s[:m.start(2)] + body + s[m.end(2):]
+sect('Colors:Selection', {'BackgroundNormal': '58,58,58', 'BackgroundAlternate': '42,42,42',
+                          'ForegroundNormal': '255,255,255', 'ForegroundInactive': '200,200,200'})
+s = re.sub(r'^Name=.*$', 'Name=Nothing Files', s, count=1, flags=re.M)
+open(sys.argv[2], 'w').write(s)
+PY
+}
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+files_scheme "$HOME/.local/share/color-schemes"
+
 tune "$HOME/.config/dolphinrc" "$HOME/.local/share/dolphin/view_properties/global/.directory"
 if [ -d "$FP" ] || flatpak info org.kde.dolphin >/dev/null 2>&1; then
+  files_scheme "$FP/data/color-schemes"
   tune "$FP/config/dolphinrc" "$FP/data/dolphin/view_properties/global/.directory"
   # the sandbox reads Kvantum from its own XDG_CONFIG_HOME; point it at the real one
   [ -e "$FP/config/Kvantum" ] || ln -s "$HOME/.config/Kvantum" "$FP/config/Kvantum"

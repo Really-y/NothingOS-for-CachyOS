@@ -25,6 +25,7 @@ kw --file kdeglobals --group KDE --key widgetStyle kvantum
 echo "· dolphin";      "$ROOT/scripts/dolphin.sh"
 echo "· defaults";     "$ROOT/scripts/defaults.sh"
 echo "· ble.sh";       ln -sfn "$ROOT/terminal/blerc" "$HOME/.blerc"; sed -i "s/^neofetch$/fastfetch  # Nothing (was: neofetch)/" "$HOME/.bashrc"
+echo "· zsh";          sed -i "s/^neofetch$/fastfetch  # Nothing (was: neofetch)/" "$HOME/.zshrc"; grep -q "nothing zsh styles" "$HOME/.zshrc" || printf "\n# >>> nothing zsh styles (terminal/zsh-nothing.zsh) >>>\n[ -r %s ] && source %s\n# <<< nothing zsh styles <<<\n" "$ROOT/terminal/zsh-nothing.zsh" "$ROOT/terminal/zsh-nothing.zsh" >> "$HOME/.zshrc"
 # Flatpak Dolphin only sees Kvantum through the org.kde.KStyle.Kvantum extension (downloads from Flathub; opt-in)
 if flatpak info org.kde.dolphin >/dev/null 2>&1; then
   RT=$(flatpak info -m org.kde.dolphin | sed -n 's|^runtime=org.kde.Platform/[^/]*/||p' | head -1)
