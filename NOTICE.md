@@ -1,6 +1,6 @@
 # Notice and attribution
 
-**NothingOS for CachyOS** — Copyright © 2026 Really-y (https://github.com/Really-y)
+**NothingOS for CachyOS** — Copyright © 2026 **Azedev — Yusif Ezizov** (https://github.com/Really-y)
 
 This project is licensed under the **Creative Commons Attribution 4.0 International
 License (CC BY 4.0)**. The full text is in [`LICENSE`](LICENSE).
@@ -12,12 +12,12 @@ You may use, share, adapt and build on this work, including commercially, **only
 you give credit**. When you copy, fork, modify or redistribute any part of it:
 
 1. **Keep this credit, unchanged:**
-   `NothingOS for CachyOS by Really-y — https://github.com/Really-y/NothingOS-for-CachyOS — CC BY 4.0`
+   `NothingOS for CachyOS by Azedev — Yusif Ezizov — https://github.com/Really-y/NothingOS-for-CachyOS — CC BY 4.0`
 2. **Keep this `NOTICE.md` file and the `LICENSE` file**, and do not remove or alter
    the copyright, author and license notices in it or in the source files.
 3. **Say that you changed it** and describe your changes, e.g. "Modified from
-   NothingOS for CachyOS by Really-y". Do not present a modified version as the
-   original, and do not imply that Really-y endorses your version.
+   NothingOS for CachyOS by Azedev — Yusif Ezizov". Do not present a modified version as the
+   original, and do not imply that Azedev / Yusif Ezizov endorses your version.
 4. **Link to the license** (CC BY 4.0).
 
 Removing, replacing or hiding the original credit ends your permission to use this
