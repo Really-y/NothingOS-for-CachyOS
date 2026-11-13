@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Bake each character style into the two textures the org.nothing.dots shader samples.
 
-styles: cute = girl.svg, glam = glam.svg, casual = casual.svg, sultry = sultry.svg  ->  figure-<style>.png, figure-<style>-aux.png
+styles: cute = girl.svg, glam = glam.svg  ->  figure-<style>.png, figure-<style>-aux.png
 
 figure-*.png    R = luminance, eyes open      G = luminance, eyes closed
                 B = silhouette (coverage)
@@ -24,17 +24,17 @@ from PIL import Image, ImageFilter
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "..", "..", "plasma", "wallpapers", "org.nothing.dots", "contents", "ui")
-STYLES = {"cute": "girl.svg", "glam": "glam.svg", "casual": "casual.svg", "sultry": "sultry.svg"}
+STYLES = {"cute": "girl.svg", "glam": "glam.svg"}
 SVG = ""
 W, H = 600, 800          # canvas
 TW, TH = 600, 800        # texture (1 canvas px per texel: 1-dot features survive)
 GROUPS = ["hair-back", "neck", "body", "rim", "hair-curtain", "hand", "face", "eyes-open", "eyes-closed",
           "hair-side", "bangs", "ahoge", "clip"]
-# hair-curtain sway starts higher where the hair is lifted (sultry: from her hand, nape tendrils)
-CURTAIN_RAMP = {"sultry": (200, 560)}
+# per-style override of where the hair-curtain sway starts/ends (canvas y)
+CURTAIN_RAMP = {}
 # Nothing-style posterise: snap luminance to a few discrete dot sizes (0 = missing dot and
 # >= 0.97 forced highlights are kept as they are)
-QUANT = {"sultry": (0.26, 0.42, 0.56, 0.7, 0.85)}
+QUANT = {}
 
 
 def variant(show):

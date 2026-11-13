@@ -29,7 +29,7 @@ textures, and a GPU fragment shader turns those textures into dots every frame.
 - **Greyscale only.** Luminance is the only thing baked (red channel × alpha), so
   draw in greys from `#000` to `#fff`. Colour in the SVG is ignored.
 - **The one red accent is not in the SVG.** The shader draws it at a fixed canvas
-  point per style (`clipUV` in `GlyphField.qml`, e.g. the earring at (330, 302)).
+  point per style (`clipUV` in `GlyphField.qml`, e.g. the glam earring).
 - **Named groups are required.** `gen_figure.py` renders the file several times with
   different groups hidden, so every element must live in one of these
   `<g id="…">` groups (order = paint order):
@@ -54,14 +54,14 @@ textures, and a GPU fragment shader turns those textures into dots every frame.
   more, with lighter folds), liner / brows / lip line 0. Never leave large flat
   near-black areas: they turn into holes.
 
-Styles can be assembled from parts: `make_sultry.py` and `make_casual.py` take the
-head from `glam.svg` and add a body fragment (`*-body.svgfrag`), so a fix to the
-head carries over.
+Two styles ship: `glam.svg` (portrait) and `girl.svg` (cute). Each is drawn whole in
+one file. A new style can reuse the glam head by copying it into a new SVG and
+drawing a different body.
 
 ## 2. Baking (`gen_figure.py`)
 
 ```bash
-python3 wallpapers/glyphgirl/gen_figure.py sultry      # or: cute glam casual sultry
+python3 wallpapers/glyphgirl/gen_figure.py glam      # or: cute
 ```
 
 Needs `rsvg-convert`, `numpy` and `Pillow`. It renders the SVG with eyes open and
@@ -72,7 +72,7 @@ into the plugin package.
 ## 3. Rendering (`GlyphField.qml` + `shaders/glyphfield.frag`)
 
 - One fragment shader draws everything. The figure's dot pitch is set per style
-  (`figurePitch`: glam 8, cute 5, others 6 — divisors of the 24 px field).
+  (`figurePitch`: glam 8, cute 5 — divisors of the 24 px field).
 - Dot **size** follows luminance (`mix(0.30, 0.80, lum) × pitch`), so dark features
   become missing dots. Highlights flagged in the face mask are forced to full size.
 - Animation is driven by one time uniform: breathing (scale), hair sway (aux R),
