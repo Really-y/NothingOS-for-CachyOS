@@ -8,6 +8,7 @@
   <img alt="Wayland" src="https://img.shields.io/badge/Wayland-ready-000000?style=for-the-badge&logo=wayland&logoColor=white&labelColor=000000&color=1a1a1a">
   <img alt="Rust" src="https://img.shields.io/badge/daemon-Rust-000000?style=for-the-badge&logo=rust&logoColor=white&labelColor=000000&color=1a1a1a">
   <img alt="CachyOS" src="https://img.shields.io/badge/CachyOS-tested-000000?style=for-the-badge&logo=archlinux&logoColor=white&labelColor=000000&color=1a1a1a">
+  <a href="https://azedev.com"><img alt="Made by Azedev" src="https://img.shields.io/badge/made%20by-Azedev-000000?style=for-the-badge&labelColor=000000&color=d71921"></a>
 </p>
 
 <p align="center">
@@ -160,18 +161,22 @@ sudo sddm/install.sh --uninstall
 ## ● License and credits
 
 <p>
-  <b>NothingOS for CachyOS</b> — © 2026 <b>Azedev — Yusif Ezizov</b><br>
+  <b>NothingOS for CachyOS</b> — © 2026 <a href="https://azedev.com"><b>Azedev</b></a> — <b>Yusif Ezizov</b><br>
   Licensed under <a href="LICENSE"><b>Creative Commons Attribution 4.0 (CC BY 4.0)</b></a>.
 </p>
 
 You may use, share and modify this project, including commercially, **only if the
 credit stays intact**. You must:
-- keep the credit **"NothingOS for CachyOS by Azedev — Yusif Ezizov"** unchanged, with a link to this repository;
+- keep the credit **"NothingOS for CachyOS by Azedev — Yusif Ezizov"** unchanged, with a link to this repository and to [azedev.com](https://azedev.com);
 - keep [`LICENSE`](LICENSE) and [`NOTICE.md`](NOTICE.md);
 - clearly state what you changed.
 
 Removing or replacing the credit ends your permission to use this work.
 
 Bundled fonts and icons keep their own licenses (SIL OFL 1.1, Apache 2.0, CC0); see [`NOTICE.md`](NOTICE.md).
+
+<p align="center">
+  <a href="https://azedev.com"><b>azedev.com</b></a> — built by Azedev
+</p>
 
 <sub>"Nothing" and "Nothing OS" are trademarks of Nothing Technology Limited. This is an independent fan project. It is not affiliated with or endorsed by Nothing, and it contains no Nothing OS code or assets.</sub>
