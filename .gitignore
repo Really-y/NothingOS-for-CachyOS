@@ -14,3 +14,11 @@ icons/Nothing/48/
 icons/Nothing/16/
 icons/Nothing/scalable/mimetypes/
 icons/Nothing/scalable/devices/
+
+# private local files, never published
+docs/AGENTS.md
+docs/*.png
+docs/*.jpg
+docs/*.jpeg
+docs/*.webp
+daemon/target/
